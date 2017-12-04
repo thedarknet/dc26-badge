@@ -1,6 +1,6 @@
 [submodule "firmware/esp-wroom-32/esp-idf"]
 	path = firmware/esp-wroom-32/esp-idf
 	url = https://github.com/espressif/esp-idf.git
-[submodule "firmware/NucleoF411RE/InitDevBoard/Src/darknet/libstm32"]
-	path = firmware/NucleoF411RE/InitDevBoard/Src/darknet/libstm32
+[submodule "firmware/NucleoF411RE/DC26/Src/darknet/libstm32"]
+	path = firmware/NucleoF411RE/DC26/Src/darknet/libstm32
 	url = https://github.com/cmdc0de/libstm32.git

@@ -8,15 +8,6 @@
 #ifndef DARKNET_DC26_H_
 #define DARKNET_DC26_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-	void init();
-	void runOnce();
-#ifdef __cplusplus
-}
-#endif
-
 #include "libstm32/app/app.h"
 
 class DC26 : public cmdc0de::App {

@@ -9,6 +9,8 @@
 #include "libstm32/display/display_device.h"
 #include "libstm32/display/gui.h"
 #include "libstm32/display/fonts.h"
+#include <main.h>
+#include "libstm32/config.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::DisplayST7735;
@@ -26,14 +28,6 @@ uint8_t DrawBufferRangeChange[DISPLAY_HEIGHT / DISPLAY_OPT_WRITE_ROWS + 1];
 
 cmdc0de::DrawBufferNoBuffer NoBuffer(&Display, &DrawBuffer[0], DISPLAY_OPT_WRITE_ROWS);
 
-
-void init() {
-
-}
-
-void runOnce() {
-
-}
 
 
 DC26::DC26() {

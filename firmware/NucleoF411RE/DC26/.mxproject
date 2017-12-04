@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=D:/My Stuff/dev/defcon/defcon26/dc26-badge/firmware/NucleoF411RE/InitDevBoard/Inc
+HeaderPath=D:/My Stuff/dev/defcon/defcon26/dc26-badge/firmware/NucleoF411RE/DC26/Inc
 HeaderFiles=gpio.h;dma.h;libjpeg.h;jconfig.h;jmorecfg.h;jdata_conf.h;spi.h;usart.h;usb_device.h;usbd_conf.h;usbd_desc.h;usbd_cdc_if.h;stm32f4xx_it.h;stm32f4xx_hal_conf.h;main.h;
-SourcePath=D:/My Stuff/dev/defcon/defcon26/dc26-badge/firmware/NucleoF411RE/InitDevBoard/Src
+SourcePath=D:/My Stuff/dev/defcon/defcon26/dc26-badge/firmware/NucleoF411RE/DC26/Src
 SourceFiles=gpio.h;dma.h;libjpeg.h;jconfig.h;jmorecfg.h;jdata_conf.h;spi.h;usart.h;usb_device.h;usbd_conf.h;usbd_desc.h;usbd_cdc_if.h;stm32f4xx_it.h;stm32f4xx_hal_conf.h;main.h;gpio.c;dma.c;libjpeg.c;spi.c;usart.c;usb_device.c;usbd_conf.c;usbd_desc.c;usbd_cdc_if.c;stm32f4xx_it.c;stm32f4xx_hal_msp.c;main.c;
 
 [PreviousLibFiles]

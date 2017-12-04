@@ -23,7 +23,7 @@ const cmdc0de::PinConfig & cmdc0de::DisplayST7735::HardwareConfig::getBackLit() 
 }
 
 SPI_HandleTypeDef *cmdc0de::DisplayST7735::HardwareConfig::getSPI() {
-	return &hspi1;
+	return &hspi2;
 }
 
 const cmdc0de::PinConfig &cmdc0de::DisplayST7735::HardwareConfig::getDataCmd() {

@@ -58,6 +58,8 @@
 
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
+#define LCD_DATA_CMD_Pin GPIO_PIN_0
+#define LCD_DATA_CMD_GPIO_Port GPIOC
 #define LCD_CS_Pin GPIO_PIN_1
 #define LCD_CS_GPIO_Port GPIOC
 #define SPI2_LCD_MOSI_Pin GPIO_PIN_3
@@ -68,6 +70,10 @@
 #define USART_RX_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
+#define LCD_RESET_Pin GPIO_PIN_5
+#define LCD_RESET_GPIO_Port GPIOC
+#define LCD_BACKLIGHT_Pin GPIO_PIN_2
+#define LCD_BACKLIGHT_GPIO_Port GPIOB
 #define SPI2_LCD_SCK_Pin GPIO_PIN_10
 #define SPI2_LCD_SCK_GPIO_Port GPIOB
 #define SPI3_ESP_SCK_Pin GPIO_PIN_12

@@ -12,7 +12,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	void initD();
+	void init();
 	void runOnce();
 #ifdef __cplusplus
 }

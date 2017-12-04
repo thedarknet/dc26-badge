@@ -57,7 +57,7 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "darknet/init.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -113,7 +113,7 @@ int main(void)
   MX_I2C1_Init();
 
   /* USER CODE BEGIN 2 */
-
+  init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -121,7 +121,7 @@ int main(void)
   while (1)
   {
   /* USER CODE END WHILE */
-
+	  runOnce();
   /* USER CODE BEGIN 3 */
 
   }

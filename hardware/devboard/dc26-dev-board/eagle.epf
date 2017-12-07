@@ -1,0 +1,42 @@
+[Eagle]
+Version="08 04 03"
+Platform="Windows"
+Globals="Globals"
+Desktop="Desktop"
+
+[Globals]
+AutoSaveProject=1
+UsedLibrary="D:/My Stuff/dev/eagle/cmdc0de-esp8266.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-Connectors.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/GeekAmmo.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/LilyPad-Wearables.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-Aesthetics.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-AnalogIC.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-Boards.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-Capacitors.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-DigitalIC.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-DiscreteSemi.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-Displays.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-Electromechanical.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-FreqCtrl.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-LED.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-Passives.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-PowerIC.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-RF.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-Resistors.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-Retired.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/SparkFun-Sensors.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/SparkFun-Eagle-Libraries/User-Submitted.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/Eagle-Libraries/Voltage Regulators/l5973d.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/Eagle-Libraries/Voltage Regulators/v-reg-3.lbr"
+UsedLibrary="D:/My Stuff/dev/eagle/eagle/libraries/switch-tact.lbr"
+
+[Win_1]
+Type="Control Panel"
+Loc="28 10 1433 1730"
+State=2
+Number=0
+
+[Desktop]
+Screen="6000 3840"
+Window="Win_1"

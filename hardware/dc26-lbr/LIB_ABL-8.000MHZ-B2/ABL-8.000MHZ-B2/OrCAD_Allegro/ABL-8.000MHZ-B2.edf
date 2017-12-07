@@ -1,0 +1,88 @@
+
+(EDIF
+  (rename &ABL_8_000MHZ_B2 "ABL_8_000MHZ_B2")
+  (EDIFVersion 2 0 0)
+  (EDIFLevel 0)
+  (keywordMap (keywordLevel 0))
+  (status
+    (written
+      (timestamp 2017 12 07 07 43 31)
+      (dataOrigin "649388/28562/2.18/2/4/Crystal or Oscillator")
+      (program "SamacSys ECAD Model ABL_8_000MHZ_B2"
+        (version "1.1"))))
+  (library
+  (rename &ABL_8_000MHZ_B2 "ABL_8_000MHZ_B2")
+    (EDIFLevel 0)
+    (technology
+      (numberDefinition (scale 1 (e 254 -6) (unit DISTANCE)))
+      (userData GRIDRESOLUTION (integer 50 50))
+      (figureGroup DEFAULT (pathWidth 10) (textHeight 100))
+      (figureGroup PROPERTY (pathWidth 10) (textHeight 90))
+      (figureGroup PINNUMBER (pathWidth 10) (textHeight 90))
+      (figureGroup PINNAME (pathWidth 10) (textHeight 90))
+      (figureGroup COMMENT (pathWidth 10) (textHeight 90))
+      (figureGroup PIN (pathWidth 10) (textHeight 90))
+      (figureGroup GRAPHIC (pathWidth 10) (textHeight 100))
+    )
+    (cell
+      (rename &ABL_8_000MHZ_B2 "ABL_8_000MHZ_B2")
+      (cellType GENERIC)
+      (view
+        (rename NORMAL "Normal")
+        (viewType SCHEMATIC)
+        (interface
+          (designator "Y")
+          (property (rename PACKAGENAME "PackageName") (string "ABL_8_000MHZ_B2"))
+          (property (rename ISHETEROGENEOUS "IsHeterogeneous") (string "False"))
+          (property (rename DEVICESINVIEW "DevicesInView") (string "1"))
+          (property (rename DEVICESINPACKAGE "DevicesInPackage") (string "1"))
+          (property (rename DEVICEDESIGNATOR "DeviceDesignator") (string "A"))
+          (property (rename DEVICENUMBERING "DeviceNumbering") (string "Alpha"))
+          (property (rename PCB_32_FOOTPRINT "PCB Footprint") (string "HC/49US_(AT49)PTH"))
+          (property (rename &Supplier_Name "Supplier_Name") (string "RS"))
+          (property (rename &RS_Part_Number "RS Part Number") (string ""))
+          (property (rename &Manufacturer_Name "Manufacturer_Name") (string "ABRACON"))
+          (property (rename &Manufacturer_Part_Number "Manufacturer_Part_Number") (string "ABL-8.000MHZ-B2"))
+          (property (rename &Allied_Number "Allied_Number") (string ""))
+          (property (rename &Other_Part_Number "Other Part Number") (string ""))
+          (property (rename &Description "Description") (string "ABRACON - ABL-8.000MHZ-B2 - CRYSTAL, 8MHZ, 18PF, HC-49US"))
+          (property (rename &Datasheet_Link "Datasheet Link") (string "http://www.abracon.com/Resonators/ABL.pdf"))
+          (property (rename &_60__32_VALUE_32__62_ "< Value >") (string "ABL_8_000MHZ_B2"))
+          (property (rename VALUE "Value") (string "Value"))
+          (port
+            (rename &1 "1")
+            (designator "1")
+            (property (rename ORDER "Order") (string "0") (owner "OrCAD"))
+          )
+          (port
+            (rename &2 "2")
+            (designator "2")
+            (property (rename ORDER "Order") (string "1") (owner "OrCAD"))
+          )
+          (symbol
+            (portImplementation
+              (name &1 (display PINNAME (justify CENTERLEFT) (orientation R0) (origin (pt 0 -10000))))
+              (keywordDisplay DESIGNATOR (display PINNUMBER (justify LOWERRIGHT) (orientation R0) (origin (pt 0 -10000))))
+              (figure PIN (path (pointList (pt -30000 -10000) (pt 0 -10000))))
+              (connectLocation (figure GRAPHIC (dot (pt -30000 -10000))))
+            )
+            (portImplementation
+              (name &2 (display PINNAME (justify CENTERRIGHT) (orientation R0) (origin (pt 50000 -10000))))
+              (keywordDisplay DESIGNATOR (display PINNUMBER (justify LOWERLEFT) (orientation R0) (origin (pt 50000 -10000))))
+              (figure PIN (path (pointList (pt 80000 -10000) (pt 50000 -10000))))
+              (connectLocation (figure GRAPHIC (dot (pt 80000 -10000))))
+            )
+            (figure GRAPHIC
+              (path (pointList (pt 0 0) (pt 50000 0)))
+              (path (pointList (pt 50000 0) (pt 50000 -20000)))
+              (path (pointList (pt 50000 -20000) (pt 0 -20000)))
+              (path (pointList (pt 0 -20000) (pt 0 0)))
+            )
+            (keywordDisplay DESIGNATOR (display PROPERTY (justify LOWERLEFT) (orientation R0) (origin (pt 0 -2000))))
+            (propertyDisplay &_60__32_VALUE_32__62_ (display PROPERTY (justify UPPERLEFT) (orientation R0) (origin (pt 0 -20000))))
+          )
+        )
+      )
+    )
+  )
+)

@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP STM32F411RET6
+D 32-Bit MCU+DSP 512K Flash 100MHz LQFP64 STMicroelectronics STM32F411RET6, 32bit ARM Cortex M4 MCU, 100MHz, 512 kB Flash, 64-Pin LQFP
+K
+F http://www.farnell.com/datasheets/2042639.pdf
+$ENDCMP
+#
+#End Doc Library

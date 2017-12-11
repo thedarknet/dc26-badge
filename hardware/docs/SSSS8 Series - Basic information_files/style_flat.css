@@ -1,0 +1,681 @@
+@import url( /common/css/header.css );
+@import url( /common/css/footer.css );
+@import url( /common/css/common.css );
+@import url( /common/css/top.css );
+@import url( ./base.css );
+
+
+/* common */
+html,body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	font-size: 12px;
+	font-family:"メイリオ",Meiryo,"ヒラギノ角ゴ Pro W3","Hiragino Kaku Gothic Pro",Osaka,"ＭＳ Ｐゴシック",sans-serif;
+}
+
+*{
+	margin: 0;
+	padding: 0;
+}
+
+img{
+	border:0px;
+}
+
+ul,li,ol {
+	list-style-type:none;
+	padding:0;
+	margin:0;
+}
+
+a{
+/*	color:#333333;*/
+	color:#0072FF;
+	text-decoration: none;
+}
+
+a:hover {
+/*	text-decoration: none;*/
+	text-decoration: underline;
+	color:#0072FF;
+}
+
+
+ol.numberlist,
+ol.numberlist li {
+	list-style-type: decimal
+}
+
+ol.numberlist li {
+	margin-left: 20px;
+}
+
+#breadcrumb {
+	width: 100%;
+/*	height: 79px;*/
+	background-color: #F9F9F9;
+	border-bottom: 1px solid #DEDEDE;
+	position:relative;
+	z-index:100;
+	margin-bottom: 36px;
+}
+
+#breadcrumb p {
+	padding:15px 0 0 28px;
+	font-size:10px;
+	color: #666666;
+}
+
+#breadcrumb a {
+	text-decoration: none;
+	color: #666666;
+}
+
+#breadcrumb h2 {
+	color: #666666;
+	font-weight: normal;
+	font-size: 26px;
+	padding: 0px 0 0 28px;
+}
+
+#header .logo {
+	margin-top: 16px;
+}
+
+
+#chi #header .logo {
+	margin-top: 10px;
+}
+
+
+
+a.inq_mailbox {
+	width: 317px;
+	height: 61px;
+	display: block;
+	background: #ffffff url(http://www.alps.com/products/common/images/inqbox_mail.png) no-repeat 0px 0px;
+	text-decoration: none;
+}
+
+a:hover.inq_mailbox {
+	background: #ffffff url(http://www.alps.com/products/common/images/inqbox_mail.png) no-repeat 0px -61px;
+}
+
+.inq_mailbox span{
+	font-size: 14px;
+	font-weight: bold; 
+	display: block;
+	padding: 21px 10px 10px 43px;
+}
+
+
+#pagetop {
+ position: fixed;
+ z-index:5;
+ bottom:45px;
+ right:0px;
+}
+
+#pagetop a:hover{
+ filter:alpha(opacity=70);
+ -moz-opacity: 0.7;
+ opacity: 0.7;
+}
+
+/*
+#seriesList #breadcrumb h2{
+	padding-top: 22px;
+}
+*/
+
+#seriesList h4.varietyTitle{
+	font-size: 18px;
+	padding-top: 14px;
+	font-weight: normal;
+}
+
+.navi_table{
+	float:right;
+	width:610px;
+	height:37px;
+}
+
+#eng .navi_table,
+#chi .navi_table{
+	width:300px;
+}
+
+
+.navi_table ul li{
+	float: left;
+	margin-left: 10px;
+}
+
+.navi_table ul li:first-child{
+	margin-left: 0px;
+}
+
+#seriesList .tablebox_series td{
+	color: #4C4C4C;
+/*	font-weight: bold;*/
+	padding:2px 0 2px 0px;
+	border-top : 1px dashed #CCCCCC;
+	vertical-align: middle;
+}
+
+#seriesList .tablebox_series{
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 12px;
+	border-left: none;
+	border-right: none;
+	border-collapse: collapse;
+	border-top : 1px solid #CCCCCC;
+	border-bottom : 1px solid #CCCCCC;
+}
+
+.photo_table a{
+	display: block;
+
+}
+
+
+td.series_table img{
+	vertical-align: -3px;
+}
+
+#seriesList .series_table a{
+	font-weight: bold;
+	color: #0066CC;
+}
+
+#seriesList .tablebox_series .hotnewsBox td img{
+	vertical-align: -6px;
+}
+
+#seriesList .tablebox_series .hotnewsBox td,
+#seriesList .tablebox_series .densokuBox td,
+#seriesList .tablebox_series .caruseBox td{
+/*	font-weight: bold;*/
+	padding:0px 0px 0px 0px;
+	border-top : none;
+	vertical-align: middle;
+	line-height: 1em;
+}
+
+#seriesList .tablebox_series .densokuBox td a {
+	color: #0066CC;
+}
+
+#seriesList .tablebox_series .itemTitle td{
+	border-bottom : 1px solid #CCCCCC;
+	background-color: #F2F2F2;
+	padding:5px 0 5px 0px;
+}
+
+.info_table {
+	width: 120px;
+}
+
+.series_table {
+	width: 100px;
+}
+
+.photo_table {
+	width: 110px;
+}
+
+
+
+
+
+
+
+
+
+
+
+.catalog h3.title{
+	background: #ffffff url(images/ttl_button_blue.jpg) no-repeat 0px 5px;
+	font-size: 26px;
+	margin: 0px 0 9px 31px;
+	text-indent: 0px;
+	font-weight: normal;
+	padding: 0px 0 0 18px;
+	float:left;
+	width: auto;
+}
+
+
+.tablebox_productline,
+.tablebox_productline_etc{
+	width: 100%;
+	border-collapse: collapse;
+	border : 1px solid #CCCCCC;
+	margin-bottom: 20px;
+}
+
+.tablebox_productline td,
+.tablebox_productline_etc td{
+	border-collapse: collapse;
+	border : 1px solid #CCCCCC;
+	color: #4C4C4C;
+	padding:10px 5px 10px 5px;
+}
+
+
+.tablebox_productline tr.itemTitle td,
+.tablebox_productline_etc tr.itemTitle td{
+	background-color: #F2F2F2;
+}
+
+.tablebox_productline a{
+	font-weight: bold;
+	color: #0066CC;
+}
+
+.web_ml30{
+	margin-left: 30px;
+}
+
+.cautionList{
+	width: 100%;
+}
+
+
+.catchcopy_swrv{
+	vertical-align: top;
+	padding-left: 10px;
+}
+
+
+.featurebox{
+	width: 100%;
+}
+
+
+table.EtcHTMLLink {
+	width: 100%;
+}
+
+table.EtcHTMLLink img {
+	visibility: hidden;
+	display:none;
+
+}
+
+table.EtcHTMLLink a {
+
+}
+
+#productList .separateBorder{
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	font-size: 1px;
+	line-height: 1px;
+	border-bottom : 1px solid #CCCCCC;
+	margin-bottom: 20px;
+	margin-top: 20px;
+}
+
+#productList h5 {
+	font-weight: normal;
+	font-size: 16px;
+	margin-bottom: 15px;
+}
+
+#productList a.cad_box {
+	margin-left:auto;
+	margin-right:auto;
+	display: block;
+	width:17px;
+	height:17px;
+	background: #8f8f8f url(images/icon_download.jpg) no-repeat 0px 0px;
+}
+/*
+.tablebox_productline a.cad_box {
+	margin-left:0px;
+}*/
+
+#productList a:hover.cad_box {
+	background: #8f8f8f url(images/icon_download.jpg) no-repeat 0px 0px;
+	text-decoration: none;
+     filter: alpha(opacity=60);
+    -moz-opacity:0.6;
+    opacity:0.6;
+}
+
+
+#productList a.app_box {
+	margin-left:auto;
+	margin-right:auto;
+	display: block;
+	width:16px;
+	height:19px;
+	background: #8f8f8f url(images/hotnews_pdf.gif) no-repeat 0px 0px;
+}
+
+
+#productList a:hover.app_box {
+	background: #8f8f8f url(images/hotnews_pdf.gif) no-repeat 0px 0px;
+	text-decoration: none;
+     filter: alpha(opacity=60);
+    -moz-opacity:0.6;
+    opacity:0.6;
+}
+
+
+.featurebox{
+	margin-top: 30px;
+}
+
+.featurebox .imagebox {
+	width: 298px;
+	height: 198px;
+	border: 1px solid #D2D2D2;
+}
+
+.featurebox .imagebox img{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 41px;
+
+}
+
+.catchcopy_swrv h4{
+	width: 100%;
+/*	max-width: 520px;*/
+	color:#333333;
+	font-size:14px;
+	font-weight: bold;
+	margin: 2px 0px 10px 0px;
+	padding-bottom:8px;
+	border-bottom:1px #cccccc solid;
+
+}
+
+.useicon{
+	vertical-align : middle;
+}
+.usebox_parent{
+	width:520px;
+}
+.usebox{
+	float: left; 
+	width:250px;
+	list-style-type:none;
+	margin: 2px 10px 2px 0px;
+	padding: 0px 0px 6px 0px;
+/*	border-bottom:1px #cccccc solid;*/
+}
+
+
+#productList .navi_table{
+	margin-top: 8px;
+	float:left;
+	width:300px;
+	height:37px;
+}
+
+
+
+
+
+
+/* detail content */
+
+#detail #header h1{font-size:100%;margin:0px;padding:0px; font-weight: normal;}
+
+#detail .close_button {
+	margin-top: 22px;
+}
+
+#detail #breadcrumb {
+	border-top: 1px solid #DEDEDE;
+	margin-bottom: 20px;
+	height: auto;
+}
+
+#detail #breadcrumb p{
+	padding: 10px 0 0 0px;
+}
+
+#detail #breadcrumb h2 {
+	font-size: 18px;
+	padding: 3px 0 10px 0px;
+	line-height: 1.2em;
+}
+
+#detail #jpn #breadcrumb .box,
+#detail #chi #breadcrumb .box{
+	float: left;
+	width: 520px;
+}
+
+#detail #eng #breadcrumb .box{
+	float: left;
+	width: 500px;
+}
+
+#breadcrumb .relation_link {
+	float:right;
+	margin-top: 14px;
+}
+
+
+#detail .block {
+	width: 630px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#detail h3 {
+	display: block;
+	font-weight: normal;
+	font-size: 16px;
+	margin-bottom: 15px;
+}
+
+
+/* 詳細情報 */
+#detail p.type{
+	font-weight: bold;
+	color: #808080;
+}
+
+.tablebox_product{
+	width: 630px;
+	margin-left: auto;
+	margin-right: auto;
+	border-left: none;
+	border-right: none;
+	border-collapse: collapse;
+	border-bottom : 1px solid #CCCCCC;
+}
+
+.tablebox_product td{
+	color: #4C4C4C;
+/*	font-weight: bold;*/
+	padding:10px 0 10px 5px;
+	border-top : 1px dashed #CCCCCC;
+	vertical-align: top;
+}
+
+#detail td strong{
+	font-weight: bold;
+	color: #808080;
+}
+
+#detail .tablebox_product td strong{
+	font-size: 16px;
+	color: #4B4B4B;
+}
+
+.tablebox_product tr:first-child td{
+	border-top : 1px solid #CCCCCC;
+}
+
+.tableBottomBorder{
+	width: 630px;
+	margin-left: auto;
+	margin-right: auto;
+	font-size: 1px;
+	line-height: 1px;
+	border-bottom : 1px solid #CCCCCC;
+}
+
+.separateBorder{
+	width: 630px;
+	margin-left: auto;
+	margin-right: auto;
+	font-size: 1px;
+	line-height: 1px;
+	border-bottom : 2px solid #CCCCCC;
+	margin-bottom: 20px;
+}
+
+
+.green20{
+	width:20%;
+}
+
+.green30{
+	width:30%;
+}
+
+.green40{
+	width:40%;
+}
+
+
+.green60{
+	width:60%;
+}
+html>body .green60{
+	width:60%;
+}
+
+.gray20{
+	width: 20%;
+}
+
+.gray30{
+	width: 30%;
+}
+.gray40{
+	width: 40%;
+}
+
+.gray60{
+	width:60%;
+}
+.gray{
+}
+
+.gray_itemname{
+	width: 40%;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#detail #header {
+	width: 630px;
+	height: 69px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#detail #footer {
+	width: 100%;
+	border-top: 1px solid #C4C4C4;
+	margin-top: 20px;
+	padding-bottom: 20px;
+}
+
+#detail #footer span{
+	display: block;
+	width: 630px;
+	padding-top: 10px;
+	font-size: 11px;
+}
+
+
+
+
+#detail a.inq_mailbox {
+	width: 240px;
+	height: 50px;
+	display: block;
+	background: #ffffff url(http://www.alps.com/products/common/images/inqbox_mail_detail.png) no-repeat 0px 0px;
+	text-decoration: none;
+}
+
+#detail a:hover.inq_mailbox {
+	background: #ffffff url(http://www.alps.com/products/common/images/inqbox_mail_detail.png) no-repeat 0px -50px;
+}
+
+#detail .inq_mailbox span{
+	font-size: 12px;
+	font-weight: bold; 
+	display: block;
+	padding: 16px 10px 10px 39px;
+}
+
+
+.mobile_use{
+visibility: hidden; display:none;
+}
+
+#opt{
+visibility: hidden; display:none;
+}
+
+a.datasheet {
+	display: block;
+	width:111px;
+	height:21px;
+	text-indent:-9999px;
+	background: url(./images/datasheet.png) no-repeat ;
+	margin-left: auto;
+	margin-right: auto;
+}
+a:hover.datasheet{
+	background: url(./images/datasheet.png) no-repeat 0px -21px;
+}
+
+
+/*
+.mobile_no_use { visibility: hidden; display:none;}
+#detail #breadcrumb h2 { padding: 10px 0 10px 0px;}
+#breadcrumb .relation {	margin-top: 10px; }
+
+*/
+
+@media print {
+	.print_hidden {	visibility: hidden; display:none;}
+	.page {	page-break-after: always}
+	
+	#detail #breadcrumb h2 { padding: 10px 0 10px 0px;}
+}

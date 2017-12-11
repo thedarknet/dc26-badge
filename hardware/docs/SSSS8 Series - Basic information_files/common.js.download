@@ -1,0 +1,50 @@
+/* ===================================================================
+smooth scroll & page Top
+=================================================================== */
+
+
+/* ===================================================================
+mouseover & opacity change
+=================================================================== */
+$(function(){
+    $('.op').hover(function(){
+        $(this).stop().fadeTo('fast', 0.6);
+    },function(){
+        $(this).stop().fadeTo('fast', 1.0);
+    });
+});
+
+
+/* ===================================================================
+mouseover & image change
+=================================================================== */
+$(function(){
+  $('.ov').hover(
+    function(){
+      $(this).attr('src', $(this).attr('src').replace('_off', '_on'));
+    },
+    function(){
+      $(this).attr('src', $(this).attr('src').replace('_on', '_off'));
+    }
+  );
+});
+
+/* ===================================================================
+page top
+=================================================================== */
+$(function(){
+	$('#pagetop').hide();
+	$(window).scroll(function(){
+	if ($(this).scrollTop() > 100) {
+		$('#pagetop').fadeIn();
+		} else {
+		$('#pagetop').fadeOut();
+		}
+	});
+	$('#pagetop').click(function(){
+		$('html,body').animate({
+			scrollTop: 0}, 300);
+			return false;}
+		);
+});
+

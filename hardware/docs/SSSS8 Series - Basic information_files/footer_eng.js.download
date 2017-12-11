@@ -1,0 +1,29 @@
+﻿var s = '';
+
+s += '<div id="pagetop">';
+s += '<a href="#"><img src="http://www.alps.com/common/images/btn_pagetop.png"></a>';
+s += '</div>';
+
+s += '<div class="print_hidden mobile_no_use">';
+s += '<h3 class="block mt40">Inquiries about Products</h3>';
+s += '<table class="block">';
+s += '<tr> ';
+s += '<td align="left" valign="top">';
+s += '<a href="https://www4.alps.co.jp/inquiry/inqcatalog?lang=en" target="_blank" class="inq_mailbox"><span>Inquiry</span></a>';
+s += '</td>';
+/*
+s += '<td align="right">';
+s += '<div style="width:368px; height: 120px; background-color: #F5F5F5;text-align:left;font-size: 12px;color: #666666;">';
+s += '<span style="display:block; padding:10px 0 0 28px; font-weight:bold;">For more information please contact: Sales or Products Information Center.</span>';
+s += '<span style="display:block; padding:6px 0 0 28px;">';
+s += '1-7, Yukigaya-otsukamachi, Ota-ku, Tokyo, Japan 145-8501<br />PHONE : +81 (3) 5499-8154<br />';
+s += '</span>';
+s += '</div>';
+s += '</td>';
+*/
+s += '</tr>';
+s += '</table>';
+s += '</div><!--//print_hidden-->';
+s += '<div id="footer"><span class="block">COPYRIGHT&copy; 2017 ALPS ELECTRIC CO., LTD</span></div>';
+
+document.write(s);

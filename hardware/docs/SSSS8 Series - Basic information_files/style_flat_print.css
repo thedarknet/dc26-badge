@@ -1,0 +1,11 @@
+@import url( ./style_flat.css );
+
+@media print {
+	.print_hidden {	visibility: hidden; display:none;}
+	.page {	page-break-after: always}
+
+	#productList .navi_table { visibility: hidden; display:none;}
+	#productList .td_3dCAD { visibility: hidden; display:none;}
+	#detail #breadcrumb h2 { padding: 10px 0 10px 0px;}
+	#footer { visibility: hidden; display:none;}
+}

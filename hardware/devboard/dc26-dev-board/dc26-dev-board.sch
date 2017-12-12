@@ -4388,6 +4388,30 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <part name="VCC" library="dc-26" deviceset="VCC" device="" value="3.3V"/>
 <part name="SUPPLY3" library="dc-26" deviceset="VCC" device="" value="5V"/>
 <part name="GND9" library="dc-26" deviceset="GND" device=""/>
+<part name="C5" library="dc-26" deviceset="C-US" device="C1206" value="100nF"/>
+<part name="C6" library="dc-26" deviceset="C-US" device="C1206" value="100nF"/>
+<part name="C7" library="dc-26" deviceset="C-US" device="C1206" value="100nF"/>
+<part name="C8" library="dc-26" deviceset="C-US" device="C1206" value="4.7uF"/>
+<part name="SUPPLY4" library="dc-26" deviceset="VCC" device=""/>
+<part name="SUPPLY5" library="dc-26" deviceset="VCC" device="" value="VDD3"/>
+<part name="VSS3" library="dc-26" deviceset="GND" device="" value="VSS3"/>
+<part name="SUPPLY6" library="dc-26" deviceset="VCC" device="" value="VDD2"/>
+<part name="VSS2" library="dc-26" deviceset="GND" device="" value="VSS2"/>
+<part name="GND12" library="dc-26" deviceset="GND" device=""/>
+<part name="SUPPLY7" library="dc-26" deviceset="VCC" device="" value="VDD1"/>
+<part name="VSS1" library="dc-26" deviceset="GND" device="" value="VSS1"/>
+<part name="C9" library="dc-26" deviceset="C-US" device="C1206" value="100nF"/>
+<part name="VSS4" library="dc-26" deviceset="GND" device="" value="VDD4"/>
+<part name="SUPPLY8" library="dc-26" deviceset="VCC" device="" value="VDD4"/>
+<part name="C10" library="dc-26" deviceset="C-US" device="C1206" value="100nF"/>
+<part name="SUPPLY9" library="dc-26" deviceset="VCC" device="" value="VBAT"/>
+<part name="GND10" library="dc-26" deviceset="GND" device=""/>
+<part name="SUPPLY10" library="dc-26" deviceset="VCC" device=""/>
+<part name="C11" library="dc-26" deviceset="C-US" device="C1206" value="100nF"/>
+<part name="C12" library="dc-26" deviceset="C-US" device="C1206" value="1uF"/>
+<part name="SUPPLY11" library="dc-26" deviceset="VCC" device=""/>
+<part name="SUPPLY12" library="dc-26" deviceset="VCC" device="" value="VDDA"/>
+<part name="VSSA" library="dc-26" deviceset="GND" device="" value="VSSA"/>
 </parts>
 <sheets>
 <sheet>
@@ -4397,6 +4421,14 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <text x="-10.16" y="200.66" size="1.778" layer="91">power dissipation: Power Rule: P = I × V</text>
 <text x="238.76" y="162.56" size="1.778" layer="91">Battery, USB, ST-LINK Power Out</text>
 <text x="20.32" y="170.18" size="1.778" layer="91">APA104's need at least 3.5V</text>
+<text x="71.12" y="-71.12" size="1.778" layer="91">The VDD pins must be connected to VDD with external decoupling capacitors: one
+single Tantalum or Ceramic capacitor (min. 4.7 μF typ.10 μF) for the package + one
+100 nF Ceramic capacitor for each VDD pin.
+• The VBAT pin can be connected to the external battery (1.65 V &lt; VBAT &lt; 3.6 V). If no
+external battery is used, it is recommended to connect this pin to VDD with a 100 nF
+external ceramic decoupling capacitor.
+• The VDDA pin must be connected to two external decoupling capacitors (100 nF
+Ceramic + 1 μF Tantalum or Ceramic).</text>
 </plain>
 <instances>
 <instance part="U1" gate="G$1" x="20.32" y="43.18"/>
@@ -4453,6 +4485,30 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <instance part="VCC" gate="G$1" x="246.38" y="208.28"/>
 <instance part="SUPPLY3" gate="G$1" x="88.9" y="177.8" rot="R180"/>
 <instance part="GND9" gate="1" x="91.44" y="198.12" rot="R180"/>
+<instance part="C5" gate="G$1" x="160.02" y="-10.16"/>
+<instance part="C6" gate="G$1" x="127" y="-12.7"/>
+<instance part="C7" gate="G$1" x="142.24" y="-12.7"/>
+<instance part="C8" gate="G$1" x="208.28" y="0"/>
+<instance part="SUPPLY4" gate="G$1" x="208.28" y="7.62"/>
+<instance part="SUPPLY5" gate="G$1" x="167.64" y="-7.62" rot="R270"/>
+<instance part="VSS3" gate="1" x="160.02" y="-30.48"/>
+<instance part="SUPPLY6" gate="G$1" x="147.32" y="-10.16" rot="R270"/>
+<instance part="VSS2" gate="1" x="142.24" y="-30.48"/>
+<instance part="GND12" gate="1" x="223.52" y="-5.08" rot="R90"/>
+<instance part="SUPPLY7" gate="G$1" x="132.08" y="-10.16" rot="R270"/>
+<instance part="VSS1" gate="1" x="127" y="-30.48"/>
+<instance part="C9" gate="G$1" x="180.34" y="-10.16"/>
+<instance part="VSS4" gate="1" x="180.34" y="-30.48"/>
+<instance part="SUPPLY8" gate="G$1" x="187.96" y="-7.62" rot="R270"/>
+<instance part="C10" gate="G$1" x="55.88" y="-12.7"/>
+<instance part="SUPPLY9" gate="G$1" x="68.58" y="-10.16" rot="R270"/>
+<instance part="GND10" gate="1" x="55.88" y="-25.4"/>
+<instance part="SUPPLY10" gate="G$1" x="55.88" y="-2.54"/>
+<instance part="C11" gate="G$1" x="83.82" y="-20.32"/>
+<instance part="C12" gate="G$1" x="96.52" y="-20.32"/>
+<instance part="SUPPLY11" gate="G$1" x="83.82" y="-15.24"/>
+<instance part="SUPPLY12" gate="G$1" x="104.14" y="-17.78" rot="R270"/>
+<instance part="VSSA" gate="1" x="106.68" y="-27.94" rot="R90"/>
 </instances>
 <busses>
 </busses>
@@ -4567,6 +4623,16 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <segment>
 <pinref part="IC2" gate="G$1" pin="VSS"/>
 <wire x1="27.94" y1="119.38" x2="27.94" y2="124.46" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="C8" gate="G$1" pin="2"/>
+<wire x1="208.28" y1="-5.08" x2="220.98" y2="-5.08" width="0.1524" layer="91"/>
+<pinref part="GND12" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="C10" gate="G$1" pin="2"/>
+<wire x1="55.88" y1="-17.78" x2="55.88" y2="-22.86" width="0.1524" layer="91"/>
+<pinref part="GND10" gate="1" pin="GND"/>
 </segment>
 </net>
 <net name="VCC1" class="0">
@@ -4747,6 +4813,58 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <wire x1="246.38" y1="200.66" x2="246.38" y2="208.28" width="0.1524" layer="91"/>
 <pinref part="VCC" gate="G$1" pin="VCC"/>
 </segment>
+<segment>
+<pinref part="C8" gate="G$1" pin="1"/>
+<wire x1="208.28" y1="7.62" x2="208.28" y2="2.54" width="0.1524" layer="91"/>
+<wire x1="208.28" y1="2.54" x2="180.34" y2="2.54" width="0.1524" layer="91"/>
+<junction x="208.28" y="2.54"/>
+<wire x1="180.34" y1="2.54" x2="160.02" y2="2.54" width="0.1524" layer="91"/>
+<wire x1="160.02" y1="2.54" x2="160.02" y2="-7.62" width="0.1524" layer="91"/>
+<pinref part="C5" gate="G$1" pin="1"/>
+<wire x1="160.02" y1="-7.62" x2="167.64" y2="-7.62" width="0.1524" layer="91"/>
+<junction x="160.02" y="-7.62"/>
+<pinref part="SUPPLY4" gate="G$1" pin="VCC"/>
+<pinref part="SUPPLY5" gate="G$1" pin="VCC"/>
+<wire x1="160.02" y1="2.54" x2="142.24" y2="2.54" width="0.1524" layer="91"/>
+<junction x="160.02" y="2.54"/>
+<pinref part="C7" gate="G$1" pin="1"/>
+<wire x1="142.24" y1="2.54" x2="142.24" y2="-10.16" width="0.1524" layer="91"/>
+<wire x1="142.24" y1="-10.16" x2="147.32" y2="-10.16" width="0.1524" layer="91"/>
+<junction x="142.24" y="-10.16"/>
+<pinref part="SUPPLY6" gate="G$1" pin="VCC"/>
+<wire x1="142.24" y1="2.54" x2="127" y2="2.54" width="0.1524" layer="91"/>
+<junction x="142.24" y="2.54"/>
+<pinref part="C6" gate="G$1" pin="1"/>
+<wire x1="127" y1="2.54" x2="127" y2="-10.16" width="0.1524" layer="91"/>
+<wire x1="127" y1="-10.16" x2="132.08" y2="-10.16" width="0.1524" layer="91"/>
+<junction x="127" y="-10.16"/>
+<pinref part="SUPPLY7" gate="G$1" pin="VCC"/>
+<pinref part="C9" gate="G$1" pin="1"/>
+<wire x1="180.34" y1="-7.62" x2="180.34" y2="2.54" width="0.1524" layer="91"/>
+<junction x="180.34" y="2.54"/>
+<wire x1="180.34" y1="-7.62" x2="187.96" y2="-7.62" width="0.1524" layer="91"/>
+<junction x="180.34" y="-7.62"/>
+<pinref part="SUPPLY8" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<pinref part="C10" gate="G$1" pin="1"/>
+<wire x1="55.88" y1="-2.54" x2="55.88" y2="-10.16" width="0.1524" layer="91"/>
+<wire x1="55.88" y1="-10.16" x2="68.58" y2="-10.16" width="0.1524" layer="91"/>
+<junction x="55.88" y="-10.16"/>
+<pinref part="SUPPLY9" gate="G$1" pin="VCC"/>
+<pinref part="SUPPLY10" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<pinref part="C11" gate="G$1" pin="1"/>
+<pinref part="C12" gate="G$1" pin="1"/>
+<wire x1="83.82" y1="-17.78" x2="96.52" y2="-17.78" width="0.1524" layer="91"/>
+<wire x1="96.52" y1="-17.78" x2="104.14" y2="-17.78" width="0.1524" layer="91"/>
+<junction x="96.52" y="-17.78"/>
+<wire x1="83.82" y1="-17.78" x2="83.82" y2="-15.24" width="0.1524" layer="91"/>
+<junction x="83.82" y="-17.78"/>
+<pinref part="SUPPLY11" gate="G$1" pin="VCC"/>
+<pinref part="SUPPLY12" gate="G$1" pin="VCC"/>
+</segment>
 </net>
 <net name="N$6" class="0">
 <segment>
@@ -4882,9 +5000,109 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <wire x1="33.02" y1="116.84" x2="27.94" y2="116.84" width="0.1524" layer="91"/>
 </segment>
 </net>
+<net name="VDD3" class="0">
+<segment>
+<pinref part="IC1" gate="G$1" pin="VDD(3)"/>
+<wire x1="127" y1="66.04" x2="132.08" y2="66.04" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="VSS3" class="0">
+<segment>
+<pinref part="IC1" gate="G$1" pin="VSS(3)"/>
+<wire x1="127" y1="63.5" x2="132.08" y2="63.5" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="C5" gate="G$1" pin="2"/>
+<wire x1="160.02" y1="-15.24" x2="160.02" y2="-27.94" width="0.1524" layer="91"/>
+<pinref part="VSS3" gate="1" pin="GND"/>
+</segment>
+</net>
+<net name="VSS2" class="0">
+<segment>
+<pinref part="IC1" gate="G$1" pin="VSS(2)"/>
+<wire x1="116.84" y1="7.62" x2="116.84" y2="2.54" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="C7" gate="G$1" pin="2"/>
+<wire x1="142.24" y1="-17.78" x2="142.24" y2="-27.94" width="0.1524" layer="91"/>
+<pinref part="VSS2" gate="1" pin="GND"/>
+</segment>
+</net>
+<net name="VDD2" class="0">
+<segment>
+<pinref part="IC1" gate="G$1" pin="VDD(2)"/>
+<wire x1="119.38" y1="7.62" x2="119.38" y2="2.54" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="VSS1" class="0">
+<segment>
+<pinref part="C6" gate="G$1" pin="2"/>
+<wire x1="127" y1="-17.78" x2="127" y2="-27.94" width="0.1524" layer="91"/>
+<pinref part="VSS1" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="IC1" gate="G$1" pin="VSS(1)"/>
+<wire x1="83.82" y1="7.62" x2="83.82" y2="2.54" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="VDD1" class="0">
+<segment>
+<pinref part="IC1" gate="G$1" pin="VDD(1)"/>
+<wire x1="86.36" y1="7.62" x2="86.36" y2="2.54" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="VDD4" class="0">
+<segment>
+<pinref part="IC1" gate="G$1" pin="VDD(4)"/>
+<wire x1="81.28" y1="83.82" x2="81.28" y2="88.9" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="VSS4" class="0">
+<segment>
+<pinref part="IC1" gate="G$1" pin="VSS(4)"/>
+<wire x1="83.82" y1="83.82" x2="83.82" y2="88.9" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="C9" gate="G$1" pin="2"/>
+<wire x1="180.34" y1="-15.24" x2="180.34" y2="-27.94" width="0.1524" layer="91"/>
+<pinref part="VSS4" gate="1" pin="GND"/>
+</segment>
+</net>
+<net name="VBAT" class="0">
+<segment>
+<pinref part="IC1" gate="G$1" pin="VBAT"/>
+<wire x1="73.66" y1="66.04" x2="66.04" y2="66.04" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="VSSA" class="0">
+<segment>
+<pinref part="IC1" gate="G$1" pin="VSSA/VREF-"/>
+<wire x1="66.04" y1="38.1" x2="73.66" y2="38.1" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="C11" gate="G$1" pin="2"/>
+<pinref part="C12" gate="G$1" pin="2"/>
+<wire x1="83.82" y1="-25.4" x2="96.52" y2="-25.4" width="0.1524" layer="91"/>
+<wire x1="96.52" y1="-25.4" x2="104.14" y2="-27.94" width="0.1524" layer="91"/>
+<junction x="96.52" y="-25.4"/>
+<pinref part="VSSA" gate="1" pin="GND"/>
+</segment>
+</net>
+<net name="VDDA" class="0">
+<segment>
+<pinref part="IC1" gate="G$1" pin="VDDA/VREF+"/>
+<wire x1="73.66" y1="35.56" x2="68.58" y2="35.56" width="0.1524" layer="91"/>
+</segment>
+</net>
 </nets>
 </sheet>
 </sheets>
 </schematic>
 </drawing>
+<compatibility>
+<note version="6.3" minversion="6.2.2" severity="warning">
+Since Version 6.2.2 text objects can contain more than one line,
+which will not be processed correctly with this version.
+</note>
+</compatibility>
 </eagle>

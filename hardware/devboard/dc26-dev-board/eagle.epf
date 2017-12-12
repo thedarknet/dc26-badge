@@ -33,7 +33,7 @@ UsedLibrary="D:/My Stuff/dev/eagle/eagle/libraries/switch-tact.lbr"
 
 [Win_1]
 Type="Control Panel"
-Loc="28 10 1433 1730"
+Loc="21 49 1519 1327"
 State=2
 Number=0
 

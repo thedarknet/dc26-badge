@@ -1,0 +1,125 @@
+
+(EDIF
+  (rename &CMDZ3L3_TR "CMDZ3L3_TR")
+  (EDIFVersion 2 0 0)
+  (EDIFLevel 0)
+  (keywordMap (keywordLevel 0))
+  (status
+    (written
+      (timestamp 2017 12 18 08 49 23)
+      (dataOrigin "792590/28562/2.18/2/4/Zener Diode")
+      (program "SamacSys ECAD Model CMDZ3L3_TR"
+        (version "2.1"))))
+  (library
+  (rename &CMDZ3L3_TR "CMDZ3L3_TR")
+    (EDIFLevel 0)
+    (technology
+      (numberDefinition (scale 1 (e 254 -6) (unit DISTANCE)))
+      (userData GRIDRESOLUTION (integer 50 50))
+      (figureGroup DEFAULT (pathWidth 10) (textHeight 100))
+      (figureGroup PROPERTY (pathWidth 10) (textHeight 90))
+      (figureGroup PINNUMBER (pathWidth 10) (textHeight 90))
+      (figureGroup PINNAME (pathWidth 10) (textHeight 90))
+      (figureGroup COMMENT (pathWidth 10) (textHeight 90))
+      (figureGroup PIN (pathWidth 10) (textHeight 90))
+      (figureGroup GRAPHIC (pathWidth 10) (textHeight 100))
+    )
+    (cell
+      (rename &CMDZ3L3_TR "CMDZ3L3_TR")
+      (cellType GENERIC)
+      (view
+        (rename NORMAL "Normal")
+        (viewType SCHEMATIC)
+        (interface
+          (designator "Z")
+          (property (rename PACKAGENAME "PackageName") (string "CMDZ3L3_TR"))
+          (property (rename ISHETEROGENEOUS "IsHeterogeneous") (string "False"))
+          (property (rename DEVICESINVIEW "DevicesInView") (string "1"))
+          (property (rename DEVICESINPACKAGE "DevicesInPackage") (string "1"))
+          (property (rename DEVICEDESIGNATOR "DeviceDesignator") (string "A"))
+          (property (rename DEVICENUMBERING "DeviceNumbering") (string "Alpha"))
+          (property (rename PCB_32_FOOTPRINT "PCB Footprint") (string "SOD2512X110N"))
+          (property (rename &Supplier_Name "Supplier_Name") (string "RS"))
+          (property (rename &RS_Part_Number "RS Part Number") (string ""))
+          (property (rename &Manufacturer_Name "Manufacturer_Name") (string "Central Semiconductor"))
+          (property (rename &Manufacturer_Part_Number "Manufacturer_Part_Number") (string "CMDZ3L3 TR"))
+          (property (rename &Allied_Number "Allied_Number") (string ""))
+          (property (rename &Other_Part_Number "Other Part Number") (string ""))
+          (property (rename &Description "Description") (string "ZENER DIODE 250mW, 3.3V  SOD-323"))
+          (property (rename &Datasheet_Link "Datasheet Link") (string "https://www.centralsemi.com/get_document.php?cmp=1&amp;mergetype=pd&amp;mergepath=pd&amp;pdf_id=CMDZ5L1-36L.PDF"))
+          (property (rename &Height "Height") (string "1.1 mm"))
+          (property (rename &_60__32_VALUE_32__62_ "< Value >") (string "CMDZ3L3_TR"))
+          (property (rename VALUE "Value") (string "Value"))
+          (port
+            (rename &K "K")
+            (designator "1")
+            (property (rename ORDER "Order") (string "0") (owner "OrCAD"))
+          )
+          (port
+            (rename &A "A")
+            (designator "2")
+            (property (rename ORDER "Order") (string "1") (owner "OrCAD"))
+          )
+          (symbol
+            (portImplementation
+              (name &K)
+              (keywordDisplay DESIGNATOR (display PINNUMBER))
+              (figure PIN (path (pointList (pt -200 -100) (pt 0 -100))))
+              (connectLocation (figure GRAPHIC (dot (pt -200 -100))))
+            )
+            (portImplementation
+              (name &A)
+              (keywordDisplay DESIGNATOR (display PINNUMBER))
+              (figure PIN (path (pointList (pt 200 -100) (pt 400 -100))))
+              (connectLocation (figure GRAPHIC (dot (pt 400 -100))))
+            )
+            (figure GRAPHIC
+              (figureGroupOverride GRAPHIC
+                (pathWidth 10))
+              (path
+                (pointList
+                  (pt 0 -100)
+                  (pt 200 0)
+                  (pt 200 -200)
+                  (pt 0 -100)
+                )
+              )
+            )
+            (figure GRAPHIC
+              (figureGroupOverride GRAPHIC
+                (pathWidth 10))
+              (path
+                (pointList
+                  (pt 0 -20)
+                  (pt 0 -180)
+                )
+              )
+            )
+            (figure GRAPHIC
+              (figureGroupOverride GRAPHIC
+                (pathWidth 10))
+              (path
+                (pointList
+                  (pt 0 -20)
+                  (pt 40 0)
+                )
+              )
+            )
+            (figure GRAPHIC
+              (figureGroupOverride GRAPHIC
+                (pathWidth 10))
+              (path
+                (pointList
+                  (pt -40 -200)
+                  (pt 0 -180)
+                )
+              )
+            )
+            (keywordDisplay DESIGNATOR (display PROPERTY (justify LEFT) (orientation R0) (origin (pt 200 180))))
+            (propertyDisplay &_60__32_VALUE_32__62_ (display PROPERTY (justify LEFT) (orientation R0) (origin (pt 200 80))))
+          )
+        )
+      )
+    )
+  )
+)

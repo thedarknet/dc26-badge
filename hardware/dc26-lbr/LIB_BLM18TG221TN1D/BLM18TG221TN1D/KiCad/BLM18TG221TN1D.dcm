@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP BLM18TG221TN1D
+D Ferrite bead SMD 0603 220R Murata Ferrite Bead (Chip Ferrite Bead), 1.6 x 0.8 x 0.6mm (0603), 1000 impedance at 100 MHz
+K
+F http://www.murata.com/~/media/webrenewal/support/library/catalog/products/emc/emifil/c31e.ashx?la=en-gb
+$ENDCMP
+#
+#End Doc Library

@@ -1,0 +1,10 @@
+(unit MM)
+
+(package "BEADC1608X75N"
+    (type UNDEF)
+    (uver 2)
+    (mountForm default
+        (footprintRef "BEADC1608X75N")
+        (spec "default")
+    )
+)

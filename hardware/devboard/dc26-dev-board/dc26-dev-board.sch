@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.5.0">
+<eagle version="8.5.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -3466,6 +3466,23 @@ Commonly used for 1/4W through-hole resistors. 0.3" pitch between holes.&lt;br&g
 <smd name="39" x="-3.5687" y="-24.13" dx="4.1402" dy="0.9906" layer="1"/>
 <smd name="40" x="3.5687" y="-24.13" dx="4.1402" dy="0.9906" layer="1"/>
 </package>
+<package name="BEADC1608X75N">
+<description>&lt;b&gt;BLM18KG_T&lt;/b&gt;&lt;br&gt;
+</description>
+<smd name="1" x="-0.8" y="0" dx="1" dy="0.85" layer="1" rot="R90"/>
+<smd name="2" x="0.8" y="0" dx="1" dy="0.85" layer="1" rot="R90"/>
+<text x="0" y="0" size="1.27" layer="25" align="center">&gt;NAME</text>
+<text x="0" y="0" size="1.27" layer="51" align="center">&gt;VALUE</text>
+<wire x1="-1.475" y1="0.75" x2="1.475" y2="0.75" width="0.05" layer="21"/>
+<wire x1="1.475" y1="0.75" x2="1.475" y2="-0.75" width="0.05" layer="21"/>
+<wire x1="1.475" y1="-0.75" x2="-1.475" y2="-0.75" width="0.05" layer="21"/>
+<wire x1="-1.475" y1="-0.75" x2="-1.475" y2="0.75" width="0.05" layer="21"/>
+<wire x1="-0.8" y1="0.4" x2="0.8" y2="0.4" width="0.1" layer="51"/>
+<wire x1="0.8" y1="0.4" x2="0.8" y2="-0.4" width="0.1" layer="51"/>
+<wire x1="0.8" y1="-0.4" x2="-0.8" y2="-0.4" width="0.1" layer="51"/>
+<wire x1="-0.8" y1="-0.4" x2="-0.8" y2="0.4" width="0.1" layer="51"/>
+<wire x1="0" y1="0.3" x2="0" y2="-0.3" width="0.2" layer="25"/>
+</package>
 </packages>
 <symbols>
 <symbol name="LCD_ST7735S">
@@ -3803,6 +3820,16 @@ Commonly used for 1/4W through-hole resistors. 0.3" pitch between holes.&lt;br&g
 <wire x1="-1.27" y1="-20.32" x2="-2.54" y2="-20.32" width="0.6096" layer="94"/>
 <wire x1="-1.27" y1="-22.86" x2="-2.54" y2="-22.86" width="0.6096" layer="94"/>
 <wire x1="-1.27" y1="-25.4" x2="-2.54" y2="-25.4" width="0.6096" layer="94"/>
+</symbol>
+<symbol name="BLM18TG221TN1D">
+<wire x1="5.08" y1="2.54" x2="15.24" y2="2.54" width="0.254" layer="94"/>
+<wire x1="15.24" y1="2.54" x2="15.24" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="15.24" y1="-2.54" x2="5.08" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="5.08" y1="-2.54" x2="5.08" y2="2.54" width="0.254" layer="94"/>
+<text x="10.16" y="5.08" size="1.778" layer="95" align="center">&gt;NAME</text>
+<text x="10.16" y="-5.08" size="1.778" layer="96" align="center">&gt;VALUE</text>
+<pin name="1" x="0" y="0" length="middle" direction="pas"/>
+<pin name="2" x="20.32" y="0" length="middle" direction="pas" rot="R180"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -5344,6 +5371,36 @@ Source: &lt;a href="https://www.centralsemi.com/get_document.php?cmp=1&amp;merge
 </device>
 </devices>
 </deviceset>
+<deviceset name="BLM18TG221TN1D" prefix="FB">
+<description>&lt;b&gt;Ferrite bead SMD 0603 220R Murata Ferrite Bead (Chip Ferrite Bead), 1.6 x 0.8 x 0.6mm (0603), 1000 impedance at 100 MHz&lt;/b&gt;&lt;p&gt;
+&lt;/b&gt;&lt;br&gt;&lt;a href="&lt;br&gt;&lt;a href="https://componentsearchengine.com/Images/3/BLM18TG221TN1D.jpg" title="Image"&gt;
+&lt;img src="https://componentsearchengine.com/Images/3/BLM18TG221TN1D.jpg" width="150"&gt;&lt;/a&gt;&lt;p&gt;
+Source: &lt;a href="http://www.murata.com/~/media/webrenewal/support/library/catalog/products/emc/emifil/c31e.ashx?la=en-gb"&gt; Datasheet &lt;/a&gt;</description>
+<gates>
+<gate name="G$1" symbol="BLM18TG221TN1D" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="BEADC1608X75N">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="3D_PACKAGE" value="" constant="no"/>
+<attribute name="ALLIED_NUMBER" value="" constant="no"/>
+<attribute name="DESCRIPTION" value="Ferrite bead SMD 0603 220R Murata Ferrite Bead (Chip Ferrite Bead), 1.6 x 0.8 x 0.6mm (0603), 1000 impedance at 100 MHz" constant="no"/>
+<attribute name="HEIGHT" value="0.75mm" constant="no"/>
+<attribute name="MANUFACTURER_NAME" value="Murata Electronics" constant="no"/>
+<attribute name="MANUFACTURER_PART_NUMBER" value="BLM18TG221TN1D" constant="no"/>
+<attribute name="OTHER_PART_NUMBER" value="" constant="no"/>
+<attribute name="RS_PART_NUMBER" value="6197526" constant="no"/>
+<attribute name="SUPPLIER_NAME" value="RS" constant="no"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
 </devicesets>
 </library>
 </libraries>
@@ -5409,14 +5466,10 @@ Source: &lt;a href="https://www.centralsemi.com/get_document.php?cmp=1&amp;merge
 <part name="C8" library="dc-26" deviceset="C-US" device="C1206" value="4.7uF"/>
 <part name="SUPPLY4" library="dc-26" deviceset="VCC" device=""/>
 <part name="SUPPLY5" library="dc-26" deviceset="VCC" device="" value="VDD3"/>
-<part name="VSS3" library="dc-26" deviceset="GND" device="" value="VSS3"/>
 <part name="SUPPLY6" library="dc-26" deviceset="VCC" device="" value="VDD2"/>
-<part name="VSS2" library="dc-26" deviceset="GND" device="" value="VSS2"/>
 <part name="GND12" library="dc-26" deviceset="GND" device=""/>
 <part name="SUPPLY7" library="dc-26" deviceset="VCC" device="" value="VDD1"/>
-<part name="VSS1" library="dc-26" deviceset="GND" device="" value="VSS1"/>
 <part name="C9" library="dc-26" deviceset="C-US" device="C1206" value="100nF"/>
-<part name="VSS4" library="dc-26" deviceset="GND" device="" value="VDD4"/>
 <part name="SUPPLY8" library="dc-26" deviceset="VCC" device="" value="VDD4"/>
 <part name="C10" library="dc-26" deviceset="C-US" device="C1206" value="100nF"/>
 <part name="SUPPLY9" library="dc-26" deviceset="VCC" device="" value="VBAT"/>
@@ -5426,7 +5479,6 @@ Source: &lt;a href="https://www.centralsemi.com/get_document.php?cmp=1&amp;merge
 <part name="C12" library="dc-26" deviceset="C-US" device="C1206" value="1uF"/>
 <part name="SUPPLY11" library="dc-26" deviceset="VCC" device=""/>
 <part name="SUPPLY12" library="dc-26" deviceset="VCC" device="" value="VDDA"/>
-<part name="VSSA" library="dc-26" deviceset="GND" device="" value="VSSA"/>
 <part name="U1" library="dc-26" deviceset="ESP-WROOM-32" device=""/>
 <part name="GND11" library="dc-26" deviceset="GND" device=""/>
 <part name="C13" library="dc-26" deviceset="C-US" device="C0805" value="10uF"/>
@@ -5448,6 +5500,12 @@ Source: &lt;a href="https://www.centralsemi.com/get_document.php?cmp=1&amp;merge
 <part name="SUPPLY15" library="dc-26" deviceset="VCC" device=""/>
 <part name="ESP-BREAKOUT" library="dc-26" deviceset="M20X2" device=""/>
 <part name="STM32-BREAKOUT" library="dc-26" deviceset="M20X2" device=""/>
+<part name="FB1" library="dc-26" deviceset="BLM18TG221TN1D" device=""/>
+<part name="GND20" library="dc-26" deviceset="GND" device=""/>
+<part name="GND21" library="dc-26" deviceset="GND" device=""/>
+<part name="GND22" library="dc-26" deviceset="GND" device=""/>
+<part name="GND23" library="dc-26" deviceset="GND" device=""/>
+<part name="GND24" library="dc-26" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -5466,6 +5524,8 @@ external battery is used, it is recommended to connect this pin to VDD with a 10
 external ceramic decoupling capacitor.
 • The VDDA pin must be connected to two external decoupling capacitors (100 nF
 Ceramic + 1 μF Tantalum or Ceramic).</text>
+<text x="10.16" y="-86.36" size="1.778" layer="91">Placement of Ferrite bead discussed here: 
+ https://www.allaboutcircuits.com/technical-articles/choosing-and-using-ferrite-beads/</text>
 </plain>
 <instances>
 <instance part="Y1" gate="G$1" x="50.8" y="71.12" rot="R90"/>
@@ -5527,24 +5587,19 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <instance part="C8" gate="G$1" x="208.28" y="0"/>
 <instance part="SUPPLY4" gate="G$1" x="208.28" y="7.62"/>
 <instance part="SUPPLY5" gate="G$1" x="167.64" y="-7.62" rot="R270"/>
-<instance part="VSS3" gate="1" x="160.02" y="-30.48"/>
 <instance part="SUPPLY6" gate="G$1" x="147.32" y="-10.16" rot="R270"/>
-<instance part="VSS2" gate="1" x="142.24" y="-30.48"/>
 <instance part="GND12" gate="1" x="223.52" y="-5.08" rot="R90"/>
 <instance part="SUPPLY7" gate="G$1" x="132.08" y="-10.16" rot="R270"/>
-<instance part="VSS1" gate="1" x="127" y="-30.48"/>
 <instance part="C9" gate="G$1" x="180.34" y="-10.16"/>
-<instance part="VSS4" gate="1" x="180.34" y="-30.48"/>
 <instance part="SUPPLY8" gate="G$1" x="187.96" y="-7.62" rot="R270"/>
-<instance part="C10" gate="G$1" x="55.88" y="-12.7"/>
-<instance part="SUPPLY9" gate="G$1" x="68.58" y="-10.16" rot="R270"/>
-<instance part="GND10" gate="1" x="55.88" y="-25.4"/>
-<instance part="SUPPLY10" gate="G$1" x="55.88" y="-2.54"/>
-<instance part="C11" gate="G$1" x="83.82" y="-20.32"/>
-<instance part="C12" gate="G$1" x="96.52" y="-20.32"/>
-<instance part="SUPPLY11" gate="G$1" x="83.82" y="-15.24"/>
-<instance part="SUPPLY12" gate="G$1" x="104.14" y="-17.78" rot="R270"/>
-<instance part="VSSA" gate="1" x="106.68" y="-27.94" rot="R90"/>
+<instance part="C10" gate="G$1" x="40.64" y="-10.16"/>
+<instance part="SUPPLY9" gate="G$1" x="48.26" y="-7.62" rot="R270"/>
+<instance part="GND10" gate="1" x="40.64" y="-22.86"/>
+<instance part="SUPPLY10" gate="G$1" x="40.64" y="-2.54"/>
+<instance part="C11" gate="G$1" x="73.66" y="-30.48"/>
+<instance part="C12" gate="G$1" x="86.36" y="-30.48"/>
+<instance part="SUPPLY11" gate="G$1" x="73.66" y="-2.54"/>
+<instance part="SUPPLY12" gate="G$1" x="93.98" y="-27.94" rot="R270"/>
 <instance part="U1" gate="G$1" x="-5.08" y="63.5"/>
 <instance part="GND11" gate="1" x="2.54" y="38.1"/>
 <instance part="C13" gate="G$1" x="-40.64" y="53.34"/>
@@ -5566,6 +5621,12 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <instance part="SUPPLY15" gate="G$1" x="-25.4" y="142.24"/>
 <instance part="ESP-BREAKOUT" gate="G$1" x="-96.52" y="40.64"/>
 <instance part="STM32-BREAKOUT" gate="G$1" x="271.78" y="43.18"/>
+<instance part="FB1" gate="G$1" x="73.66" y="-5.08" rot="R270"/>
+<instance part="GND20" gate="1" x="160.02" y="-22.86"/>
+<instance part="GND21" gate="1" x="180.34" y="-22.86"/>
+<instance part="GND22" gate="1" x="142.24" y="-22.86"/>
+<instance part="GND23" gate="1" x="127" y="-22.86"/>
+<instance part="GND24" gate="1" x="96.52" y="-38.1" rot="R90"/>
 </instances>
 <busses>
 </busses>
@@ -5688,7 +5749,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 </segment>
 <segment>
 <pinref part="C10" gate="G$1" pin="2"/>
-<wire x1="55.88" y1="-17.78" x2="55.88" y2="-22.86" width="0.1524" layer="91"/>
+<wire x1="40.64" y1="-15.24" x2="40.64" y2="-20.32" width="0.1524" layer="91"/>
 <pinref part="GND10" gate="1" pin="GND"/>
 </segment>
 <segment>
@@ -5745,6 +5806,62 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="RESET" gate="G$1" pin="C"/>
 <pinref part="GND18" gate="1" pin="GND"/>
 <wire x1="-60.96" y1="96.52" x2="-60.96" y2="99.06" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="C6" gate="G$1" pin="2"/>
+<wire x1="127" y1="-17.78" x2="127" y2="-20.32" width="0.1524" layer="91"/>
+<pinref part="GND23" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="C7" gate="G$1" pin="2"/>
+<wire x1="142.24" y1="-17.78" x2="142.24" y2="-20.32" width="0.1524" layer="91"/>
+<pinref part="GND22" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="C5" gate="G$1" pin="2"/>
+<wire x1="160.02" y1="-15.24" x2="160.02" y2="-20.32" width="0.1524" layer="91"/>
+<pinref part="GND20" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="C9" gate="G$1" pin="2"/>
+<wire x1="180.34" y1="-15.24" x2="180.34" y2="-20.32" width="0.1524" layer="91"/>
+<pinref part="GND21" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="IC1" gate="G$1" pin="VSS(3)"/>
+<wire x1="127" y1="63.5" x2="129.54" y2="63.5" width="0.1524" layer="91"/>
+<label x="129.54" y="63.5" size="1.778" layer="95"/>
+<label x="129.54" y="63.5" size="1.778" layer="95"/>
+<label x="129.54" y="63.5" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="IC1" gate="G$1" pin="VSS(4)"/>
+<wire x1="83.82" y1="83.82" x2="83.82" y2="86.36" width="0.1524" layer="91"/>
+<label x="83.82" y="86.36" size="1.778" layer="95" rot="R90"/>
+</segment>
+<segment>
+<pinref part="IC1" gate="G$1" pin="VDD(2)"/>
+<wire x1="119.38" y1="7.62" x2="119.38" y2="2.54" width="0.1524" layer="91"/>
+<label x="119.38" y="0" size="1.778" layer="95" rot="R90"/>
+</segment>
+<segment>
+<pinref part="IC1" gate="G$1" pin="VSS(1)"/>
+<wire x1="83.82" y1="7.62" x2="83.82" y2="2.54" width="0.1524" layer="91"/>
+<label x="83.82" y="0" size="1.778" layer="95" rot="R90"/>
+</segment>
+<segment>
+<pinref part="IC1" gate="G$1" pin="VSSA/VREF-"/>
+<wire x1="68.58" y1="38.1" x2="73.66" y2="38.1" width="0.1524" layer="91"/>
+<label x="63.5" y="38.1" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="C11" gate="G$1" pin="2"/>
+<pinref part="C12" gate="G$1" pin="2"/>
+<wire x1="73.66" y1="-35.56" x2="86.36" y2="-35.56" width="0.1524" layer="91"/>
+<wire x1="86.36" y1="-35.56" x2="93.98" y2="-38.1" width="0.1524" layer="91"/>
+<junction x="86.36" y="-35.56"/>
+<pinref part="GND24" gate="1" pin="GND"/>
+<junction x="93.98" y="-38.1"/>
 </segment>
 </net>
 <net name="VCC1" class="0">
@@ -5960,22 +6077,22 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 </segment>
 <segment>
 <pinref part="C10" gate="G$1" pin="1"/>
-<wire x1="55.88" y1="-2.54" x2="55.88" y2="-10.16" width="0.1524" layer="91"/>
-<wire x1="55.88" y1="-10.16" x2="68.58" y2="-10.16" width="0.1524" layer="91"/>
-<junction x="55.88" y="-10.16"/>
+<wire x1="40.64" y1="-2.54" x2="40.64" y2="-7.62" width="0.1524" layer="91"/>
+<wire x1="40.64" y1="-7.62" x2="48.26" y2="-7.62" width="0.1524" layer="91"/>
+<junction x="40.64" y="-7.62"/>
 <pinref part="SUPPLY9" gate="G$1" pin="VCC"/>
 <pinref part="SUPPLY10" gate="G$1" pin="VCC"/>
 </segment>
 <segment>
 <pinref part="C11" gate="G$1" pin="1"/>
 <pinref part="C12" gate="G$1" pin="1"/>
-<wire x1="83.82" y1="-17.78" x2="96.52" y2="-17.78" width="0.1524" layer="91"/>
-<wire x1="96.52" y1="-17.78" x2="104.14" y2="-17.78" width="0.1524" layer="91"/>
-<junction x="96.52" y="-17.78"/>
-<wire x1="83.82" y1="-17.78" x2="83.82" y2="-15.24" width="0.1524" layer="91"/>
-<junction x="83.82" y="-17.78"/>
-<pinref part="SUPPLY11" gate="G$1" pin="VCC"/>
+<wire x1="73.66" y1="-27.94" x2="86.36" y2="-27.94" width="0.1524" layer="91"/>
+<wire x1="86.36" y1="-27.94" x2="93.98" y2="-27.94" width="0.1524" layer="91"/>
+<junction x="86.36" y="-27.94"/>
 <pinref part="SUPPLY12" gate="G$1" pin="VCC"/>
+<pinref part="FB1" gate="G$1" pin="2"/>
+<wire x1="73.66" y1="-27.94" x2="73.66" y2="-25.4" width="0.1524" layer="91"/>
+<junction x="73.66" y="-27.94"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="VCC"/>
@@ -6001,6 +6118,11 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="R4" gate="G$1" pin="2"/>
 <wire x1="-25.4" y1="129.54" x2="-25.4" y2="142.24" width="0.1524" layer="91"/>
 <pinref part="SUPPLY15" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<pinref part="SUPPLY11" gate="G$1" pin="VCC"/>
+<pinref part="FB1" gate="G$1" pin="1"/>
+<wire x1="73.66" y1="-5.08" x2="73.66" y2="-2.54" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$6" class="0">
@@ -6141,88 +6263,34 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <segment>
 <pinref part="IC1" gate="G$1" pin="VDD(3)"/>
 <wire x1="127" y1="66.04" x2="129.54" y2="66.04" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="VSS3" class="0">
-<segment>
-<pinref part="IC1" gate="G$1" pin="VSS(3)"/>
-<wire x1="127" y1="63.5" x2="129.54" y2="63.5" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="C5" gate="G$1" pin="2"/>
-<wire x1="160.02" y1="-15.24" x2="160.02" y2="-27.94" width="0.1524" layer="91"/>
-<pinref part="VSS3" gate="1" pin="GND"/>
+<label x="129.54" y="66.04" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="VSS2" class="0">
 <segment>
 <pinref part="IC1" gate="G$1" pin="VSS(2)"/>
 <wire x1="116.84" y1="7.62" x2="116.84" y2="2.54" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="C7" gate="G$1" pin="2"/>
-<wire x1="142.24" y1="-17.78" x2="142.24" y2="-27.94" width="0.1524" layer="91"/>
-<pinref part="VSS2" gate="1" pin="GND"/>
-</segment>
-</net>
-<net name="VDD2" class="0">
-<segment>
-<pinref part="IC1" gate="G$1" pin="VDD(2)"/>
-<wire x1="119.38" y1="7.62" x2="119.38" y2="2.54" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="VSS1" class="0">
-<segment>
-<pinref part="C6" gate="G$1" pin="2"/>
-<wire x1="127" y1="-17.78" x2="127" y2="-27.94" width="0.1524" layer="91"/>
-<pinref part="VSS1" gate="1" pin="GND"/>
-</segment>
-<segment>
-<pinref part="IC1" gate="G$1" pin="VSS(1)"/>
-<wire x1="83.82" y1="7.62" x2="83.82" y2="2.54" width="0.1524" layer="91"/>
+<label x="116.84" y="0" size="1.778" layer="95" rot="R90"/>
 </segment>
 </net>
 <net name="VDD1" class="0">
 <segment>
 <pinref part="IC1" gate="G$1" pin="VDD(1)"/>
 <wire x1="86.36" y1="7.62" x2="86.36" y2="2.54" width="0.1524" layer="91"/>
+<label x="86.36" y="0" size="1.778" layer="95" rot="R90"/>
 </segment>
 </net>
 <net name="VDD4" class="0">
 <segment>
 <pinref part="IC1" gate="G$1" pin="VDD(4)"/>
-<wire x1="81.28" y1="83.82" x2="81.28" y2="88.9" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="VSS4" class="0">
-<segment>
-<pinref part="IC1" gate="G$1" pin="VSS(4)"/>
-<wire x1="83.82" y1="83.82" x2="83.82" y2="88.9" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="C9" gate="G$1" pin="2"/>
-<wire x1="180.34" y1="-15.24" x2="180.34" y2="-27.94" width="0.1524" layer="91"/>
-<pinref part="VSS4" gate="1" pin="GND"/>
+<wire x1="81.28" y1="83.82" x2="81.28" y2="86.36" width="0.1524" layer="91"/>
+<label x="81.28" y="86.36" size="1.778" layer="95" rot="R90"/>
 </segment>
 </net>
 <net name="VBAT" class="0">
 <segment>
 <pinref part="IC1" gate="G$1" pin="VBAT"/>
 <wire x1="73.66" y1="66.04" x2="68.58" y2="66.04" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="VSSA" class="0">
-<segment>
-<pinref part="IC1" gate="G$1" pin="VSSA/VREF-"/>
-<wire x1="68.58" y1="38.1" x2="73.66" y2="38.1" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="C11" gate="G$1" pin="2"/>
-<pinref part="C12" gate="G$1" pin="2"/>
-<wire x1="83.82" y1="-25.4" x2="96.52" y2="-25.4" width="0.1524" layer="91"/>
-<wire x1="96.52" y1="-25.4" x2="104.14" y2="-27.94" width="0.1524" layer="91"/>
-<junction x="96.52" y="-25.4"/>
-<pinref part="VSSA" gate="1" pin="GND"/>
 </segment>
 </net>
 <net name="VDDA" class="0">

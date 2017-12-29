@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP CMDZ3L3_TR
+D ZENER DIODE 250mW, 3.3V  SOD-323
+K
+F https://www.centralsemi.com/get_document.php?cmp=1&amp;mergetype=pd&amp;mergepath=pd&amp;pdf_id=CMDZ5L1-36L.PDF
+$ENDCMP
+#
+#End Doc Library

@@ -8,34 +8,34 @@
 </settings>
 <grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
-<layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
-<layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
-<layer number="3" name="Route3" color="4" fill="3" visible="no" active="no"/>
-<layer number="4" name="Route4" color="1" fill="4" visible="no" active="no"/>
-<layer number="5" name="Route5" color="4" fill="4" visible="no" active="no"/>
-<layer number="6" name="Route6" color="1" fill="8" visible="no" active="no"/>
-<layer number="7" name="Route7" color="4" fill="8" visible="no" active="no"/>
-<layer number="8" name="Route8" color="1" fill="2" visible="no" active="no"/>
-<layer number="9" name="Route9" color="4" fill="2" visible="no" active="no"/>
-<layer number="10" name="Route10" color="1" fill="7" visible="no" active="no"/>
-<layer number="11" name="Route11" color="4" fill="7" visible="no" active="no"/>
-<layer number="12" name="Route12" color="1" fill="5" visible="no" active="no"/>
-<layer number="13" name="Route13" color="4" fill="5" visible="no" active="no"/>
-<layer number="14" name="Route14" color="1" fill="6" visible="no" active="no"/>
-<layer number="15" name="Route15" color="4" fill="6" visible="no" active="no"/>
-<layer number="16" name="Bottom" color="1" fill="1" visible="no" active="no"/>
-<layer number="17" name="Pads" color="2" fill="1" visible="no" active="no"/>
-<layer number="18" name="Vias" color="2" fill="1" visible="no" active="no"/>
-<layer number="19" name="Unrouted" color="6" fill="1" visible="no" active="no"/>
-<layer number="20" name="Dimension" color="15" fill="1" visible="no" active="no"/>
-<layer number="21" name="tPlace" color="7" fill="1" visible="no" active="no"/>
-<layer number="22" name="bPlace" color="7" fill="1" visible="no" active="no"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="no"/>
-<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="no"/>
-<layer number="25" name="tNames" color="7" fill="1" visible="no" active="no"/>
-<layer number="26" name="bNames" color="7" fill="1" visible="no" active="no"/>
-<layer number="27" name="tValues" color="7" fill="1" visible="no" active="no"/>
-<layer number="28" name="bValues" color="7" fill="1" visible="no" active="no"/>
+<layer number="1" name="Top" color="4" fill="1" visible="yes" active="no"/>
+<layer number="2" name="Route2" color="1" fill="3" visible="yes" active="no"/>
+<layer number="3" name="Route3" color="4" fill="3" visible="yes" active="no"/>
+<layer number="4" name="Route4" color="1" fill="4" visible="yes" active="no"/>
+<layer number="5" name="Route5" color="4" fill="4" visible="yes" active="no"/>
+<layer number="6" name="Route6" color="1" fill="8" visible="yes" active="no"/>
+<layer number="7" name="Route7" color="4" fill="8" visible="yes" active="no"/>
+<layer number="8" name="Route8" color="1" fill="2" visible="yes" active="no"/>
+<layer number="9" name="Route9" color="4" fill="2" visible="yes" active="no"/>
+<layer number="10" name="Route10" color="1" fill="7" visible="yes" active="no"/>
+<layer number="11" name="Route11" color="4" fill="7" visible="yes" active="no"/>
+<layer number="12" name="Route12" color="1" fill="5" visible="yes" active="no"/>
+<layer number="13" name="Route13" color="4" fill="5" visible="yes" active="no"/>
+<layer number="14" name="Route14" color="1" fill="6" visible="yes" active="no"/>
+<layer number="15" name="Route15" color="4" fill="6" visible="yes" active="no"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="no"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="no"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="no"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="no"/>
+<layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="no"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="no"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="no"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="no"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="no"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="no"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="no"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="no"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="no"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="no"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="no"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="no"/>
@@ -44,8 +44,8 @@
 <layer number="34" name="bFinish" color="6" fill="6" visible="no" active="no"/>
 <layer number="35" name="tGlue" color="7" fill="4" visible="no" active="no"/>
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="no"/>
-<layer number="37" name="tTest" color="7" fill="1" visible="no" active="no"/>
-<layer number="38" name="bTest" color="7" fill="1" visible="no" active="no"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="yes" active="no"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="yes" active="no"/>
 <layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="no"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="no"/>
 <layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="no"/>
@@ -53,19 +53,19 @@
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="no"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="no"/>
 <layer number="45" name="Holes" color="7" fill="1" visible="no" active="no"/>
-<layer number="46" name="Milling" color="3" fill="1" visible="no" active="no"/>
-<layer number="47" name="Measures" color="7" fill="1" visible="no" active="no"/>
-<layer number="48" name="Document" color="7" fill="1" visible="no" active="no"/>
-<layer number="49" name="Reference" color="7" fill="1" visible="no" active="no"/>
-<layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
-<layer number="51" name="tDocu" color="7" fill="1" visible="no" active="no"/>
-<layer number="52" name="bDocu" color="7" fill="1" visible="no" active="no"/>
-<layer number="53" name="tGND_GNDA" color="7" fill="9" visible="no" active="no"/>
-<layer number="54" name="bGND_GNDA" color="1" fill="9" visible="no" active="no"/>
-<layer number="56" name="wert" color="7" fill="1" visible="no" active="no"/>
-<layer number="57" name="tCAD" color="7" fill="1" visible="no" active="no"/>
-<layer number="59" name="tCarbon" color="7" fill="1" visible="no" active="no"/>
-<layer number="60" name="bCarbon" color="7" fill="1" visible="no" active="no"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="yes" active="no"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="yes" active="no"/>
+<layer number="48" name="Document" color="7" fill="1" visible="yes" active="no"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="no"/>
+<layer number="50" name="dxf" color="7" fill="1" visible="yes" active="no"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="no"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="no"/>
+<layer number="53" name="tGND_GNDA" color="7" fill="9" visible="yes" active="no"/>
+<layer number="54" name="bGND_GNDA" color="1" fill="9" visible="yes" active="no"/>
+<layer number="56" name="wert" color="7" fill="1" visible="yes" active="no"/>
+<layer number="57" name="tCAD" color="7" fill="1" visible="yes" active="no"/>
+<layer number="59" name="tCarbon" color="7" fill="1" visible="yes" active="no"/>
+<layer number="60" name="bCarbon" color="7" fill="1" visible="yes" active="no"/>
 <layer number="88" name="SimResults" color="9" fill="1" visible="yes" active="yes"/>
 <layer number="89" name="SimProbes" color="9" fill="1" visible="yes" active="yes"/>
 <layer number="90" name="Modules" color="5" fill="1" visible="yes" active="yes"/>
@@ -5432,8 +5432,8 @@ Source: &lt;a href="http://www.murata.com/~/media/webrenewal/support/library/cat
 <part name="IC16" library="APA104" deviceset="APA104" device=""/>
 <part name="U$1" library="dc-26" deviceset="ST7735S_LCD_MODULE" device=""/>
 <part name="CN1" library="dc-26" deviceset="JST_2PIN" device="-SMT-RA"/>
-<part name="C1" library="dc-26" deviceset="C-US" device="C1210" value="4.7uF"/>
-<part name="C2" library="dc-26" deviceset="C-US" device="C1210" value="4.7uf"/>
+<part name="C1" library="dc-26" deviceset="C-US" device="C0805" value="4.7uF"/>
+<part name="C2" library="dc-26" deviceset="C-US" device="C0805" value="4.7uf"/>
 <part name="U$2" library="dc-26" deviceset="DX4R005JJ2" device="DX4R005JJ2"/>
 <part name="U$3" library="dc-26" deviceset="DS21984E" device="" value="MCP73831"/>
 <part name="GND1" library="dc-26" deviceset="GND" device=""/>
@@ -5452,31 +5452,31 @@ Source: &lt;a href="http://www.murata.com/~/media/webrenewal/support/library/cat
 <part name="R2" library="dc-26" deviceset="RESISTOR" device="0805-RES" value="470"/>
 <part name="R3" library="dc-26" deviceset="RESISTOR" device="0805-RES" value="2k"/>
 <part name="SUPPLY2" library="dc-26" deviceset="VCC" device="" value="3.7V From Battery Out"/>
-<part name="C3" library="dc-26" deviceset="C-US" device="C1206" value="1uf"/>
-<part name="C4" library="dc-26" deviceset="C-US" device="C1206" value="1uf"/>
+<part name="C3" library="dc-26" deviceset="C-US" device="C0805" value="1uf"/>
+<part name="C4" library="dc-26" deviceset="C-US" device="C0805" value="1uf"/>
 <part name="GND6" library="dc-26" deviceset="GND" device=""/>
 <part name="GND7" library="dc-26" deviceset="GND" device=""/>
 <part name="GND8" library="dc-26" deviceset="GND" device=""/>
 <part name="VCC" library="dc-26" deviceset="VCC" device="" value="3.3V"/>
 <part name="SUPPLY3" library="dc-26" deviceset="VCC" device="" value="5V"/>
 <part name="GND9" library="dc-26" deviceset="GND" device=""/>
-<part name="C5" library="dc-26" deviceset="C-US" device="C1206" value="100nF"/>
-<part name="C6" library="dc-26" deviceset="C-US" device="C1206" value="100nF"/>
-<part name="C7" library="dc-26" deviceset="C-US" device="C1206" value="100nF"/>
-<part name="C8" library="dc-26" deviceset="C-US" device="C1206" value="4.7uF"/>
+<part name="C5" library="dc-26" deviceset="C-US" device="C0805" value="100nF"/>
+<part name="C6" library="dc-26" deviceset="C-US" device="C0805" value="100nF"/>
+<part name="C7" library="dc-26" deviceset="C-US" device="C0805" value="100nF"/>
+<part name="C8" library="dc-26" deviceset="C-US" device="C0805" value="4.7uF"/>
 <part name="SUPPLY4" library="dc-26" deviceset="VCC" device=""/>
 <part name="SUPPLY5" library="dc-26" deviceset="VCC" device="" value="VDD3"/>
 <part name="SUPPLY6" library="dc-26" deviceset="VCC" device="" value="VDD2"/>
 <part name="GND12" library="dc-26" deviceset="GND" device=""/>
 <part name="SUPPLY7" library="dc-26" deviceset="VCC" device="" value="VDD1"/>
-<part name="C9" library="dc-26" deviceset="C-US" device="C1206" value="100nF"/>
+<part name="C9" library="dc-26" deviceset="C-US" device="C0805" value="100nF"/>
 <part name="SUPPLY8" library="dc-26" deviceset="VCC" device="" value="VDD4"/>
-<part name="C10" library="dc-26" deviceset="C-US" device="C1206" value="100nF"/>
+<part name="C10" library="dc-26" deviceset="C-US" device="C0805" value="100nF"/>
 <part name="SUPPLY9" library="dc-26" deviceset="VCC" device="" value="VBAT"/>
 <part name="GND10" library="dc-26" deviceset="GND" device=""/>
 <part name="SUPPLY10" library="dc-26" deviceset="VCC" device=""/>
-<part name="C11" library="dc-26" deviceset="C-US" device="C1206" value="100nF"/>
-<part name="C12" library="dc-26" deviceset="C-US" device="C1206" value="1uF"/>
+<part name="C11" library="dc-26" deviceset="C-US" device="C0805" value="100nF"/>
+<part name="C12" library="dc-26" deviceset="C-US" device="C0805" value="1uF"/>
 <part name="SUPPLY11" library="dc-26" deviceset="VCC" device=""/>
 <part name="SUPPLY12" library="dc-26" deviceset="VCC" device="" value="VDDA"/>
 <part name="U1" library="dc-26" deviceset="ESP-WROOM-32" device=""/>

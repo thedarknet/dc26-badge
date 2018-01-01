@@ -3859,28 +3859,28 @@ Commonly used for 1/4W through-hole resistors. 0.3" pitch between holes.&lt;br&g
 <rectangle x1="20.066" y1="-0.254" x2="20.574" y2="0.254" layer="51"/>
 <rectangle x1="22.606" y1="-0.254" x2="23.114" y2="0.254" layer="51"/>
 </package>
-<package name="SON95P300X300X100-7N">
-<description>&lt;b&gt;DFN6(3X3)&lt;/b&gt;&lt;br&gt;
+<package name="SON95P300X300X90-7N">
+<description>&lt;b&gt;DFN6(3X3)_1&lt;/b&gt;&lt;br&gt;
 </description>
-<smd name="1" x="-1.5" y="0.95" dx="0.8" dy="0.4" layer="1"/>
-<smd name="2" x="-1.5" y="0" dx="0.8" dy="0.4" layer="1"/>
-<smd name="3" x="-1.5" y="-0.95" dx="0.8" dy="0.4" layer="1"/>
-<smd name="4" x="1.5" y="-0.95" dx="0.8" dy="0.4" layer="1"/>
-<smd name="5" x="1.5" y="0" dx="0.8" dy="0.4" layer="1"/>
-<smd name="6" x="1.5" y="0.95" dx="0.8" dy="0.4" layer="1"/>
+<smd name="1" x="-1.5" y="0.95" dx="0.8" dy="0.3" layer="1"/>
+<smd name="2" x="-1.5" y="0" dx="0.8" dy="0.3" layer="1"/>
+<smd name="3" x="-1.5" y="-0.95" dx="0.8" dy="0.3" layer="1"/>
+<smd name="4" x="1.5" y="-0.95" dx="0.8" dy="0.3" layer="1"/>
+<smd name="5" x="1.5" y="0" dx="0.8" dy="0.3" layer="1"/>
+<smd name="6" x="1.5" y="0.95" dx="0.8" dy="0.3" layer="1"/>
 <smd name="7" x="0" y="0" dx="2.5" dy="1.75" layer="1" rot="R90"/>
 <text x="0" y="0" size="1.27" layer="25" align="center">&gt;NAME</text>
 <text x="0" y="0" size="1.27" layer="51" align="center">&gt;VALUE</text>
-<wire x1="-2.125" y1="1.8" x2="2.125" y2="1.8" width="0.05" layer="21"/>
-<wire x1="2.125" y1="1.8" x2="2.125" y2="-1.8" width="0.05" layer="21"/>
-<wire x1="2.125" y1="-1.8" x2="-2.125" y2="-1.8" width="0.05" layer="21"/>
-<wire x1="-2.125" y1="-1.8" x2="-2.125" y2="1.8" width="0.05" layer="21"/>
+<wire x1="-2.125" y1="1.775" x2="2.125" y2="1.775" width="0.05" layer="21"/>
+<wire x1="2.125" y1="1.775" x2="2.125" y2="-1.775" width="0.05" layer="21"/>
+<wire x1="2.125" y1="-1.775" x2="-2.125" y2="-1.775" width="0.05" layer="21"/>
+<wire x1="-2.125" y1="-1.775" x2="-2.125" y2="1.775" width="0.05" layer="21"/>
 <wire x1="-1.5" y1="1.5" x2="1.5" y2="1.5" width="0.1" layer="51"/>
 <wire x1="1.5" y1="1.5" x2="1.5" y2="-1.5" width="0.1" layer="51"/>
 <wire x1="1.5" y1="-1.5" x2="-1.5" y2="-1.5" width="0.1" layer="51"/>
 <wire x1="-1.5" y1="-1.5" x2="-1.5" y2="1.5" width="0.1" layer="51"/>
 <wire x1="-1.5" y1="0.75" x2="-0.75" y2="1.5" width="0.1" layer="51"/>
-<circle x="-1.9" y="1.65" radius="0.125" width="0.25" layer="25"/>
+<circle x="-1.9" y="1.6" radius="0.125" width="0.25" layer="25"/>
 </package>
 </packages>
 <symbols>
@@ -4239,20 +4239,20 @@ Commonly used for 1/4W through-hole resistors. 0.3" pitch between holes.&lt;br&g
 <pin name="9" x="10.16" y="2.54" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
 <pin name="10" x="10.16" y="5.08" visible="pad" length="middle" direction="pas" swaplevel="1" rot="R180"/>
 </symbol>
-<symbol name="LD39050PU33R">
-<wire x1="5.08" y1="2.54" x2="22.86" y2="2.54" width="0.254" layer="94"/>
-<wire x1="22.86" y1="2.54" x2="22.86" y2="-10.16" width="0.254" layer="94"/>
-<wire x1="22.86" y1="-10.16" x2="5.08" y2="-10.16" width="0.254" layer="94"/>
+<symbol name="LD39100PU33RY">
+<wire x1="5.08" y1="2.54" x2="33.02" y2="2.54" width="0.254" layer="94"/>
+<wire x1="33.02" y1="2.54" x2="33.02" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="33.02" y1="-10.16" x2="5.08" y2="-10.16" width="0.254" layer="94"/>
 <wire x1="5.08" y1="-10.16" x2="5.08" y2="2.54" width="0.254" layer="94"/>
-<text x="13.97" y="5.08" size="1.778" layer="95" align="center">&gt;NAME</text>
-<text x="13.97" y="-12.7" size="1.778" layer="96" align="center">&gt;VALUE</text>
-<pin name="EN" x="0" y="0" length="middle" direction="in"/>
-<pin name="GND" x="0" y="-2.54" length="middle" direction="pwr"/>
-<pin name="PG" x="0" y="-5.08" length="middle" direction="out"/>
-<pin name="VOUT" x="0" y="-7.62" length="middle" direction="out"/>
-<pin name="PAD" x="27.94" y="0" length="middle" direction="pwr" rot="R180"/>
-<pin name="VIN" x="27.94" y="-2.54" length="middle" direction="pwr" rot="R180"/>
-<pin name="NC" x="27.94" y="-5.08" length="middle" direction="nc" rot="R180"/>
+<text x="19.05" y="5.08" size="1.778" layer="95" align="center">&gt;NAME</text>
+<text x="19.05" y="-12.7" size="1.778" layer="96" align="center">&gt;VALUE</text>
+<pin name="EN" x="0" y="0" length="middle" direction="pas"/>
+<pin name="GND" x="0" y="-2.54" length="middle" direction="pas"/>
+<pin name="PG" x="0" y="-5.08" length="middle" direction="pas"/>
+<pin name="VOUT" x="0" y="-7.62" length="middle" direction="pas"/>
+<pin name="THERMAL_PAD" x="38.1" y="0" length="middle" direction="pas" rot="R180"/>
+<pin name="VIN" x="38.1" y="-2.54" length="middle" direction="pas" rot="R180"/>
+<pin name="NC" x="38.1" y="-5.08" length="middle" direction="nc" rot="R180"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -5931,22 +5931,22 @@ Standard 10-pin 0.1" header. Use with straight break away headers (SKU : PRT-001
 </device>
 </devices>
 </deviceset>
-<deviceset name="LD39050PU33R" prefix="PS">
-<description>&lt;b&gt;STMICROELECTRONICS - LD39050PU33R - LDO, FIXED, 3.3V, 0.5A, DFN-6&lt;/b&gt;&lt;p&gt;
-&lt;/b&gt;&lt;br&gt;&lt;a href="&lt;br&gt;&lt;a href="https://componentsearchengine.com/Images/1/LD39050PU33R.jpg" title="Image"&gt;
-&lt;img src="https://componentsearchengine.com/Images/1/LD39050PU33R.jpg" width="150"&gt;&lt;/a&gt;&lt;p&gt;
-Source: &lt;a href="https://componentsearchengine.com/Datasheets/2/LD39050PU33R.pdf"&gt; Datasheet &lt;/a&gt;</description>
+<deviceset name="LD39100PU33RY" prefix="IC">
+<description>&lt;b&gt;LDO Voltage Regulators 1 A low quiescent current low noise voltage regulator&lt;/b&gt;&lt;p&gt;
+&lt;/b&gt;&lt;br&gt;&lt;a href="&lt;br&gt;&lt;a href="https://componentsearchengine.com/Images/9/LD39100PU33RY.jpg" title="Image"&gt;
+&lt;img src="https://componentsearchengine.com/Images/9/LD39100PU33RY.jpg" width="150"&gt;&lt;/a&gt;&lt;p&gt;
+Source: &lt;a href="http://www.st.com/content/ccc/resource/technical/document/datasheet/72/02/e5/ee/df/36/40/5e/CD00233788.pdf/files/CD00233788.pdf/jcr:content/translations/en.CD00233788.pdf"&gt; Datasheet &lt;/a&gt;</description>
 <gates>
-<gate name="G$1" symbol="LD39050PU33R" x="0" y="0"/>
+<gate name="G$1" symbol="LD39100PU33RY" x="0" y="0"/>
 </gates>
 <devices>
-<device name="" package="SON95P300X300X100-7N">
+<device name="" package="SON95P300X300X90-7N">
 <connects>
 <connect gate="G$1" pin="EN" pad="1"/>
 <connect gate="G$1" pin="GND" pad="2"/>
 <connect gate="G$1" pin="NC" pad="5"/>
-<connect gate="G$1" pin="PAD" pad="7"/>
 <connect gate="G$1" pin="PG" pad="3"/>
+<connect gate="G$1" pin="THERMAL_PAD" pad="7"/>
 <connect gate="G$1" pin="VIN" pad="6"/>
 <connect gate="G$1" pin="VOUT" pad="4"/>
 </connects>
@@ -5954,10 +5954,10 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/2/LD39050PU33R.
 <technology name="">
 <attribute name="3D_PACKAGE" value="" constant="no"/>
 <attribute name="ALLIED_NUMBER" value="" constant="no"/>
-<attribute name="DESCRIPTION" value="STMICROELECTRONICS - LD39050PU33R - LDO, FIXED, 3.3V, 0.5A, DFN-6" constant="no"/>
-<attribute name="HEIGHT" value="1mm" constant="no"/>
+<attribute name="DESCRIPTION" value="LDO Voltage Regulators 1 A low quiescent current low noise voltage regulator" constant="no"/>
+<attribute name="HEIGHT" value="0.9mm" constant="no"/>
 <attribute name="MANUFACTURER_NAME" value="STMicroelectronics" constant="no"/>
-<attribute name="MANUFACTURER_PART_NUMBER" value="LD39050PU33R" constant="no"/>
+<attribute name="MANUFACTURER_PART_NUMBER" value="LD39100PU33RY" constant="no"/>
 <attribute name="OTHER_PART_NUMBER" value="" constant="no"/>
 <attribute name="RS_PART_NUMBER" value="" constant="no"/>
 <attribute name="SUPPLIER_NAME" value="RS" constant="no"/>
@@ -6123,7 +6123,6 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/2/LD39050PU33R.
 <part name="GND66" library="dc-26" deviceset="GND" device=""/>
 <part name="C17" library="dc-26" deviceset="C-US" device="C0805" value="4.7uF"/>
 <part name="GND65" library="dc-26" deviceset="GND" device=""/>
-<part name="PS1" library="dc-26" deviceset="LD39050PU33R" device=""/>
 <part name="GND7" library="dc-26" deviceset="GND" device=""/>
 <part name="R5" library="dc-26" deviceset="RESISTOR" device="0805-RES" value="10K"/>
 <part name="GND67" library="dc-26" deviceset="GND" device=""/>
@@ -6136,6 +6135,7 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/2/LD39050PU33R.
 <part name="C19" library="dc-26" deviceset="C-US" device="C0805" value="100nF"/>
 <part name="GND69" library="dc-26" deviceset="GND" device=""/>
 <part name="R8" library="dc-26" deviceset="RESISTOR" device="0805-RES" value="4K7"/>
+<part name="VOLTAGE_REG_1A_3.3V" library="dc-26" deviceset="LD39100PU33RY" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -6144,7 +6144,7 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/2/LD39050PU33R.
 <text x="66.04" y="73.66" size="1.778" layer="91">Battery JST 2 PIN</text>
 <text x="43.18" y="91.44" size="1.778" layer="91">Battery, USB, ST-LINK Power Out</text>
 <text x="172.72" y="114.3" size="1.778" layer="91">power dissipation: Power Rule: P = I × V</text>
-<text x="111.76" y="99.06" size="1.778" layer="91">3.7V From Battery Out</text>
+<text x="111.76" y="109.22" size="1.778" layer="91">3.7V From Battery Out</text>
 <text x="81.28" y="43.18" size="1.778" layer="91">VCC0 = 5V
 VCC 1 = 3.7 V
 VCC = 3.3V</text>
@@ -6178,19 +6178,19 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <instance part="LED1" gate="G$1" x="-7.62" y="73.66"/>
 <instance part="R2" gate="G$1" x="-7.62" y="81.28" rot="R90"/>
 <instance part="R3" gate="G$1" x="27.94" y="71.12" rot="R90"/>
-<instance part="RESETTABLE-FUSE" gate="G$1" x="127" y="86.36"/>
+<instance part="RESETTABLE-FUSE" gate="G$1" x="127" y="96.52"/>
 <instance part="U$5" gate="G$1" x="157.48" y="50.8"/>
-<instance part="C3" gate="G$1" x="152.4" y="91.44"/>
+<instance part="C3" gate="G$1" x="152.4" y="101.6"/>
 <instance part="C4" gate="G$1" x="193.04" y="50.8"/>
-<instance part="GND6" gate="1" x="152.4" y="96.52" rot="R180"/>
+<instance part="GND6" gate="1" x="152.4" y="106.68" rot="R180"/>
 <instance part="GND" gate="1" x="193.04" y="43.18"/>
 <instance part="GND8" gate="1" x="170.18" y="48.26"/>
-<instance part="PS1" gate="G$1" x="167.64" y="53.34" rot="R90"/>
-<instance part="GND7" gate="1" x="157.48" y="81.28" rot="R270"/>
+<instance part="GND7" gate="1" x="157.48" y="91.44" rot="R270"/>
 <instance part="U$2" gate="G$1" x="27.94" y="33.02" rot="R180"/>
 <instance part="U$4" gate="G$1" x="15.24" y="2.54"/>
 <instance part="GND5" gate="1" x="43.18" y="-15.24"/>
 <instance part="GND9" gate="1" x="43.18" y="40.64" rot="R180"/>
+<instance part="VOLTAGE_REG_1A_3.3V" gate="G$1" x="167.64" y="53.34" rot="R90"/>
 </instances>
 <busses>
 </busses>
@@ -6229,14 +6229,9 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="GND6" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="PS1" gate="G$1" pin="GND"/>
 <wire x1="170.18" y1="53.34" x2="170.18" y2="50.8" width="0.1524" layer="91"/>
 <pinref part="GND8" gate="1" pin="GND"/>
-</segment>
-<segment>
-<pinref part="PS1" gate="G$1" pin="PAD"/>
-<wire x1="167.64" y1="81.28" x2="160.02" y2="81.28" width="0.1524" layer="91"/>
-<pinref part="GND7" gate="1" pin="GND"/>
+<pinref part="VOLTAGE_REG_1A_3.3V" gate="G$1" pin="GND"/>
 </segment>
 <segment>
 <pinref part="U$4" gate="G$1" pin="GND"/>
@@ -6249,6 +6244,11 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <wire x1="33.02" y1="30.48" x2="43.18" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="30.48" x2="43.18" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="GND9" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="VOLTAGE_REG_1A_3.3V" gate="G$1" pin="THERMAL_PAD"/>
+<pinref part="GND7" gate="1" pin="GND"/>
+<wire x1="167.64" y1="91.44" x2="160.02" y2="91.44" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="VCC1" class="0">
@@ -6269,9 +6269,9 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 </segment>
 <segment>
 <pinref part="RESETTABLE-FUSE" gate="G$1" pin="1"/>
-<wire x1="111.76" y1="96.52" x2="111.76" y2="86.36" width="0.1524" layer="91"/>
-<wire x1="111.76" y1="86.36" x2="121.92" y2="86.36" width="0.1524" layer="91"/>
-<label x="111.76" y="96.52" size="1.778" layer="95"/>
+<wire x1="111.76" y1="106.68" x2="111.76" y2="96.52" width="0.1524" layer="91"/>
+<wire x1="111.76" y1="96.52" x2="121.92" y2="96.52" width="0.1524" layer="91"/>
+<label x="111.76" y="106.68" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$3" class="0">
@@ -6324,16 +6324,16 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <segment>
 <pinref part="C3" gate="G$1" pin="2"/>
 <pinref part="RESETTABLE-FUSE" gate="G$1" pin="2"/>
-<wire x1="152.4" y1="86.36" x2="144.78" y2="86.36" width="0.1524" layer="91"/>
-<junction x="152.4" y="86.36"/>
+<wire x1="152.4" y1="96.52" x2="144.78" y2="96.52" width="0.1524" layer="91"/>
+<junction x="152.4" y="96.52"/>
 <pinref part="U$5" gate="G$1" pin="1"/>
-<wire x1="144.78" y1="86.36" x2="134.62" y2="86.36" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="96.52" x2="134.62" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="147.32" y1="48.26" x2="144.78" y2="53.34" width="0.1524" layer="91"/>
-<wire x1="144.78" y1="53.34" x2="144.78" y2="86.36" width="0.1524" layer="91"/>
-<junction x="144.78" y="86.36"/>
-<pinref part="PS1" gate="G$1" pin="VIN"/>
-<wire x1="152.4" y1="86.36" x2="170.18" y2="86.36" width="0.1524" layer="91"/>
-<wire x1="170.18" y1="86.36" x2="170.18" y2="81.28" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="53.34" x2="144.78" y2="96.52" width="0.1524" layer="91"/>
+<junction x="144.78" y="96.52"/>
+<wire x1="152.4" y1="96.52" x2="170.18" y2="96.52" width="0.1524" layer="91"/>
+<pinref part="VOLTAGE_REG_1A_3.3V" gate="G$1" pin="VIN"/>
+<wire x1="170.18" y1="91.44" x2="170.18" y2="96.52" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="VCC" class="0">
@@ -6341,16 +6341,16 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="C4" gate="G$1" pin="1"/>
 <wire x1="193.04" y1="53.34" x2="193.04" y2="55.88" width="0.1524" layer="91"/>
 <label x="193.04" y="55.88" size="1.778" layer="95"/>
-<pinref part="PS1" gate="G$1" pin="VOUT"/>
 <wire x1="175.26" y1="53.34" x2="193.04" y2="53.34" width="0.1524" layer="91"/>
 <junction x="193.04" y="53.34"/>
+<pinref part="VOLTAGE_REG_1A_3.3V" gate="G$1" pin="VOUT"/>
 </segment>
 </net>
 <net name="VIN-EN" class="0">
 <segment>
 <pinref part="U$5" gate="G$1" pin="C"/>
-<pinref part="PS1" gate="G$1" pin="EN"/>
 <wire x1="167.64" y1="50.8" x2="167.64" y2="53.34" width="0.1524" layer="91"/>
+<pinref part="VOLTAGE_REG_1A_3.3V" gate="G$1" pin="EN"/>
 </segment>
 </net>
 <net name="SYS_JTCK_SWCLK" class="0">
@@ -8544,7 +8544,6 @@ and ESP 32 share the same SPI</text>
 <approved hash="104,3,187.96,78.74,APA19,VSS,GND,,,"/>
 <approved hash="104,3,187.96,88.9,APA20,VDD,VCC1,,,"/>
 <approved hash="104,3,187.96,116.84,APA20,VSS,GND,,,"/>
-<approved hash="104,1,167.64,81.28,PS1,PAD,GND,,,"/>
 <approved hash="115,3,186.69,88.9,VCC1,,,,,"/>
 <approved hash="115,3,186.69,50.8,VCC1,,,,,"/>
 <approved hash="115,3,186.69,12.7,VCC1,,,,,"/>

@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP LD39100PU33RY
+D LDO Voltage Regulators 1 A low quiescent current low noise voltage regulator
+K
+F http://www.st.com/content/ccc/resource/technical/document/datasheet/72/02/e5/ee/df/36/40/5e/CD00233788.pdf/files/CD00233788.pdf/jcr:content/translations/en.CD00233788.pdf
+$ENDCMP
+#
+#End Doc Library

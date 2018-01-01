@@ -6026,6 +6026,29 @@ Commonly used for 1/4W through-hole resistors. 0.3" pitch between holes.&lt;br&g
 <wire x1="-1.5" y1="0.75" x2="-0.75" y2="1.5" width="0.1" layer="51"/>
 <circle x="-1.9" y="1.65" radius="0.125" width="0.25" layer="25"/>
 </package>
+<package name="SON95P300X300X90-7N">
+<description>&lt;b&gt;DFN6(3X3)_1&lt;/b&gt;&lt;br&gt;
+</description>
+<smd name="1" x="-1.5" y="0.95" dx="0.8" dy="0.3" layer="1"/>
+<smd name="2" x="-1.5" y="0" dx="0.8" dy="0.3" layer="1"/>
+<smd name="3" x="-1.5" y="-0.95" dx="0.8" dy="0.3" layer="1"/>
+<smd name="4" x="1.5" y="-0.95" dx="0.8" dy="0.3" layer="1"/>
+<smd name="5" x="1.5" y="0" dx="0.8" dy="0.3" layer="1"/>
+<smd name="6" x="1.5" y="0.95" dx="0.8" dy="0.3" layer="1"/>
+<smd name="7" x="0" y="0" dx="2.5" dy="1.75" layer="1" rot="R90"/>
+<text x="0" y="0" size="1.27" layer="25" align="center">&gt;NAME</text>
+<text x="0" y="0" size="1.27" layer="51" align="center">&gt;VALUE</text>
+<wire x1="-2.125" y1="1.775" x2="2.125" y2="1.775" width="0.05" layer="21"/>
+<wire x1="2.125" y1="1.775" x2="2.125" y2="-1.775" width="0.05" layer="21"/>
+<wire x1="2.125" y1="-1.775" x2="-2.125" y2="-1.775" width="0.05" layer="21"/>
+<wire x1="-2.125" y1="-1.775" x2="-2.125" y2="1.775" width="0.05" layer="21"/>
+<wire x1="-1.5" y1="1.5" x2="1.5" y2="1.5" width="0.1" layer="51"/>
+<wire x1="1.5" y1="1.5" x2="1.5" y2="-1.5" width="0.1" layer="51"/>
+<wire x1="1.5" y1="-1.5" x2="-1.5" y2="-1.5" width="0.1" layer="51"/>
+<wire x1="-1.5" y1="-1.5" x2="-1.5" y2="1.5" width="0.1" layer="51"/>
+<wire x1="-1.5" y1="0.75" x2="-0.75" y2="1.5" width="0.1" layer="51"/>
+<circle x="-1.9" y="1.6" radius="0.125" width="0.25" layer="25"/>
+</package>
 </packages>
 <symbols>
 <symbol name="CMD_C0DE_LOGO">
@@ -7233,6 +7256,21 @@ Commonly used for 1/4W through-hole resistors. 0.3" pitch between holes.&lt;br&g
 <pin name="PAD" x="27.94" y="0" length="middle" direction="pwr" rot="R180"/>
 <pin name="VIN" x="27.94" y="-2.54" length="middle" direction="pwr" rot="R180"/>
 <pin name="NC" x="27.94" y="-5.08" length="middle" direction="nc" rot="R180"/>
+</symbol>
+<symbol name="LD39100PU33RY">
+<wire x1="5.08" y1="2.54" x2="33.02" y2="2.54" width="0.254" layer="94"/>
+<wire x1="33.02" y1="2.54" x2="33.02" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="33.02" y1="-10.16" x2="5.08" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="5.08" y1="-10.16" x2="5.08" y2="2.54" width="0.254" layer="94"/>
+<text x="19.05" y="5.08" size="1.778" layer="95" align="center">&gt;NAME</text>
+<text x="19.05" y="-12.7" size="1.778" layer="96" align="center">&gt;VALUE</text>
+<pin name="EN" x="0" y="0" length="middle" direction="pas"/>
+<pin name="GND" x="0" y="-2.54" length="middle" direction="pas"/>
+<pin name="PG" x="0" y="-5.08" length="middle" direction="pas"/>
+<pin name="VOUT" x="0" y="-7.62" length="middle" direction="pas"/>
+<pin name="THERMAL_PAD" x="38.1" y="0" length="middle" direction="pas" rot="R180"/>
+<pin name="VIN" x="38.1" y="-2.54" length="middle" direction="pas" rot="R180"/>
+<pin name="NC" x="38.1" y="-5.08" length="middle" direction="nc" rot="R180"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -9435,6 +9473,41 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/2/LD39050PU33R.
 <attribute name="HEIGHT" value="1mm" constant="no"/>
 <attribute name="MANUFACTURER_NAME" value="STMicroelectronics" constant="no"/>
 <attribute name="MANUFACTURER_PART_NUMBER" value="LD39050PU33R" constant="no"/>
+<attribute name="OTHER_PART_NUMBER" value="" constant="no"/>
+<attribute name="RS_PART_NUMBER" value="" constant="no"/>
+<attribute name="SUPPLIER_NAME" value="RS" constant="no"/>
+</technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="LD39100PU33RY" prefix="IC">
+<description>&lt;b&gt;LDO Voltage Regulators 1 A low quiescent current low noise voltage regulator&lt;/b&gt;&lt;p&gt;
+&lt;/b&gt;&lt;br&gt;&lt;a href="&lt;br&gt;&lt;a href="https://componentsearchengine.com/Images/9/LD39100PU33RY.jpg" title="Image"&gt;
+&lt;img src="https://componentsearchengine.com/Images/9/LD39100PU33RY.jpg" width="150"&gt;&lt;/a&gt;&lt;p&gt;
+Source: &lt;a href="http://www.st.com/content/ccc/resource/technical/document/datasheet/72/02/e5/ee/df/36/40/5e/CD00233788.pdf/files/CD00233788.pdf/jcr:content/translations/en.CD00233788.pdf"&gt; Datasheet &lt;/a&gt;</description>
+<gates>
+<gate name="G$1" symbol="LD39100PU33RY" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="SON95P300X300X90-7N">
+<connects>
+<connect gate="G$1" pin="EN" pad="1"/>
+<connect gate="G$1" pin="GND" pad="2"/>
+<connect gate="G$1" pin="NC" pad="5"/>
+<connect gate="G$1" pin="PG" pad="3"/>
+<connect gate="G$1" pin="THERMAL_PAD" pad="7"/>
+<connect gate="G$1" pin="VIN" pad="6"/>
+<connect gate="G$1" pin="VOUT" pad="4"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="3D_PACKAGE" value="" constant="no"/>
+<attribute name="ALLIED_NUMBER" value="" constant="no"/>
+<attribute name="DESCRIPTION" value="LDO Voltage Regulators 1 A low quiescent current low noise voltage regulator" constant="no"/>
+<attribute name="HEIGHT" value="0.9mm" constant="no"/>
+<attribute name="MANUFACTURER_NAME" value="STMicroelectronics" constant="no"/>
+<attribute name="MANUFACTURER_PART_NUMBER" value="LD39100PU33RY" constant="no"/>
 <attribute name="OTHER_PART_NUMBER" value="" constant="no"/>
 <attribute name="RS_PART_NUMBER" value="" constant="no"/>
 <attribute name="SUPPLIER_NAME" value="RS" constant="no"/>

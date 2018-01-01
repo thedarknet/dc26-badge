@@ -5986,7 +5986,7 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/2/LD39050PU33R.
 <part name="C1" library="dc-26" deviceset="C-US" device="C0805" value="4.7uF"/>
 <part name="C2" library="dc-26" deviceset="C-US" device="C0805" value="4.7uf"/>
 <part name="U$2" library="dc-26" deviceset="DX4R005JJ2" device="DX4R005JJ2"/>
-<part name="U$3" library="dc-26" deviceset="DS21984E" device="" value="MCP73831"/>
+<part name="CHARGING_CIRCUT" library="dc-26" deviceset="DS21984E" device="" value="MCP73831"/>
 <part name="GND1" library="dc-26" deviceset="GND" device=""/>
 <part name="GND2" library="dc-26" deviceset="GND" device=""/>
 <part name="GND3" library="dc-26" deviceset="GND" device=""/>
@@ -6127,7 +6127,7 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/2/LD39050PU33R.
 <part name="GND7" library="dc-26" deviceset="GND" device=""/>
 <part name="R5" library="dc-26" deviceset="RESISTOR" device="0805-RES" value="10K"/>
 <part name="GND67" library="dc-26" deviceset="GND" device=""/>
-<part name="U$6" library="dc-26" deviceset="SWITCH_TACTILE" device="TACTILE-2PIN-NARROW" value="MJTP1243"/>
+<part name="RESET_BUTTON" library="dc-26" deviceset="SWITCH_TACTILE" device="TACTILE-2PIN-NARROW" value="MJTP1243"/>
 <part name="C18" library="dc-26" deviceset="C-US" device="C0805" value="100nF"/>
 <part name="GND68" library="dc-26" deviceset="GND" device=""/>
 <part name="USERBUTTON" library="dc-26" deviceset="SWITCH_TACTILE" device="TACTILE-2PIN-NARROW" value="UserButton"/>
@@ -6170,7 +6170,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <attribute name="NAME" x="-21.844" y="79.375" size="1.778" layer="95"/>
 <attribute name="VALUE" x="-19.304" y="74.549" size="1.778" layer="96"/>
 </instance>
-<instance part="U$3" gate="G$1" x="15.24" y="76.2"/>
+<instance part="CHARGING_CIRCUT" gate="G$1" x="15.24" y="76.2"/>
 <instance part="GND1" gate="1" x="50.8" y="66.04"/>
 <instance part="GND2" gate="1" x="35.56" y="60.96"/>
 <instance part="GND3" gate="1" x="27.94" y="58.42"/>
@@ -6214,7 +6214,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <wire x1="-22.86" y1="73.66" x2="-22.86" y2="71.12" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="U$3" gate="G$1" pin="VSS"/>
+<pinref part="CHARGING_CIRCUT" gate="G$1" pin="VSS"/>
 <pinref part="GND3" gate="1" pin="GND"/>
 <wire x1="27.94" y1="60.96" x2="27.94" y2="66.04" width="0.1524" layer="91"/>
 <pinref part="R3" gate="G$1" pin="1"/>
@@ -6260,7 +6260,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <wire x1="50.8" y1="76.2" x2="35.56" y2="76.2" width="0.1524" layer="91"/>
 <wire x1="35.56" y1="76.2" x2="33.02" y2="76.2" width="0.1524" layer="91"/>
 <wire x1="33.02" y1="76.2" x2="33.02" y2="86.36" width="0.1524" layer="91"/>
-<pinref part="U$3" gate="G$1" pin="VBAT"/>
+<pinref part="CHARGING_CIRCUT" gate="G$1" pin="VBAT"/>
 <wire x1="33.02" y1="86.36" x2="27.94" y2="86.36" width="0.1524" layer="91"/>
 <pinref part="C1" gate="G$1" pin="1"/>
 <wire x1="35.56" y1="71.12" x2="35.56" y2="76.2" width="0.1524" layer="91"/>
@@ -6277,7 +6277,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <net name="N$3" class="0">
 <segment>
 <wire x1="-7.62" y1="68.58" x2="-7.62" y2="66.04" width="0.1524" layer="91"/>
-<pinref part="U$3" gate="G$1" pin="STAT"/>
+<pinref part="CHARGING_CIRCUT" gate="G$1" pin="STAT"/>
 <wire x1="-7.62" y1="66.04" x2="0" y2="66.04" width="0.1524" layer="91"/>
 <pinref part="LED1" gate="G$1" pin="C"/>
 </segment>
@@ -6285,7 +6285,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <net name="VCC0" class="0">
 <segment>
 <wire x1="-30.48" y1="86.36" x2="-30.48" y2="91.44" width="0.1524" layer="91"/>
-<pinref part="U$3" gate="G$1" pin="VDD"/>
+<pinref part="CHARGING_CIRCUT" gate="G$1" pin="VDD"/>
 <wire x1="0" y1="86.36" x2="-7.62" y2="86.36" width="0.1524" layer="91"/>
 <pinref part="C2" gate="G$1" pin="1"/>
 <wire x1="-7.62" y1="86.36" x2="-22.86" y2="86.36" width="0.1524" layer="91"/>
@@ -6316,7 +6316,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 </net>
 <net name="N$2" class="0">
 <segment>
-<pinref part="U$3" gate="G$1" pin="PROG"/>
+<pinref part="CHARGING_CIRCUT" gate="G$1" pin="PROG"/>
 <pinref part="R3" gate="G$1" pin="2"/>
 </segment>
 </net>
@@ -6421,7 +6421,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <instance part="GND65" gate="1" x="114.3" y="-22.86"/>
 <instance part="R5" gate="G$1" x="91.44" y="106.68" rot="R90"/>
 <instance part="GND67" gate="1" x="91.44" y="114.3" rot="R180"/>
-<instance part="U$6" gate="G$1" x="35.56" y="119.38" rot="R180"/>
+<instance part="RESET_BUTTON" gate="G$1" x="35.56" y="119.38" rot="R180"/>
 <instance part="C18" gate="G$1" x="48.26" y="119.38"/>
 <instance part="GND68" gate="1" x="35.56" y="106.68"/>
 <instance part="USERBUTTON" gate="G$1" x="172.72" y="121.92" rot="R180"/>
@@ -6530,7 +6530,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="GND67" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="U$6" gate="G$1" pin="A"/>
+<pinref part="RESET_BUTTON" gate="G$1" pin="A"/>
 <wire x1="35.56" y1="114.3" x2="48.26" y2="114.3" width="0.1524" layer="91"/>
 <pinref part="C18" gate="G$1" pin="2"/>
 <wire x1="35.56" y1="114.3" x2="35.56" y2="109.22" width="0.1524" layer="91"/>
@@ -6926,13 +6926,13 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <label x="22.86" y="124.46" size="1.778" layer="95"/>
 <pinref part="C18" gate="G$1" pin="1"/>
 <wire x1="48.26" y1="121.92" x2="48.26" y2="124.46" width="0.1524" layer="91"/>
-<pinref part="U$6" gate="G$1" pin="C"/>
-<wire x1="35.56" y1="124.46" x2="48.26" y2="124.46" width="0.1524" layer="91"/>
+<pinref part="RESET_BUTTON" gate="G$1" pin="C"/>
+<wire x1="35.56" y1="124.46" x2="43.18" y2="124.46" width="0.1524" layer="91"/>
 <junction x="35.56" y="124.46"/>
-</segment>
-<segment>
 <pinref part="R8" gate="G$1" pin="2"/>
+<wire x1="43.18" y1="124.46" x2="48.26" y2="124.46" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="129.54" x2="43.18" y2="124.46" width="0.1524" layer="91"/>
+<junction x="43.18" y="124.46"/>
 </segment>
 </net>
 <net name="PC2" class="0">
@@ -7065,30 +7065,6 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="IC1" gate="G$1" pin="PA15"/>
 <wire x1="116.84" y1="83.82" x2="116.84" y2="86.36" width="0.1524" layer="91"/>
 <label x="116.84" y="86.36" size="1.778" layer="95" rot="R90"/>
-</segment>
-</net>
-<net name="PA10" class="0">
-<segment>
-<pinref part="STM32-BREAKOUT" gate="G$1" pin="12"/>
-<wire x1="193.04" y1="58.42" x2="198.12" y2="58.42" width="0.1524" layer="91"/>
-<label x="198.12" y="58.42" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="IC1" gate="G$1" pin="PA10"/>
-<wire x1="127" y1="53.34" x2="132.08" y2="53.34" width="0.1524" layer="91"/>
-<label x="132.08" y="53.34" size="1.778" layer="95"/>
-</segment>
-</net>
-<net name="PA9" class="0">
-<segment>
-<pinref part="STM32-BREAKOUT" gate="G$1" pin="14"/>
-<wire x1="193.04" y1="55.88" x2="198.12" y2="55.88" width="0.1524" layer="91"/>
-<label x="198.12" y="55.88" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="IC1" gate="G$1" pin="PA9"/>
-<wire x1="127" y1="50.8" x2="132.08" y2="50.8" width="0.1524" layer="91"/>
-<label x="132.08" y="50.8" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="PC9" class="0">
@@ -7309,6 +7285,30 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <wire x1="190.5" y1="114.3" x2="190.5" y2="106.68" width="0.1524" layer="91"/>
 <pinref part="R6" gate="G$1" pin="2"/>
 <wire x1="190.5" y1="106.68" x2="187.96" y2="106.68" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="USART1_RX" class="0">
+<segment>
+<pinref part="IC1" gate="G$1" pin="PA10"/>
+<wire x1="127" y1="53.34" x2="132.08" y2="53.34" width="0.1524" layer="91"/>
+<label x="132.08" y="53.34" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="STM32-BREAKOUT" gate="G$1" pin="12"/>
+<wire x1="193.04" y1="58.42" x2="198.12" y2="58.42" width="0.1524" layer="91"/>
+<label x="198.12" y="58.42" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="USART1_TX" class="0">
+<segment>
+<pinref part="IC1" gate="G$1" pin="PA9"/>
+<wire x1="127" y1="50.8" x2="132.08" y2="50.8" width="0.1524" layer="91"/>
+<label x="132.08" y="50.8" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="STM32-BREAKOUT" gate="G$1" pin="14"/>
+<wire x1="193.04" y1="55.88" x2="198.12" y2="55.88" width="0.1524" layer="91"/>
+<label x="198.12" y="55.88" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
@@ -8406,11 +8406,11 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 </sheet>
 <sheet>
 <plain>
-<text x="99.06" y="68.58" size="1.778" layer="91">This is correct:  SD Card reader
+<text x="104.14" y="68.58" size="1.778" layer="91">This is correct:  SD Card reader
 and ESP 32 share the same SPI</text>
 </plain>
 <instances>
-<instance part="U$1" gate="G$1" x="43.18" y="58.42"/>
+<instance part="U$1" gate="G$1" x="48.26" y="58.42"/>
 </instances>
 <busses>
 </busses>
@@ -8418,85 +8418,85 @@ and ESP 32 share the same SPI</text>
 <net name="GND" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="GND"/>
-<wire x1="15.24" y1="71.12" x2="10.16" y2="71.12" width="0.1524" layer="91"/>
-<label x="-5.08" y="71.12" size="1.778" layer="95"/>
+<wire x1="20.32" y1="71.12" x2="15.24" y2="71.12" width="0.1524" layer="91"/>
+<label x="0" y="71.12" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="VCC" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="VCC"/>
-<wire x1="15.24" y1="76.2" x2="10.16" y2="76.2" width="0.1524" layer="91"/>
-<label x="-5.08" y="76.2" size="1.778" layer="95"/>
+<wire x1="20.32" y1="76.2" x2="15.24" y2="76.2" width="0.1524" layer="91"/>
+<label x="0" y="76.2" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="LCD_DATA_CMD" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="A0"/>
-<wire x1="15.24" y1="55.88" x2="10.16" y2="55.88" width="0.1524" layer="91"/>
-<label x="-5.08" y="55.88" size="1.778" layer="95"/>
+<wire x1="20.32" y1="55.88" x2="15.24" y2="55.88" width="0.1524" layer="91"/>
+<label x="0" y="55.88" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="LCD_CS" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="CS"/>
-<wire x1="15.24" y1="66.04" x2="10.16" y2="66.04" width="0.1524" layer="91"/>
-<label x="-5.08" y="66.04" size="1.778" layer="95"/>
+<wire x1="20.32" y1="66.04" x2="15.24" y2="66.04" width="0.1524" layer="91"/>
+<label x="0" y="66.04" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SPI2_LCD_MOSI" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="SDA"/>
-<wire x1="15.24" y1="50.8" x2="10.16" y2="50.8" width="0.1524" layer="91"/>
-<label x="-5.08" y="50.8" size="1.778" layer="95"/>
+<wire x1="20.32" y1="50.8" x2="15.24" y2="50.8" width="0.1524" layer="91"/>
+<label x="0" y="50.8" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="LCD_RESET" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="RESET"/>
-<wire x1="15.24" y1="60.96" x2="10.16" y2="60.96" width="0.1524" layer="91"/>
-<label x="-5.08" y="60.96" size="1.778" layer="95"/>
+<wire x1="20.32" y1="60.96" x2="15.24" y2="60.96" width="0.1524" layer="91"/>
+<label x="0" y="60.96" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="LCD_BACKLIGHT" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="LED"/>
-<wire x1="15.24" y1="40.64" x2="10.16" y2="40.64" width="0.1524" layer="91"/>
-<label x="-5.08" y="40.64" size="1.778" layer="95"/>
+<wire x1="20.32" y1="40.64" x2="15.24" y2="40.64" width="0.1524" layer="91"/>
+<label x="0" y="40.64" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SPI2_LCD_SCK" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="SCK"/>
-<wire x1="15.24" y1="45.72" x2="10.16" y2="45.72" width="0.1524" layer="91"/>
-<label x="-5.08" y="45.72" size="1.778" layer="95"/>
+<wire x1="20.32" y1="45.72" x2="15.24" y2="45.72" width="0.1524" layer="91"/>
+<label x="0" y="45.72" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SD_CS" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="SD_CS"/>
-<wire x1="71.12" y1="66.04" x2="78.74" y2="66.04" width="0.1524" layer="91"/>
-<label x="78.74" y="66.04" size="1.778" layer="95"/>
+<wire x1="76.2" y1="66.04" x2="83.82" y2="66.04" width="0.1524" layer="91"/>
+<label x="83.82" y="66.04" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SPI3_ESP_SCK" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="SD_SCK"/>
-<wire x1="71.12" y1="50.8" x2="78.74" y2="50.8" width="0.1524" layer="91"/>
-<label x="78.74" y="50.8" size="1.778" layer="95"/>
+<wire x1="76.2" y1="50.8" x2="83.82" y2="50.8" width="0.1524" layer="91"/>
+<label x="83.82" y="50.8" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SPI3_ESP_MISO" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="SD_MISO"/>
-<wire x1="71.12" y1="55.88" x2="76.2" y2="55.88" width="0.1524" layer="91"/>
-<label x="78.74" y="55.88" size="1.778" layer="95"/>
+<wire x1="76.2" y1="55.88" x2="81.28" y2="55.88" width="0.1524" layer="91"/>
+<label x="83.82" y="55.88" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SPI3_ESP_MOSI" class="0">
 <segment>
 <pinref part="U$1" gate="G$1" pin="SD_MOSI"/>
-<wire x1="71.12" y1="60.96" x2="78.74" y2="60.96" width="0.1524" layer="91"/>
-<label x="78.74" y="60.96" size="1.778" layer="95"/>
+<wire x1="76.2" y1="60.96" x2="83.82" y2="60.96" width="0.1524" layer="91"/>
+<label x="83.82" y="60.96" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>

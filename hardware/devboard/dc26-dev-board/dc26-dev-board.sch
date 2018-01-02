@@ -5985,14 +5985,14 @@ Source: &lt;a href="http://www.st.com/content/ccc/resource/technical/document/da
 <part name="CN1" library="dc-26" deviceset="JST_2PIN" device="-SMT-RA" value="JST"/>
 <part name="C1" library="dc-26" deviceset="C-US" device="C0805" value="4.7uF"/>
 <part name="C2" library="dc-26" deviceset="C-US" device="C0805" value="4.7uf"/>
-<part name="U$2" library="dc-26" deviceset="DX4R005JJ2" device="DX4R005JJ2"/>
+<part name="USB" library="dc-26" deviceset="DX4R005JJ2" device="DX4R005JJ2"/>
 <part name="CHARGING_CIRCUT" library="dc-26" deviceset="DS21984E" device="" value="MCP73831"/>
 <part name="GND1" library="dc-26" deviceset="GND" device=""/>
 <part name="GND2" library="dc-26" deviceset="GND" device=""/>
 <part name="GND3" library="dc-26" deviceset="GND" device=""/>
 <part name="GND4" library="dc-26" deviceset="GND" device=""/>
 <part name="LED1" library="dc-26" deviceset="LED" device="1206" value="MF-LED-0603-GREEN"/>
-<part name="U$4" library="dc-26" deviceset="STLINK-V2-CONNECTOR" device=""/>
+<part name="LINK1" library="dc-26" deviceset="STLINK-V2-CONNECTOR" device=""/>
 <part name="GND5" library="dc-26" deviceset="GND" device=""/>
 <part name="RESETTABLE-FUSE" library="dc-26" deviceset="PTC" device="SMD" value="SSSS811101"/>
 <part name="U$5" library="dc-26" deviceset="SWITCH_SPDT" device=""/>
@@ -6018,7 +6018,7 @@ Source: &lt;a href="http://www.st.com/content/ccc/resource/technical/document/da
 <part name="GND11" library="dc-26" deviceset="GND" device=""/>
 <part name="C13" library="dc-26" deviceset="C-US" device="C0805" value="10uF"/>
 <part name="GND13" library="dc-26" deviceset="GND" device=""/>
-<part name="ESP32-PROGRAM-HEADER" library="dc-26" deviceset="SERIAL_4" device=""/>
+<part name="ESP32PH" library="dc-26" deviceset="SERIAL_4" device=""/>
 <part name="Z1" library="dc-26" deviceset="CMDZ3L3_TR" device=""/>
 <part name="GND14" library="dc-26" deviceset="GND" device=""/>
 <part name="GND15" library="dc-26" deviceset="GND" device=""/>
@@ -6135,7 +6135,7 @@ Source: &lt;a href="http://www.st.com/content/ccc/resource/technical/document/da
 <part name="C19" library="dc-26" deviceset="C-US" device="C0805" value="100nF"/>
 <part name="GND69" library="dc-26" deviceset="GND" device=""/>
 <part name="R8" library="dc-26" deviceset="RESISTOR" device="0805-RES" value="4K7"/>
-<part name="VOLTAGE_REG_1A_3.3V" library="dc-26" deviceset="LD39100PU33RY" device=""/>
+<part name="VDO" library="dc-26" deviceset="LD39100PU33RY" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -6186,11 +6186,11 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <instance part="GND" gate="1" x="193.04" y="43.18"/>
 <instance part="GND8" gate="1" x="170.18" y="48.26"/>
 <instance part="GND7" gate="1" x="157.48" y="91.44" rot="R270"/>
-<instance part="U$2" gate="G$1" x="27.94" y="33.02" rot="R180"/>
-<instance part="U$4" gate="G$1" x="15.24" y="2.54"/>
+<instance part="USB" gate="G$1" x="27.94" y="33.02" rot="R180"/>
+<instance part="LINK1" gate="G$1" x="15.24" y="2.54"/>
 <instance part="GND5" gate="1" x="43.18" y="-15.24"/>
 <instance part="GND9" gate="1" x="43.18" y="40.64" rot="R180"/>
-<instance part="VOLTAGE_REG_1A_3.3V" gate="G$1" x="167.64" y="53.34" rot="R90"/>
+<instance part="VDO" gate="G$1" x="167.64" y="53.34" rot="R90"/>
 </instances>
 <busses>
 </busses>
@@ -6231,22 +6231,22 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <segment>
 <wire x1="170.18" y1="53.34" x2="170.18" y2="50.8" width="0.1524" layer="91"/>
 <pinref part="GND8" gate="1" pin="GND"/>
-<pinref part="VOLTAGE_REG_1A_3.3V" gate="G$1" pin="GND"/>
+<pinref part="VDO" gate="G$1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="U$4" gate="G$1" pin="GND"/>
+<pinref part="LINK1" gate="G$1" pin="GND"/>
 <wire x1="25.4" y1="-7.62" x2="43.18" y2="-7.62" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="-7.62" x2="43.18" y2="-12.7" width="0.1524" layer="91"/>
 <pinref part="GND5" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="U$2" gate="G$1" pin="GND"/>
+<pinref part="USB" gate="G$1" pin="GND"/>
 <wire x1="33.02" y1="30.48" x2="43.18" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="30.48" x2="43.18" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="GND9" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="VOLTAGE_REG_1A_3.3V" gate="G$1" pin="THERMAL_PAD"/>
+<pinref part="VDO" gate="G$1" pin="THERMAL_PAD"/>
 <pinref part="GND7" gate="1" pin="GND"/>
 <wire x1="167.64" y1="91.44" x2="160.02" y2="91.44" width="0.1524" layer="91"/>
 </segment>
@@ -6297,13 +6297,13 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <label x="-30.48" y="91.44" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$4" gate="G$1" pin="VCC"/>
+<pinref part="LINK1" gate="G$1" pin="VCC"/>
 <wire x1="25.4" y1="0" x2="43.18" y2="0" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="0" x2="43.18" y2="5.08" width="0.1524" layer="91"/>
 <label x="43.18" y="5.08" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$2" gate="G$1" pin="+5V"/>
+<pinref part="USB" gate="G$1" pin="+5V"/>
 <wire x1="33.02" y1="20.32" x2="40.64" y2="20.32" width="0.1524" layer="91"/>
 <label x="40.64" y="20.32" size="1.778" layer="95"/>
 </segment>
@@ -6332,7 +6332,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <wire x1="144.78" y1="53.34" x2="144.78" y2="96.52" width="0.1524" layer="91"/>
 <junction x="144.78" y="96.52"/>
 <wire x1="152.4" y1="96.52" x2="170.18" y2="96.52" width="0.1524" layer="91"/>
-<pinref part="VOLTAGE_REG_1A_3.3V" gate="G$1" pin="VIN"/>
+<pinref part="VDO" gate="G$1" pin="VIN"/>
 <wire x1="170.18" y1="91.44" x2="170.18" y2="96.52" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -6343,40 +6343,40 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <label x="193.04" y="55.88" size="1.778" layer="95"/>
 <wire x1="175.26" y1="53.34" x2="193.04" y2="53.34" width="0.1524" layer="91"/>
 <junction x="193.04" y="53.34"/>
-<pinref part="VOLTAGE_REG_1A_3.3V" gate="G$1" pin="VOUT"/>
+<pinref part="VDO" gate="G$1" pin="VOUT"/>
 </segment>
 </net>
 <net name="VIN-EN" class="0">
 <segment>
 <pinref part="U$5" gate="G$1" pin="C"/>
 <wire x1="167.64" y1="50.8" x2="167.64" y2="53.34" width="0.1524" layer="91"/>
-<pinref part="VOLTAGE_REG_1A_3.3V" gate="G$1" pin="EN"/>
+<pinref part="VDO" gate="G$1" pin="EN"/>
 </segment>
 </net>
 <net name="SYS_JTCK_SWCLK" class="0">
 <segment>
-<pinref part="U$4" gate="G$1" pin="SWDCLK"/>
+<pinref part="LINK1" gate="G$1" pin="SWDCLK"/>
 <wire x1="25.4" y1="-5.08" x2="40.64" y2="-5.08" width="0.1524" layer="91"/>
 <label x="45.72" y="-5.08" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SYS_JTMS_SWDIO" class="0">
 <segment>
-<pinref part="U$4" gate="G$1" pin="SWDIO"/>
+<pinref part="LINK1" gate="G$1" pin="SWDIO"/>
 <wire x1="25.4" y1="-2.54" x2="38.1" y2="-2.54" width="0.1524" layer="91"/>
 <label x="45.72" y="-2.54" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="USB_DM" class="0">
 <segment>
-<pinref part="U$2" gate="G$1" pin="D+"/>
+<pinref part="USB" gate="G$1" pin="D+"/>
 <wire x1="33.02" y1="25.4" x2="48.26" y2="25.4" width="0.1524" layer="91"/>
 <label x="50.8" y="25.4" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="USB_DP" class="0">
 <segment>
-<pinref part="U$2" gate="G$1" pin="D-"/>
+<pinref part="USB" gate="G$1" pin="D-"/>
 <wire x1="33.02" y1="22.86" x2="48.26" y2="22.86" width="0.1524" layer="91"/>
 <label x="50.8" y="22.86" size="1.778" layer="95"/>
 </segment>
@@ -7865,7 +7865,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <instance part="GND11" gate="1" x="2.54" y="38.1"/>
 <instance part="C13" gate="G$1" x="-43.18" y="53.34"/>
 <instance part="GND13" gate="1" x="-43.18" y="43.18"/>
-<instance part="ESP32-PROGRAM-HEADER" gate="G$1" x="-38.1" y="-15.24" rot="R90"/>
+<instance part="ESP32PH" gate="G$1" x="-38.1" y="-15.24" rot="R90"/>
 <instance part="Z1" gate="G$1" x="50.8" y="-12.7" rot="R90"/>
 <instance part="GND14" gate="1" x="-25.4" y="71.12" rot="R180"/>
 <instance part="GND15" gate="1" x="27.94" y="73.66" rot="R90"/>
@@ -7894,7 +7894,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <wire x1="-43.18" y1="45.72" x2="-43.18" y2="48.26" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="ESP32-PROGRAM-HEADER" gate="G$1" pin="GND"/>
+<pinref part="ESP32PH" gate="G$1" pin="GND"/>
 <wire x1="-33.02" y1="-7.62" x2="-33.02" y2="-2.54" width="0.1524" layer="91"/>
 <label x="-33.02" y="-2.54" size="1.778" layer="95" rot="R90"/>
 </segment>
@@ -7952,7 +7952,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 </net>
 <net name="VCC" class="0">
 <segment>
-<pinref part="ESP32-PROGRAM-HEADER" gate="G$1" pin="VCC"/>
+<pinref part="ESP32PH" gate="G$1" pin="VCC"/>
 <wire x1="-40.64" y1="-7.62" x2="-40.64" y2="-2.54" width="0.1524" layer="91"/>
 <label x="-40.64" y="-2.54" size="1.778" layer="95" rot="R90"/>
 </segment>
@@ -7995,7 +7995,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 </net>
 <net name="ESP-RX" class="0">
 <segment>
-<pinref part="ESP32-PROGRAM-HEADER" gate="G$1" pin="RX"/>
+<pinref part="ESP32PH" gate="G$1" pin="RX"/>
 <wire x1="-38.1" y1="-7.62" x2="-38.1" y2="-2.54" width="0.1524" layer="91"/>
 <label x="-38.1" y="-2.54" size="1.778" layer="95" rot="R90"/>
 </segment>
@@ -8029,7 +8029,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <label x="33.02" y="58.42" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="ESP32-PROGRAM-HEADER" gate="G$1" pin="TX"/>
+<pinref part="ESP32PH" gate="G$1" pin="TX"/>
 <wire x1="-35.56" y1="-7.62" x2="-35.56" y2="-2.54" width="0.1524" layer="91"/>
 <label x="-35.56" y="-2.54" size="1.778" layer="95" rot="R90"/>
 </segment>

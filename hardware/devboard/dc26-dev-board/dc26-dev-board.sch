@@ -7291,7 +7291,7 @@ Source: &lt;a href="http://www.st.com/content/ccc/resource/technical/document/da
 <part name="LINK1" library="dc-26" deviceset="STLINK-V2-CONNECTOR" device=""/>
 <part name="GND5" library="dc-26" deviceset="GND" device=""/>
 <part name="RESETTABLE-FUSE" library="dc-26" deviceset="PTC" device="SMD" value="SSSS811101"/>
-<part name="U$5" library="dc-26" deviceset="SWITCH_SPDT" device=""/>
+<part name="P1" library="dc-26" deviceset="SWITCH_SPDT" device="" value="SSSS811101"/>
 <part name="R2" library="dc-26" deviceset="RESISTOR" device="0805-RES" value="470"/>
 <part name="R3" library="dc-26" deviceset="RESISTOR" device="0805-RES" value="2k"/>
 <part name="C3" library="dc-26" deviceset="C-US" device="C0805" value="1uf"/>
@@ -7479,7 +7479,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <instance part="R2" gate="G$1" x="-7.62" y="81.28" rot="R90"/>
 <instance part="R3" gate="G$1" x="27.94" y="71.12" rot="R90"/>
 <instance part="RESETTABLE-FUSE" gate="G$1" x="127" y="96.52"/>
-<instance part="U$5" gate="G$1" x="157.48" y="50.8"/>
+<instance part="P1" gate="G$1" x="157.48" y="50.8"/>
 <instance part="C3" gate="G$1" x="152.4" y="101.6"/>
 <instance part="C4" gate="G$1" x="193.04" y="50.8"/>
 <instance part="GND6" gate="1" x="152.4" y="106.68" rot="R180"/>
@@ -7626,7 +7626,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="RESETTABLE-FUSE" gate="G$1" pin="2"/>
 <wire x1="152.4" y1="96.52" x2="144.78" y2="96.52" width="0.1524" layer="91"/>
 <junction x="152.4" y="96.52"/>
-<pinref part="U$5" gate="G$1" pin="1"/>
+<pinref part="P1" gate="G$1" pin="1"/>
 <wire x1="144.78" y1="96.52" x2="134.62" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="147.32" y1="48.26" x2="144.78" y2="53.34" width="0.1524" layer="91"/>
 <wire x1="144.78" y1="53.34" x2="144.78" y2="96.52" width="0.1524" layer="91"/>
@@ -7648,7 +7648,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 </net>
 <net name="VIN-EN" class="0">
 <segment>
-<pinref part="U$5" gate="G$1" pin="C"/>
+<pinref part="P1" gate="G$1" pin="C"/>
 <wire x1="167.64" y1="50.8" x2="167.64" y2="53.34" width="0.1524" layer="91"/>
 <pinref part="VDO" gate="G$1" pin="EN"/>
 </segment>

@@ -1,0 +1,3 @@
+Move C3 closer to the VIN pin (VCC1) of VDO
+Ground EN Pin of VDO
+Better way to make BOM

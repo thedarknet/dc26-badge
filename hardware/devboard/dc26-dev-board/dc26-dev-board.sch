@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.5.1">
+<eagle version="8.6.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -27,7 +27,7 @@
 <layer number="17" name="Pads" color="2" fill="1" visible="no" active="no"/>
 <layer number="18" name="Vias" color="2" fill="1" visible="no" active="no"/>
 <layer number="19" name="Unrouted" color="6" fill="1" visible="no" active="no"/>
-<layer number="20" name="Dimension" color="15" fill="1" visible="no" active="no"/>
+<layer number="20" name="Dimension" color="24" fill="1" visible="no" active="no"/>
 <layer number="21" name="tPlace" color="7" fill="1" visible="no" active="no"/>
 <layer number="22" name="bPlace" color="7" fill="1" visible="no" active="no"/>
 <layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="no"/>
@@ -2863,25 +2863,6 @@ Commonly used for 1/4W through-hole resistors. 0.3" pitch between holes.&lt;br&g
 <wire x1="-2.54" y1="1.27" x2="5.08" y2="1.27" width="0.127" layer="21"/>
 <wire x1="-2.54" y1="1.27" x2="-2.54" y2="-1.27" width="0.127" layer="21"/>
 </package>
-<package name="SOD2512X110N">
-<description>&lt;b&gt;SOD-323&lt;/b&gt;&lt;br&gt;
-</description>
-<smd name="1" x="-1.15" y="0" dx="1.05" dy="0.55" layer="1"/>
-<smd name="2" x="1.15" y="0" dx="1.05" dy="0.55" layer="1"/>
-<text x="0" y="0" size="1.27" layer="25" align="center">&gt;NAME</text>
-<text x="0" y="0" size="1.27" layer="51" align="center">&gt;VALUE</text>
-<wire x1="-1.925" y1="1.15" x2="1.925" y2="1.15" width="0.05" layer="21"/>
-<wire x1="1.925" y1="1.15" x2="1.925" y2="-1.15" width="0.05" layer="21"/>
-<wire x1="1.925" y1="-1.15" x2="-1.925" y2="-1.15" width="0.05" layer="21"/>
-<wire x1="-1.925" y1="-1.15" x2="-1.925" y2="1.15" width="0.05" layer="21"/>
-<wire x1="-0.85" y1="0.625" x2="0.85" y2="0.625" width="0.1" layer="51"/>
-<wire x1="0.85" y1="0.625" x2="0.85" y2="-0.625" width="0.1" layer="51"/>
-<wire x1="0.85" y1="-0.625" x2="-0.85" y2="-0.625" width="0.1" layer="51"/>
-<wire x1="-0.85" y1="-0.625" x2="-0.85" y2="0.625" width="0.1" layer="51"/>
-<wire x1="-0.85" y1="0.1" x2="-0.325" y2="0.625" width="0.1" layer="51"/>
-<wire x1="-1.675" y1="0.625" x2="0.85" y2="0.625" width="0.2" layer="25"/>
-<wire x1="-0.85" y1="-0.625" x2="0.85" y2="-0.625" width="0.2" layer="25"/>
-</package>
 <package name="TACTILE-2PIN">
 <wire x1="3.048" y1="1.016" x2="3.048" y2="2.54" width="0.2032" layer="21"/>
 <wire x1="3.048" y1="2.54" x2="2.54" y2="3.048" width="0.2032" layer="21"/>
@@ -4130,6 +4111,178 @@ Commonly used for 1/4W through-hole resistors. 0.3" pitch between holes.&lt;br&g
 <wire x1="3.095625" y1="0.238125" x2="3.175" y2="0.555625" width="0.6096" layer="122"/>
 <wire x1="3.175" y1="0.555625" x2="3.175" y2="2.38125" width="0.6096" layer="122"/>
 </package>
+<package name="SMA-DIODE">
+<description>&lt;B&gt;Diode&lt;/B&gt;&lt;p&gt;
+Basic SMA packaged diode. Good for reverse polarization protection. Common part #: MBRA140</description>
+<wire x1="-2.3" y1="1" x2="-2.3" y2="1.45" width="0.2032" layer="21"/>
+<wire x1="-2.3" y1="1.45" x2="2.3" y2="1.45" width="0.2032" layer="21"/>
+<wire x1="2.3" y1="1.45" x2="2.3" y2="1" width="0.2032" layer="21"/>
+<wire x1="2.3" y1="-1" x2="2.3" y2="-1.45" width="0.2032" layer="21"/>
+<wire x1="2.3" y1="-1.45" x2="-2.3" y2="-1.45" width="0.2032" layer="21"/>
+<wire x1="-2.3" y1="-1.45" x2="-2.3" y2="-1" width="0.2032" layer="21"/>
+<wire x1="1" y1="1" x2="1" y2="-1" width="0.2032" layer="21"/>
+<smd name="A" x="-2.15" y="0" dx="1.27" dy="1.47" layer="1" rot="R180"/>
+<smd name="C" x="2.15" y="0" dx="1.27" dy="1.47" layer="1"/>
+<text x="-2.286" y="1.651" size="0.4064" layer="25">&gt;NAME</text>
+<text x="0.254" y="1.651" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+<package name="DIODE-1N4001">
+<wire x1="3.175" y1="1.27" x2="1.905" y2="1.27" width="0.254" layer="21"/>
+<wire x1="1.905" y1="1.27" x2="-3.175" y2="1.27" width="0.254" layer="21"/>
+<wire x1="-3.175" y1="1.27" x2="-3.175" y2="0" width="0.254" layer="21"/>
+<wire x1="-3.175" y1="0" x2="-3.175" y2="-1.27" width="0.254" layer="21"/>
+<wire x1="-3.175" y1="-1.27" x2="1.905" y2="-1.27" width="0.254" layer="21"/>
+<wire x1="1.905" y1="-1.27" x2="3.175" y2="-1.27" width="0.254" layer="21"/>
+<wire x1="3.175" y1="-1.27" x2="3.175" y2="0" width="0.254" layer="21"/>
+<wire x1="3.175" y1="0" x2="3.175" y2="1.27" width="0.254" layer="21"/>
+<wire x1="1.905" y1="1.27" x2="1.905" y2="-1.27" width="0.254" layer="21"/>
+<wire x1="-3.175" y1="0" x2="-3.81" y2="0" width="0.254" layer="21"/>
+<wire x1="3.175" y1="0" x2="3.81" y2="0" width="0.254" layer="21"/>
+<pad name="A" x="-5.08" y="0" drill="1" diameter="1.9812"/>
+<pad name="C" x="5.08" y="0" drill="1" diameter="1.9812"/>
+<text x="-2.921" y="1.651" size="0.6096" layer="25">&gt;Name</text>
+<text x="-2.921" y="-0.508" size="1.016" layer="21" ratio="12">&gt;Value</text>
+</package>
+<package name="SOD-323">
+<wire x1="-0.9" y1="0.65" x2="-0.5" y2="0.65" width="0.2032" layer="21"/>
+<wire x1="-0.5" y1="0.65" x2="0.9" y2="0.65" width="0.2032" layer="21"/>
+<wire x1="-0.9" y1="-0.65" x2="-0.5" y2="-0.65" width="0.2032" layer="21"/>
+<wire x1="-0.5" y1="-0.65" x2="0.9" y2="-0.65" width="0.2032" layer="21"/>
+<wire x1="-0.5" y1="0.65" x2="-0.5" y2="-0.65" width="0.2032" layer="21"/>
+<smd name="1" x="-1.15" y="0" dx="0.63" dy="0.83" layer="1"/>
+<smd name="2" x="1.15" y="0" dx="0.63" dy="0.83" layer="1"/>
+<text x="-0.889" y="1.016" size="0.4064" layer="25">&gt;NAME</text>
+<text x="-1.016" y="-1.397" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+<package name="SOT23-3">
+<wire x1="1.4224" y1="0.6604" x2="1.4224" y2="-0.6604" width="0.1524" layer="51"/>
+<wire x1="1.4224" y1="-0.6604" x2="-1.4224" y2="-0.6604" width="0.1524" layer="51"/>
+<wire x1="-1.4224" y1="-0.6604" x2="-1.4224" y2="0.6604" width="0.1524" layer="51"/>
+<wire x1="-1.4224" y1="0.6604" x2="1.4224" y2="0.6604" width="0.1524" layer="51"/>
+<wire x1="-0.8" y1="0.7" x2="-1.4" y2="0.7" width="0.2032" layer="21"/>
+<wire x1="-1.4" y1="0.7" x2="-1.4" y2="-0.1" width="0.2032" layer="21"/>
+<wire x1="0.8" y1="0.7" x2="1.4" y2="0.7" width="0.2032" layer="21"/>
+<wire x1="1.4" y1="0.7" x2="1.4" y2="-0.1" width="0.2032" layer="21"/>
+<smd name="1" x="-0.95" y="-1" dx="0.8" dy="0.9" layer="1"/>
+<smd name="2" x="0.95" y="-1" dx="0.8" dy="0.9" layer="1"/>
+<smd name="3" x="0" y="1.1" dx="0.8" dy="0.9" layer="1"/>
+<text x="-0.8255" y="1.778" size="0.4064" layer="25">&gt;NAME</text>
+<text x="-1.016" y="-0.1905" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+<package name="DIODE-1N4148">
+<wire x1="-2.54" y1="0.762" x2="2.54" y2="0.762" width="0.2032" layer="21"/>
+<wire x1="2.54" y1="0.762" x2="2.54" y2="0" width="0.2032" layer="21"/>
+<wire x1="2.54" y1="0" x2="2.54" y2="-0.762" width="0.2032" layer="21"/>
+<wire x1="2.54" y1="-0.762" x2="-2.54" y2="-0.762" width="0.2032" layer="21"/>
+<wire x1="-2.54" y1="-0.762" x2="-2.54" y2="0" width="0.2032" layer="21"/>
+<wire x1="-2.54" y1="0" x2="-2.54" y2="0.762" width="0.2032" layer="21"/>
+<wire x1="2.54" y1="0" x2="2.794" y2="0" width="0.2032" layer="21"/>
+<wire x1="-2.54" y1="0" x2="-2.794" y2="0" width="0.2032" layer="21"/>
+<wire x1="1.905" y1="0.635" x2="1.905" y2="-0.635" width="0.2032" layer="21"/>
+<pad name="A" x="-3.81" y="0" drill="0.9" diameter="1.8796"/>
+<pad name="C" x="3.81" y="0" drill="0.9" diameter="1.8796"/>
+<text x="-2.54" y="1.27" size="0.4064" layer="25">&gt;Name</text>
+<text x="-2.032" y="-0.508" size="0.8128" layer="21">&gt;Value</text>
+</package>
+<package name="SMB-DIODE">
+<description>&lt;b&gt;Diode&lt;/b&gt;&lt;p&gt;
+Basic small signal diode good up to 200mA. SMB footprint. Common part #: BAS16</description>
+<wire x1="-3.973" y1="1.983" x2="3.973" y2="1.983" width="0.0508" layer="39"/>
+<wire x1="3.973" y1="-1.983" x2="-3.973" y2="-1.983" width="0.0508" layer="39"/>
+<wire x1="-3.973" y1="-1.983" x2="-3.973" y2="1.983" width="0.0508" layer="39"/>
+<wire x1="3.973" y1="1.983" x2="3.973" y2="-1.983" width="0.0508" layer="39"/>
+<wire x1="-2.2606" y1="1.905" x2="2.2606" y2="1.905" width="0.1016" layer="21"/>
+<wire x1="-2.2606" y1="-1.905" x2="2.2606" y2="-1.905" width="0.1016" layer="21"/>
+<wire x1="-2.261" y1="-1.905" x2="-2.261" y2="1.905" width="0.1016" layer="51"/>
+<wire x1="2.261" y1="-1.905" x2="2.261" y2="1.905" width="0.1016" layer="51"/>
+<wire x1="0.643" y1="1" x2="-0.73" y2="0" width="0.2032" layer="21"/>
+<wire x1="-0.73" y1="0" x2="0.643" y2="-1" width="0.2032" layer="21"/>
+<wire x1="0.643" y1="-1" x2="0.643" y2="1" width="0.2032" layer="21"/>
+<wire x1="-0.73" y1="1" x2="-0.73" y2="-1" width="0.2032" layer="21"/>
+<smd name="C" x="-2.2" y="0" dx="2.4" dy="2.4" layer="1"/>
+<smd name="A" x="2.2" y="0" dx="2.4" dy="2.4" layer="1"/>
+<text x="-2.159" y="2.159" size="1.27" layer="25">&gt;NAME</text>
+<text x="-1.905" y="-3.429" size="1.27" layer="27">&gt;VALUE</text>
+<rectangle x1="-2.794" y1="-1.0922" x2="-2.2606" y2="1.0922" layer="51"/>
+<rectangle x1="2.2606" y1="-1.0922" x2="2.794" y2="1.0922" layer="51"/>
+</package>
+<package name="DIODE-HV">
+<wire x1="-3.973" y1="1.983" x2="3.973" y2="1.983" width="0.0508" layer="39"/>
+<wire x1="3.973" y1="-1.983" x2="-3.973" y2="-1.983" width="0.0508" layer="39"/>
+<wire x1="-3.973" y1="-1.983" x2="-3.973" y2="1.983" width="0.0508" layer="39"/>
+<wire x1="3.973" y1="1.983" x2="3.973" y2="-1.983" width="0.0508" layer="39"/>
+<wire x1="-2.2606" y1="1.905" x2="2.2606" y2="1.905" width="0.1016" layer="21"/>
+<wire x1="-2.2606" y1="-1.905" x2="2.2606" y2="-1.905" width="0.1016" layer="21"/>
+<wire x1="-2.261" y1="-1.905" x2="-2.261" y2="1.905" width="0.1016" layer="51"/>
+<wire x1="2.261" y1="-1.905" x2="2.261" y2="1.905" width="0.1016" layer="51"/>
+<wire x1="0.643" y1="1" x2="-0.73" y2="0" width="0.2032" layer="21"/>
+<wire x1="-0.73" y1="0" x2="0.643" y2="-1" width="0.2032" layer="21"/>
+<wire x1="0.643" y1="-1" x2="0.643" y2="1" width="0.2032" layer="21"/>
+<wire x1="-0.73" y1="1" x2="-0.73" y2="-1" width="0.2032" layer="21"/>
+<smd name="C" x="-2.454" y="0" dx="2.2" dy="2.4" layer="1"/>
+<smd name="A" x="2.454" y="0" dx="2.2" dy="2.4" layer="1"/>
+<text x="-2.159" y="2.159" size="1.27" layer="25">&gt;NAME</text>
+<text x="-1.905" y="-3.429" size="1.27" layer="27">&gt;VALUE</text>
+<rectangle x1="-2.794" y1="-1.0922" x2="-2.2606" y2="1.0922" layer="51"/>
+<rectangle x1="2.2606" y1="-1.0922" x2="2.794" y2="1.0922" layer="51"/>
+</package>
+<package name="SMA-DIODE_ALT">
+<wire x1="-2.3" y1="1.3" x2="-2.3" y2="1.45" width="0.2032" layer="21"/>
+<wire x1="-2.3" y1="1.45" x2="2.3" y2="1.45" width="0.2032" layer="21"/>
+<wire x1="2.3" y1="1.45" x2="2.3" y2="1.3" width="0.2032" layer="21"/>
+<wire x1="2.3" y1="-1.3" x2="2.3" y2="-1.45" width="0.2032" layer="21"/>
+<wire x1="2.3" y1="-1.45" x2="-2.3" y2="-1.45" width="0.2032" layer="21"/>
+<wire x1="-2.3" y1="-1.45" x2="-2.3" y2="-1.3" width="0.2032" layer="21"/>
+<wire x1="0.6" y1="1" x2="0.6" y2="-1" width="0.2032" layer="21"/>
+<smd name="A" x="-2" y="0" dx="2" dy="2" layer="1" rot="R180"/>
+<smd name="C" x="2" y="0" dx="2" dy="2" layer="1"/>
+<text x="-2.286" y="1.651" size="0.4064" layer="25">&gt;NAME</text>
+<text x="0.254" y="1.651" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+<package name="SMA-DIODE-KIT">
+<wire x1="-2.3" y1="1" x2="-2.3" y2="1.45" width="0.2032" layer="21"/>
+<wire x1="-2.3" y1="1.45" x2="2.3" y2="1.45" width="0.2032" layer="21"/>
+<wire x1="2.3" y1="1.45" x2="2.3" y2="1" width="0.2032" layer="21"/>
+<wire x1="2.3" y1="-1" x2="2.3" y2="-1.45" width="0.2032" layer="21"/>
+<wire x1="2.3" y1="-1.45" x2="-2.3" y2="-1.45" width="0.2032" layer="21"/>
+<wire x1="-2.3" y1="-1.45" x2="-2.3" y2="-1" width="0.2032" layer="21"/>
+<wire x1="1" y1="1" x2="1" y2="-1" width="0.2032" layer="21"/>
+<smd name="A" x="-2.4" y="0" dx="1.77" dy="1.47" layer="1" rot="R180"/>
+<smd name="C" x="2.4" y="0" dx="1.77" dy="1.47" layer="1"/>
+<text x="-2.286" y="1.651" size="0.4064" layer="25">&gt;NAME</text>
+<text x="0.254" y="1.651" size="0.4064" layer="27">&gt;VALUE</text>
+</package>
+<package name="SOD523">
+<wire x1="-0.59" y1="0.4" x2="0.59" y2="0.4" width="0.1016" layer="21"/>
+<wire x1="0.59" y1="0.4" x2="0.59" y2="-0.4" width="0.1016" layer="51"/>
+<wire x1="0.59" y1="-0.4" x2="-0.59" y2="-0.4" width="0.1016" layer="21"/>
+<wire x1="-0.59" y1="-0.4" x2="-0.59" y2="0.4" width="0.1016" layer="51"/>
+<rectangle x1="-0.75" y1="-0.17" x2="-0.54" y2="0.17" layer="51"/>
+<rectangle x1="0.54" y1="-0.17" x2="0.75" y2="0.17" layer="51"/>
+<rectangle x1="-0.59" y1="-0.4" x2="-0.3" y2="0.4" layer="51"/>
+<smd name="A" x="0.7" y="0" dx="0.7" dy="0.5" layer="1"/>
+<smd name="C" x="-0.6" y="0" dx="0.7" dy="0.5" layer="1"/>
+<text x="-0.7366" y="0.5588" size="0.4064" layer="25">&gt;NAME</text>
+<text x="-0.6858" y="-0.9906" size="0.4064" layer="27">&gt;VALUE</text>
+<rectangle x1="-0.1397" y1="-0.3937" x2="-0.0127" y2="0.381" layer="21"/>
+</package>
+<package name="SMC">
+<description>&lt;b&gt;DIODE&lt;/b&gt;</description>
+<wire x1="-3.5606" y1="3.105" x2="3.5606" y2="3.105" width="0.1016" layer="21"/>
+<wire x1="-3.5606" y1="-3.105" x2="3.5606" y2="-3.105" width="0.1016" layer="21"/>
+<wire x1="-3.5606" y1="-3.105" x2="-3.5606" y2="3.105" width="0.1016" layer="51"/>
+<wire x1="3.5606" y1="-3.105" x2="3.5606" y2="3.105" width="0.1016" layer="51"/>
+<wire x1="0.543" y1="1" x2="-0.83" y2="0" width="0.2032" layer="21"/>
+<wire x1="-0.83" y1="0" x2="0.543" y2="-1" width="0.2032" layer="21"/>
+<wire x1="0.543" y1="-1" x2="0.543" y2="1" width="0.2032" layer="21"/>
+<smd name="C" x="-3.7" y="0" dx="2.8" dy="3.8" layer="1"/>
+<smd name="A" x="3.7" y="0" dx="2.8" dy="3.8" layer="1"/>
+<text x="-3.459" y="3.359" size="1.27" layer="25">&gt;NAME</text>
+<text x="-3.459" y="-4.629" size="1.27" layer="27">&gt;VALUE</text>
+<rectangle x1="-4.094" y1="-1.0922" x2="-3.5606" y2="1.0922" layer="51"/>
+<rectangle x1="3.5606" y1="-1.0922" x2="4.094" y2="1.0922" layer="51"/>
+<rectangle x1="-2.1" y1="-3.1" x2="-0.85" y2="3.1" layer="21"/>
+</package>
 </packages>
 <symbols>
 <symbol name="LCD_ST7735S">
@@ -4337,18 +4490,6 @@ Commonly used for 1/4W through-hole resistors. 0.3" pitch between holes.&lt;br&g
 <pin name="RX" x="7.62" y="0" visible="pad" length="middle" rot="R180"/>
 <pin name="TX" x="7.62" y="-2.54" visible="pad" length="middle" direction="in" rot="R180"/>
 <pin name="GND" x="7.62" y="-5.08" visible="pad" length="middle" direction="pwr" rot="R180"/>
-</symbol>
-<symbol name="CMDZ3L3_TR">
-<wire x1="5.08" y1="0" x2="10.16" y2="2.54" width="0.1524" layer="94"/>
-<wire x1="10.16" y1="-2.54" x2="10.16" y2="2.54" width="0.1524" layer="94"/>
-<wire x1="10.16" y1="-2.54" x2="5.08" y2="0" width="0.1524" layer="94"/>
-<wire x1="5.08" y1="2.032" x2="5.08" y2="-2.032" width="0.1524" layer="94"/>
-<wire x1="5.08" y1="2.032" x2="6.096" y2="2.54" width="0.1524" layer="94"/>
-<wire x1="4.064" y1="-2.54" x2="5.08" y2="-2.032" width="0.1524" layer="94"/>
-<text x="10.16" y="8.89" size="1.778" layer="95">&gt;NAME</text>
-<text x="10.16" y="6.35" size="1.778" layer="96">&gt;VALUE</text>
-<pin name="K" x="0" y="0" visible="pad" length="middle" direction="in"/>
-<pin name="A" x="15.24" y="0" visible="pad" length="middle" direction="in" rot="R180"/>
 </symbol>
 <symbol name="MOMEMTARY_SWITCH">
 <text x="3.556" y="-3.302" size="1.778" layer="95" rot="R90">&gt;NAME</text>
@@ -4740,6 +4881,17 @@ Commonly used for 1/4W through-hole resistors. 0.3" pitch between holes.&lt;br&g
 <wire x1="1.11125" y1="3.81" x2="3.96875" y2="0" width="0.6096" layer="94"/>
 <wire x1="3.96875" y1="0" x2="4.7625" y2="0" width="0.6096" layer="94"/>
 <wire x1="0.3175" y1="3.81" x2="1.11125" y2="3.81" width="0.6096" layer="94"/>
+</symbol>
+<symbol name="DIODE">
+<wire x1="-1.27" y1="-1.27" x2="1.27" y2="0" width="0.254" layer="94"/>
+<wire x1="1.27" y1="0" x2="-1.27" y2="1.27" width="0.254" layer="94"/>
+<wire x1="1.27" y1="1.27" x2="1.27" y2="0" width="0.254" layer="94"/>
+<wire x1="-1.27" y1="1.27" x2="-1.27" y2="-1.27" width="0.254" layer="94"/>
+<wire x1="1.27" y1="0" x2="1.27" y2="-1.27" width="0.254" layer="94"/>
+<text x="2.54" y="0.4826" size="1.778" layer="95">&gt;NAME</text>
+<text x="2.54" y="-2.3114" size="1.778" layer="96">&gt;VALUE</text>
+<pin name="A" x="-2.54" y="0" visible="off" length="short" direction="pas"/>
+<pin name="C" x="2.54" y="0" visible="off" length="short" direction="pas" rot="R180"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -5964,36 +6116,6 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 </device>
 </devices>
 </deviceset>
-<deviceset name="CMDZ3L3_TR" prefix="Z">
-<description>&lt;b&gt;ZENER DIODE 250mW, 3.3V  SOD-323&lt;/b&gt;&lt;p&gt;
-&lt;/b&gt;&lt;br&gt;&lt;a href="&lt;br&gt;&lt;a href="https://componentsearchengine.com/Images/9/CMDZ3L3+TR.jpg" title="Image"&gt;
-&lt;img src="https://componentsearchengine.com/Images/9/CMDZ3L3+TR.jpg" width="150"&gt;&lt;/a&gt;&lt;p&gt;
-Source: &lt;a href="https://www.centralsemi.com/get_document.php?cmp=1&amp;mergetype=pd&amp;mergepath=pd&amp;pdf_id=CMDZ5L1-36L.PDF"&gt; Datasheet &lt;/a&gt;</description>
-<gates>
-<gate name="G$1" symbol="CMDZ3L3_TR" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="SOD2512X110N">
-<connects>
-<connect gate="G$1" pin="A" pad="2"/>
-<connect gate="G$1" pin="K" pad="1"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="3D_PACKAGE" value="" constant="no"/>
-<attribute name="ALLIED_NUMBER" value="" constant="no"/>
-<attribute name="DESCRIPTION" value="ZENER DIODE 250mW, 3.3V  SOD-323" constant="no"/>
-<attribute name="HEIGHT" value="1.1mm" constant="no"/>
-<attribute name="MANUFACTURER_NAME" value="Central Semiconductor" constant="no"/>
-<attribute name="MANUFACTURER_PART_NUMBER" value="CMDZ3L3 TR" constant="no"/>
-<attribute name="OTHER_PART_NUMBER" value="" constant="no"/>
-<attribute name="RS_PART_NUMBER" value="" constant="no"/>
-<attribute name="SUPPLIER_NAME" value="RS" constant="no"/>
-</technology>
-</technologies>
-</device>
-</devices>
-</deviceset>
 <deviceset name="SWITCH_TACTILE">
 <gates>
 <gate name="G$1" symbol="MOMEMTARY_SWITCH" x="0" y="0"/>
@@ -6489,6 +6611,116 @@ Source: &lt;a href="http://www.st.com/content/ccc/resource/technical/document/da
 </device>
 </devices>
 </deviceset>
+<deviceset name="DIODE" prefix="D" uservalue="yes">
+<description>&lt;b&gt;Diode&lt;/b&gt;
+These are standard reverse protection diodes and small signal diodes. SMA package can handle up to about 1A. SOD-323 can handle about 200mA. What the SOD-323 package when ordering, there are some mfgs out there that are 5-pin packages.</description>
+<gates>
+<gate name="G$1" symbol="DIODE" x="0" y="0"/>
+</gates>
+<devices>
+<device name="SMA" package="SMA-DIODE">
+<connects>
+<connect gate="G$1" pin="A" pad="A"/>
+<connect gate="G$1" pin="C" pad="C"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="PTH" package="DIODE-1N4001">
+<connects>
+<connect gate="G$1" pin="A" pad="A"/>
+<connect gate="G$1" pin="C" pad="C"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="SOD" package="SOD-323">
+<connects>
+<connect gate="G$1" pin="A" pad="2"/>
+<connect gate="G$1" pin="C" pad="1"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="PROD_ID" value="DIO-09646" constant="no"/>
+</technology>
+</technologies>
+</device>
+<device name="SOT23" package="SOT23-3">
+<connects>
+<connect gate="G$1" pin="A" pad="1"/>
+<connect gate="G$1" pin="C" pad="3"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="1N4148" package="DIODE-1N4148">
+<connects>
+<connect gate="G$1" pin="A" pad="A"/>
+<connect gate="G$1" pin="C" pad="C"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="SMB" package="SMB-DIODE">
+<connects>
+<connect gate="G$1" pin="A" pad="A"/>
+<connect gate="G$1" pin="C" pad="C"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="HV" package="DIODE-HV">
+<connects>
+<connect gate="G$1" pin="A" pad="A"/>
+<connect gate="G$1" pin="C" pad="C"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="SMA-ALT" package="SMA-DIODE_ALT">
+<connects>
+<connect gate="G$1" pin="A" pad="A"/>
+<connect gate="G$1" pin="C" pad="C"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="SMA-KIT" package="SMA-DIODE-KIT">
+<connects>
+<connect gate="G$1" pin="A" pad="A"/>
+<connect gate="G$1" pin="C" pad="C"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="SOD523" package="SOD523">
+<connects>
+<connect gate="G$1" pin="A" pad="A"/>
+<connect gate="G$1" pin="C" pad="C"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="SMC/DO-214AB" package="SMC">
+<connects>
+<connect gate="G$1" pin="A" pad="A"/>
+<connect gate="G$1" pin="C" pad="C"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
 </devicesets>
 </library>
 </libraries>
@@ -6505,7 +6737,7 @@ Source: &lt;a href="http://www.st.com/content/ccc/resource/technical/document/da
 <part name="IC1" library="STM32F411RET6" deviceset="STM32F411RET6" device=""/>
 <part name="APA4" library="APA104" deviceset="APA104" device=""/>
 <part name="U$1" library="dc-26" deviceset="ST7735S_LCD_MODULE" device=""/>
-<part name="CN1" library="dc-26" deviceset="JST_2PIN" device="-SMT-RA" value="JST"/>
+<part name="CN1" library="dc-26" deviceset="JST_2PIN" device="-THM-RA" value="JST"/>
 <part name="C1" library="dc-26" deviceset="C-US" device="C0805" value="4.7uF"/>
 <part name="C2" library="dc-26" deviceset="C-US" device="C0805" value="4.7uf"/>
 <part name="USB" library="dc-26" deviceset="DX4R005JJ2" device="DX4R005JJ2"/>
@@ -6542,7 +6774,6 @@ Source: &lt;a href="http://www.st.com/content/ccc/resource/technical/document/da
 <part name="C13" library="dc-26" deviceset="C-US" device="C0805" value="10uF"/>
 <part name="GND13" library="dc-26" deviceset="GND" device=""/>
 <part name="ESP32PH" library="dc-26" deviceset="SERIAL_4" device=""/>
-<part name="Z1" library="dc-26" deviceset="CMDZ3L3_TR" device=""/>
 <part name="GND14" library="dc-26" deviceset="GND" device=""/>
 <part name="GND15" library="dc-26" deviceset="GND" device=""/>
 <part name="GND16" library="dc-26" deviceset="GND" device=""/>
@@ -6551,8 +6782,8 @@ Source: &lt;a href="http://www.st.com/content/ccc/resource/technical/document/da
 <part name="RESET" library="dc-26" deviceset="SWITCH_TACTILE" device="TACTILE-2PIN-NARROW" value="SW1"/>
 <part name="GND18" library="dc-26" deviceset="GND" device=""/>
 <part name="GND19" library="dc-26" deviceset="GND" device=""/>
-<part name="R1" library="dc-26" deviceset="RESISTOR" device="1206" value="10K"/>
-<part name="R4" library="dc-26" deviceset="RESISTOR" device="1206" value="10K"/>
+<part name="R1" library="dc-26" deviceset="RESISTOR" device="0805-RES" value="10K"/>
+<part name="R4" library="dc-26" deviceset="RESISTOR" device="0805-RES" value="10K"/>
 <part name="ESP-BREAKOUT" library="dc-26" deviceset="M20X2" device=""/>
 <part name="STM32-BREAKOUT" library="dc-26" deviceset="M20X2" device=""/>
 <part name="FB1" library="dc-26" deviceset="BLM18TG221TN1D" device=""/>
@@ -6664,6 +6895,7 @@ Source: &lt;a href="http://www.st.com/content/ccc/resource/technical/document/da
 <part name="U$2" library="dc-26" deviceset="CMD_C0DE_LOGO" device=""/>
 <part name="U$3" library="dc-26" deviceset="DARKNET_D" device="D"/>
 <part name="U$4" library="dc-26" deviceset="DARKNET_N" device="N"/>
+<part name="D1" library="dc-26" deviceset="DIODE" device="SOD"/>
 </parts>
 <sheets>
 <sheet>
@@ -6673,10 +6905,9 @@ Source: &lt;a href="http://www.st.com/content/ccc/resource/technical/document/da
 <text x="43.18" y="91.44" size="1.778" layer="91">Battery, USB, ST-LINK Power Out</text>
 <text x="172.72" y="114.3" size="1.778" layer="91">power dissipation: Power Rule: P = I × V</text>
 <text x="111.76" y="109.22" size="1.778" layer="91">3.7V From Battery Out</text>
-<text x="81.28" y="43.18" size="1.778" layer="91">VCC0 = 5V
+<text x="71.12" y="30.48" size="1.778" layer="91">VCC0 = 5V
 VCC 1 = 3.7 V
 VCC = 3.3V</text>
-<text x="43.18" y="10.16" size="1.778" layer="91">5V ST-Link In</text>
 <text x="63.5" y="111.76" size="1.778" layer="91">Power</text>
 <text x="78.74" y="-17.78" size="1.778" layer="91">STM32F411RE
 The VDD pins must be connected to VDD with external decoupling capacitors: one
@@ -6715,11 +6946,12 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <instance part="GND8" gate="1" x="170.18" y="48.26"/>
 <instance part="GND7" gate="1" x="157.48" y="91.44" rot="R270"/>
 <instance part="USB" gate="G$1" x="27.94" y="33.02" rot="R180"/>
-<instance part="LINK1" gate="G$1" x="15.24" y="2.54"/>
-<instance part="GND5" gate="1" x="43.18" y="-15.24"/>
+<instance part="LINK1" gate="G$1" x="93.98" y="78.74"/>
+<instance part="GND5" gate="1" x="121.92" y="60.96"/>
 <instance part="GND9" gate="1" x="43.18" y="40.64" rot="R180"/>
 <instance part="VDO" gate="G$1" x="167.64" y="53.34" rot="R90"/>
 <instance part="GND70" gate="1" x="144.78" y="40.64"/>
+<instance part="ESP32PH" gate="G$1" x="137.16" y="144.78" rot="R270"/>
 </instances>
 <busses>
 </busses>
@@ -6764,8 +6996,8 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 </segment>
 <segment>
 <pinref part="LINK1" gate="G$1" pin="GND"/>
-<wire x1="25.4" y1="-7.62" x2="43.18" y2="-7.62" width="0.1524" layer="91"/>
-<wire x1="43.18" y1="-7.62" x2="43.18" y2="-12.7" width="0.1524" layer="91"/>
+<wire x1="104.14" y1="68.58" x2="121.92" y2="68.58" width="0.1524" layer="91"/>
+<wire x1="121.92" y1="68.58" x2="121.92" y2="63.5" width="0.1524" layer="91"/>
 <pinref part="GND5" gate="1" pin="GND"/>
 </segment>
 <segment>
@@ -6784,6 +7016,11 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <wire x1="147.32" y1="48.26" x2="144.78" y2="48.26" width="0.1524" layer="91"/>
 <wire x1="144.78" y1="48.26" x2="144.78" y2="43.18" width="0.1524" layer="91"/>
 <pinref part="GND70" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="ESP32PH" gate="G$1" pin="GND"/>
+<wire x1="132.08" y1="137.16" x2="132.08" y2="132.08" width="0.1524" layer="91"/>
+<label x="132.08" y="132.08" size="1.778" layer="95" rot="R270"/>
 </segment>
 </net>
 <net name="VCC1" class="0">
@@ -6832,12 +7069,6 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <label x="-30.48" y="91.44" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="LINK1" gate="G$1" pin="VCC"/>
-<wire x1="25.4" y1="0" x2="43.18" y2="0" width="0.1524" layer="91"/>
-<wire x1="43.18" y1="0" x2="43.18" y2="5.08" width="0.1524" layer="91"/>
-<label x="43.18" y="5.08" size="1.778" layer="95"/>
-</segment>
-<segment>
 <pinref part="USB" gate="G$1" pin="+5V"/>
 <wire x1="33.02" y1="20.32" x2="40.64" y2="20.32" width="0.1524" layer="91"/>
 <label x="40.64" y="20.32" size="1.778" layer="95"/>
@@ -6853,22 +7084,6 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <segment>
 <pinref part="CHARGING_CIRCUT" gate="G$1" pin="PROG"/>
 <pinref part="R3" gate="G$1" pin="2"/>
-</segment>
-</net>
-<net name="VIN" class="0">
-<segment>
-<pinref part="C3" gate="G$1" pin="2"/>
-<pinref part="RESETTABLE-FUSE" gate="G$1" pin="2"/>
-<wire x1="152.4" y1="96.52" x2="144.78" y2="96.52" width="0.1524" layer="91"/>
-<junction x="152.4" y="96.52"/>
-<wire x1="144.78" y1="96.52" x2="134.62" y2="96.52" width="0.1524" layer="91"/>
-<wire x1="144.78" y1="53.34" x2="144.78" y2="96.52" width="0.1524" layer="91"/>
-<junction x="144.78" y="96.52"/>
-<wire x1="152.4" y1="96.52" x2="170.18" y2="96.52" width="0.1524" layer="91"/>
-<pinref part="VDO" gate="G$1" pin="VIN"/>
-<wire x1="170.18" y1="91.44" x2="170.18" y2="96.52" width="0.1524" layer="91"/>
-<pinref part="P1" gate="G$1" pin="2"/>
-<wire x1="147.32" y1="53.34" x2="144.78" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="VCC" class="0">
@@ -6891,15 +7106,15 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <net name="SYS_JTCK_SWCLK" class="0">
 <segment>
 <pinref part="LINK1" gate="G$1" pin="SWDCLK"/>
-<wire x1="25.4" y1="-5.08" x2="40.64" y2="-5.08" width="0.1524" layer="91"/>
-<label x="45.72" y="-5.08" size="1.778" layer="95"/>
+<wire x1="104.14" y1="71.12" x2="119.38" y2="71.12" width="0.1524" layer="91"/>
+<label x="111.76" y="71.12" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SYS_JTMS_SWDIO" class="0">
 <segment>
 <pinref part="LINK1" gate="G$1" pin="SWDIO"/>
-<wire x1="25.4" y1="-2.54" x2="38.1" y2="-2.54" width="0.1524" layer="91"/>
-<label x="45.72" y="-2.54" size="1.778" layer="95"/>
+<wire x1="104.14" y1="73.66" x2="116.84" y2="73.66" width="0.1524" layer="91"/>
+<label x="111.76" y="73.66" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="USB_DM" class="0">
@@ -6914,6 +7129,43 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="USB" gate="G$1" pin="D-"/>
 <wire x1="33.02" y1="22.86" x2="48.26" y2="22.86" width="0.1524" layer="91"/>
 <label x="50.8" y="22.86" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="VIN" class="0">
+<segment>
+<pinref part="LINK1" gate="G$1" pin="VCC"/>
+<wire x1="104.14" y1="76.2" x2="139.7" y2="76.2" width="0.1524" layer="91"/>
+<wire x1="139.7" y1="76.2" x2="139.7" y2="96.52" width="0.1524" layer="91"/>
+<pinref part="C3" gate="G$1" pin="2"/>
+<pinref part="RESETTABLE-FUSE" gate="G$1" pin="2"/>
+<wire x1="152.4" y1="96.52" x2="144.78" y2="96.52" width="0.1524" layer="91"/>
+<junction x="152.4" y="96.52"/>
+<wire x1="144.78" y1="96.52" x2="139.7" y2="96.52" width="0.1524" layer="91"/>
+<wire x1="139.7" y1="96.52" x2="134.62" y2="96.52" width="0.1524" layer="91"/>
+<wire x1="144.78" y1="53.34" x2="144.78" y2="96.52" width="0.1524" layer="91"/>
+<junction x="144.78" y="96.52"/>
+<wire x1="152.4" y1="96.52" x2="170.18" y2="96.52" width="0.1524" layer="91"/>
+<pinref part="VDO" gate="G$1" pin="VIN"/>
+<wire x1="170.18" y1="91.44" x2="170.18" y2="96.52" width="0.1524" layer="91"/>
+<pinref part="P1" gate="G$1" pin="2"/>
+<wire x1="147.32" y1="53.34" x2="144.78" y2="53.34" width="0.1524" layer="91"/>
+<junction x="139.7" y="96.52"/>
+<pinref part="ESP32PH" gate="G$1" pin="VCC"/>
+<wire x1="139.7" y1="137.16" x2="139.7" y2="96.52" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="ESP-RX" class="0">
+<segment>
+<pinref part="ESP32PH" gate="G$1" pin="RX"/>
+<wire x1="137.16" y1="137.16" x2="137.16" y2="132.08" width="0.1524" layer="91"/>
+<label x="137.16" y="132.08" size="1.778" layer="95" rot="R270"/>
+</segment>
+</net>
+<net name="ESP-TX0" class="0">
+<segment>
+<pinref part="ESP32PH" gate="G$1" pin="TX"/>
+<wire x1="134.62" y1="137.16" x2="134.62" y2="132.08" width="0.1524" layer="91"/>
+<label x="134.62" y="132.08" size="1.778" layer="95" rot="R270"/>
 </segment>
 </net>
 </nets>
@@ -8409,8 +8661,6 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <instance part="GND11" gate="1" x="2.54" y="38.1"/>
 <instance part="C13" gate="G$1" x="-43.18" y="53.34"/>
 <instance part="GND13" gate="1" x="-43.18" y="43.18"/>
-<instance part="ESP32PH" gate="G$1" x="-38.1" y="-15.24" rot="R90"/>
-<instance part="Z1" gate="G$1" x="50.8" y="-12.7" rot="R90"/>
 <instance part="GND14" gate="1" x="-25.4" y="71.12" rot="R180"/>
 <instance part="GND15" gate="1" x="27.94" y="73.66" rot="R90"/>
 <instance part="GND16" gate="1" x="20.32" y="20.32"/>
@@ -8422,6 +8672,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <instance part="R1" gate="G$1" x="78.74" y="55.88" rot="R90"/>
 <instance part="R4" gate="G$1" x="104.14" y="53.34" rot="R90"/>
 <instance part="ESP-BREAKOUT" gate="G$1" x="-78.74" y="48.26"/>
+<instance part="D1" gate="G$1" x="50.8" y="0" rot="R270"/>
 </instances>
 <busses>
 </busses>
@@ -8436,11 +8687,6 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="C13" gate="G$1" pin="2"/>
 <pinref part="GND13" gate="1" pin="GND"/>
 <wire x1="-43.18" y1="45.72" x2="-43.18" y2="48.26" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="ESP32PH" gate="G$1" pin="GND"/>
-<wire x1="-33.02" y1="-7.62" x2="-33.02" y2="-2.54" width="0.1524" layer="91"/>
-<label x="-33.02" y="-2.54" size="1.778" layer="95" rot="R90"/>
 </segment>
 <segment>
 <pinref part="U1" gate="G$1" pin="GND@1"/>
@@ -8496,11 +8742,6 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 </net>
 <net name="VCC" class="0">
 <segment>
-<pinref part="ESP32PH" gate="G$1" pin="VCC"/>
-<wire x1="-40.64" y1="-7.62" x2="-40.64" y2="-2.54" width="0.1524" layer="91"/>
-<label x="-40.64" y="-2.54" size="1.778" layer="95" rot="R90"/>
-</segment>
-<segment>
 <pinref part="R1" gate="G$1" pin="2"/>
 <wire x1="78.74" y1="60.96" x2="78.74" y2="71.12" width="0.1524" layer="91"/>
 <label x="76.2" y="71.12" size="1.778" layer="95"/>
@@ -8539,21 +8780,16 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 </net>
 <net name="ESP-RX" class="0">
 <segment>
-<pinref part="ESP32PH" gate="G$1" pin="RX"/>
-<wire x1="-38.1" y1="-7.62" x2="-38.1" y2="-2.54" width="0.1524" layer="91"/>
-<label x="-38.1" y="-2.54" size="1.778" layer="95" rot="R90"/>
-</segment>
-<segment>
-<pinref part="Z1" gate="G$1" pin="K"/>
-<wire x1="50.8" y1="-12.7" x2="50.8" y2="-17.78" width="0.1524" layer="91"/>
-<label x="53.34" y="-17.78" size="1.778" layer="95"/>
+<wire x1="50.8" y1="-2.54" x2="50.8" y2="-10.16" width="0.1524" layer="91"/>
+<label x="50.8" y="-12.7" size="1.778" layer="95"/>
+<pinref part="D1" gate="G$1" pin="C"/>
 </segment>
 </net>
 <net name="ESP-RX0" class="0">
 <segment>
-<pinref part="Z1" gate="G$1" pin="A"/>
 <wire x1="50.8" y1="2.54" x2="50.8" y2="7.62" width="0.1524" layer="91"/>
-<label x="53.34" y="7.62" size="1.778" layer="95"/>
+<label x="50.8" y="7.62" size="1.778" layer="95"/>
+<pinref part="D1" gate="G$1" pin="A"/>
 </segment>
 <segment>
 <pinref part="U1" gate="G$1" pin="RXD0"/>
@@ -8571,11 +8807,6 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="U1" gate="G$1" pin="TXD0"/>
 <wire x1="25.4" y1="58.42" x2="33.02" y2="58.42" width="0.1524" layer="91"/>
 <label x="33.02" y="58.42" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="ESP32PH" gate="G$1" pin="TX"/>
-<wire x1="-35.56" y1="-7.62" x2="-35.56" y2="-2.54" width="0.1524" layer="91"/>
-<label x="-35.56" y="-2.54" size="1.778" layer="95" rot="R90"/>
 </segment>
 <segment>
 <pinref part="ESP-BREAKOUT" gate="G$1" pin="35"/>
@@ -9052,6 +9283,23 @@ and ESP 32 share the same SPI</text>
 <instance part="U$2" gate="G$1" x="17.78" y="91.44"/>
 <instance part="U$3" gate="G$1" x="22.86" y="88.9"/>
 <instance part="U$4" gate="G$1" x="30.48" y="88.9"/>
+</instances>
+<busses>
+</busses>
+<nets>
+</nets>
+</sheet>
+<sheet>
+<plain>
+<text x="-17.78" y="71.12" size="1.778" layer="91">change log:
+2/4/18:  
+* Changed all resitors of package 1206 or 0805
+* Moved STLink VCC to VIN just after fuse as ST Link only provides 3.3V and minor for charging circut is 3.45V
+* Changed JST package to JST-PH-2-THM-RA (same one we used in dc 25)
+* Moved ESP program header to sheet 1, VCC on esp programming header now goes to VIN after the charging circut
+* Change Zener diode on RX on esp to just a DIODE on RX </text>
+</plain>
+<instances>
 </instances>
 <busses>
 </busses>

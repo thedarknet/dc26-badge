@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.6.0">
+<eagle version="8.6.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -95,7 +95,10 @@
 <layer number="114" name="Badge_Outline" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="115" name="ReferenceISLANDS" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="116" name="Patch_BOT" color="9" fill="4" visible="yes" active="yes"/>
+<layer number="117" name="mPads" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="118" name="Rect_Pads" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="119" name="mUnrouted" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="120" name="mDimension" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="121" name="_tsilk" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="122" name="_bsilk" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="123" name="tTestmark" color="7" fill="1" visible="yes" active="yes"/>
@@ -105,15 +108,38 @@
 <layer number="127" name="_tValues" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="128" name="_bValues" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="129" name="Mask" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="130" name="mbStop" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="131" name="tAdjust" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="132" name="bAdjust" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="133" name="mtFinish" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="134" name="mbFinish" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="135" name="mtGlue" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="136" name="mbGlue" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="137" name="mtTest" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="138" name="mbTest" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="139" name="mtKeepout" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="140" name="mbKeepout" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="141" name="mtRestrict" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="142" name="mbRestrict" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="143" name="mvRestrict" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="144" name="Drill_legend" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="145" name="mHoles" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="146" name="mMilling" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="147" name="mMeasures" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="148" name="mDocument" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="149" name="mReference" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="150" name="Notes" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="151" name="HeatSink" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="152" name="_bDocu" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="153" name="FabDoc1" color="6" fill="1" visible="no" active="no"/>
 <layer number="154" name="FabDoc2" color="2" fill="1" visible="no" active="no"/>
 <layer number="155" name="FabDoc3" color="7" fill="15" visible="no" active="no"/>
+<layer number="191" name="mNets" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="192" name="mBusses" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="193" name="mPins" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="194" name="mSymbols" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="195" name="mNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="196" name="mValues" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="199" name="Contour" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="200" name="200bmp" color="1" fill="10" visible="yes" active="yes"/>
 <layer number="201" name="201bmp" color="2" fill="10" visible="yes" active="yes"/>
@@ -6221,6 +6247,48 @@ Basic small signal diode good up to 200mA. SMB footprint. Common part #: BAS16</
 <rectangle x1="3.5606" y1="-1.0922" x2="4.094" y2="1.0922" layer="51"/>
 <rectangle x1="-2.1" y1="-3.1" x2="-0.85" y2="3.1" layer="21"/>
 </package>
+<package name="APA102_5050">
+<description>APA102 RGB LED</description>
+<wire x1="2.5" y1="-2.5" x2="-2.5" y2="-2.5" width="0.127" layer="21"/>
+<wire x1="-2.5" y1="-2.5" x2="-2.5" y2="1.5" width="0.127" layer="21"/>
+<wire x1="-2.5" y1="1.5" x2="-2.5" y2="2.5" width="0.127" layer="21"/>
+<wire x1="-2.5" y1="2.5" x2="-1.5" y2="2.5" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="2.5" x2="2.5" y2="2.5" width="0.127" layer="21"/>
+<wire x1="2.5" y1="2.5" x2="2.5" y2="-2.5" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="2.5" x2="-2.5" y2="1.5" width="0.127" layer="21"/>
+<circle x="-2.934" y="2.688" radius="0.1414" width="0.127" layer="21"/>
+<circle x="0" y="0" radius="2.1" width="0.127" layer="21"/>
+<smd name="1" x="2" y="-1.7" dx="2" dy="1.1" layer="1" rot="R180"/>
+<smd name="2" x="2" y="0" dx="2" dy="1.1" layer="1" rot="R180"/>
+<smd name="3" x="2" y="1.7" dx="2" dy="1.1" layer="1" rot="R180"/>
+<smd name="4" x="-2" y="1.7" dx="2" dy="1.1" layer="1" rot="R180"/>
+<smd name="5" x="-2" y="0" dx="2" dy="1.1" layer="1" rot="R180"/>
+<smd name="6" x="-2" y="-1.7" dx="2" dy="1.1" layer="1" rot="R180"/>
+<text x="0" y="-3" size="1.27" layer="25" font="vector" rot="R180" align="bottom-center">&gt;NAME</text>
+</package>
+<package name="APA102_2020">
+<wire x1="0" y1="0" x2="2" y2="0" width="0.05" layer="21"/>
+<wire x1="2" y1="0" x2="2" y2="2" width="0.05" layer="21"/>
+<wire x1="2" y1="2" x2="0" y2="2" width="0.05" layer="21"/>
+<wire x1="0" y1="2" x2="0" y2="0" width="0.05" layer="21"/>
+<smd name="D_IN" x="0.25" y="1.825" dx="0.6" dy="0.35" layer="1"/>
+<smd name="D_OUT" x="1.75" y="1.825" dx="0.6" dy="0.35" layer="1"/>
+<smd name="GND" x="0.25" y="0.175" dx="0.6" dy="0.35" layer="1"/>
+<smd name="V_CC" x="1.75" y="0.175" dx="0.6" dy="0.35" layer="1"/>
+<smd name="C_IN" x="0.25" y="1" dx="0.6" dy="0.5" layer="1"/>
+<smd name="CL_OUT" x="1.75" y="1" dx="0.6" dy="0.5" layer="1"/>
+<text x="-0.05" y="1.825" size="0.5" layer="25" align="center-right">D_IN</text>
+<text x="-0.05" y="1" size="0.5" layer="25" align="center-right">CL_IN</text>
+<text x="-0.05" y="0.15" size="0.5" layer="25" align="center-right">GND</text>
+<text x="2.05" y="1.775" size="0.5" layer="25" align="center-left">D_OUT</text>
+<text x="2.05" y="1" size="0.5" layer="25" align="center-left">CL_OUT</text>
+<text x="2.1" y="0.2" size="0.5" layer="25" align="center-left">5V</text>
+<polygon width="0.05" layer="21" spacing="0.01" pour="hatch">
+<vertex x="0.1" y="2.1"/>
+<vertex x="-0.1" y="1.9"/>
+<vertex x="-0.1" y="2.1"/>
+</polygon>
+</package>
 </packages>
 <symbols>
 <symbol name="CMD_C0DE_LOGO">
@@ -7454,6 +7522,20 @@ Basic small signal diode good up to 200mA. SMB footprint. Common part #: BAS16</
 <text x="2.54" y="-2.3114" size="1.778" layer="96">&gt;VALUE</text>
 <pin name="A" x="-2.54" y="0" visible="off" length="short" direction="pas"/>
 <pin name="C" x="2.54" y="0" visible="off" length="short" direction="pas" rot="R180"/>
+</symbol>
+<symbol name="APA102">
+<description>APA102 RGB LED</description>
+<wire x1="-10.16" y1="7.62" x2="-10.16" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="-2.54" x2="7.62" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="7.62" y1="-2.54" x2="7.62" y2="7.62" width="0.254" layer="94"/>
+<wire x1="7.62" y1="7.62" x2="-10.16" y2="7.62" width="0.254" layer="94"/>
+<pin name="DI" x="-12.7" y="5.08" visible="pin" length="short"/>
+<pin name="CI" x="-12.7" y="0" visible="pin" length="short"/>
+<pin name="GND" x="-2.54" y="-5.08" visible="pin" length="short" rot="R90"/>
+<pin name="VCC" x="0" y="10.16" visible="pin" length="short" rot="R270"/>
+<pin name="CO" x="10.16" y="0" visible="pin" length="short" rot="R180"/>
+<pin name="DO" x="10.16" y="5.08" visible="pin" length="short" rot="R180"/>
+<text x="-10.16" y="8.128" size="1.143" layer="94">APA102</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -9802,6 +9884,45 @@ These are standard reverse protection diodes and small signal diodes. SMA packag
 <connects>
 <connect gate="G$1" pin="A" pad="A"/>
 <connect gate="G$1" pin="C" pad="C"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="APA102">
+<description>APA102C 5050 RGB LED
+
+--
+Adafruit DotStar Single LED Pixel
+Product Page: https://www.adafruit.com/products/2343
+Datasheet: https://cdn-shop.adafruit.com/product-files/2343/APA102C.pdf</description>
+<gates>
+<gate name="G$1" symbol="APA102" x="-5.08" y="0"/>
+</gates>
+<devices>
+<device name="5050" package="APA102_5050">
+<connects>
+<connect gate="G$1" pin="CI" pad="5"/>
+<connect gate="G$1" pin="CO" pad="2"/>
+<connect gate="G$1" pin="DI" pad="4"/>
+<connect gate="G$1" pin="DO" pad="3"/>
+<connect gate="G$1" pin="GND" pad="6"/>
+<connect gate="G$1" pin="VCC" pad="1"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="2020" package="APA102_2020">
+<connects>
+<connect gate="G$1" pin="CI" pad="C_IN"/>
+<connect gate="G$1" pin="CO" pad="CL_OUT"/>
+<connect gate="G$1" pin="DI" pad="D_IN"/>
+<connect gate="G$1" pin="DO" pad="D_OUT"/>
+<connect gate="G$1" pin="GND" pad="GND"/>
+<connect gate="G$1" pin="VCC" pad="V_CC"/>
 </connects>
 <technologies>
 <technology name=""/>

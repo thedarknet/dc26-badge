@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.6.1">
+<eagle version="8.6.3">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -8380,6 +8380,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <segment>
 <wire x1="12.7" y1="-20.32" x2="15.24" y2="-20.32" width="0.1524" layer="91"/>
 <pinref part="C21" gate="G$1" pin="1"/>
+<pinref part="U$7" gate="G$1" pin="VCC"/>
 </segment>
 </net>
 <net name="VCC5" class="0">

@@ -7674,13 +7674,6 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <label x="236.22" y="43.18" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="GPIO_APA102_DATA" class="0">
-<segment>
-<pinref part="STM32-BREAKOUT" gate="G$1" pin="16"/>
-<wire x1="193.04" y1="53.34" x2="198.12" y2="53.34" width="0.1524" layer="91"/>
-<label x="198.12" y="53.34" size="1.778" layer="95"/>
-</segment>
-</net>
 <net name="PC13" class="0">
 <segment>
 <pinref part="STM32-BREAKOUT" gate="G$1" pin="3"/>
@@ -7885,13 +7878,6 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="IC1" gate="G$1" pin="PA15"/>
 <wire x1="116.84" y1="83.82" x2="116.84" y2="86.36" width="0.1524" layer="91"/>
 <label x="116.84" y="86.36" size="1.778" layer="95" rot="R90"/>
-</segment>
-</net>
-<net name="PC9" class="0">
-<segment>
-<pinref part="STM32-BREAKOUT" gate="G$1" pin="18"/>
-<wire x1="193.04" y1="50.8" x2="198.12" y2="50.8" width="0.1524" layer="91"/>
-<label x="198.12" y="50.8" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="PC8" class="0">
@@ -8132,12 +8118,22 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <wire x1="127" y1="45.72" x2="132.08" y2="45.72" width="0.1524" layer="91"/>
 <label x="132.08" y="45.72" size="1.778" layer="95"/>
 </segment>
+<segment>
+<pinref part="STM32-BREAKOUT" gate="G$1" pin="18"/>
+<wire x1="193.04" y1="50.8" x2="198.12" y2="50.8" width="0.1524" layer="91"/>
+<label x="198.12" y="50.8" size="1.778" layer="95"/>
+</segment>
 </net>
 <net name="APA102_DATA" class="0">
 <segment>
 <pinref part="IC1" gate="G$1" pin="PA8"/>
 <wire x1="127" y1="48.26" x2="129.54" y2="48.26" width="0.1524" layer="91"/>
 <label x="132.08" y="48.26" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="STM32-BREAKOUT" gate="G$1" pin="16"/>
+<wire x1="193.04" y1="53.34" x2="198.12" y2="53.34" width="0.1524" layer="91"/>
+<label x="198.12" y="53.34" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
@@ -8345,12 +8341,6 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="GND56" gate="1" pin="GND"/>
 </segment>
 </net>
-<net name="VCC1" class="0">
-<segment>
-<wire x1="12.7" y1="101.6" x2="15.24" y2="101.6" width="0.1524" layer="91"/>
-<pinref part="C31" gate="G$1" pin="1"/>
-</segment>
-</net>
 <net name="APA102_CLK" class="0">
 <segment>
 <pinref part="U$8" gate="G$1" pin="CI"/>
@@ -8360,99 +8350,9 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 </net>
 <net name="APA102_DATA" class="0">
 <segment>
-<wire x1="7.62" y1="129.54" x2="7.62" y2="111.76" width="0.1524" layer="91"/>
+<wire x1="7.62" y1="129.54" x2="7.62" y2="114.3" width="0.1524" layer="91"/>
 <label x="10.16" y="111.76" size="1.778" layer="95" rot="R90"/>
-</segment>
-</net>
-<net name="VCC2" class="0">
-<segment>
-<wire x1="12.7" y1="60.96" x2="15.24" y2="60.96" width="0.1524" layer="91"/>
-<pinref part="C14" gate="G$1" pin="1"/>
-</segment>
-</net>
-<net name="VCC3" class="0">
-<segment>
-<wire x1="12.7" y1="20.32" x2="15.24" y2="20.32" width="0.1524" layer="91"/>
-<pinref part="C20" gate="G$1" pin="1"/>
-</segment>
-</net>
-<net name="VCC4" class="0">
-<segment>
-<wire x1="12.7" y1="-20.32" x2="15.24" y2="-20.32" width="0.1524" layer="91"/>
-<pinref part="C21" gate="G$1" pin="1"/>
-<pinref part="U$7" gate="G$1" pin="VCC"/>
-</segment>
-</net>
-<net name="VCC5" class="0">
-<segment>
-<wire x1="45.72" y1="-5.08" x2="43.18" y2="-5.08" width="0.1524" layer="91"/>
-<pinref part="C22" gate="G$1" pin="1"/>
-</segment>
-</net>
-<net name="VCC6" class="0">
-<segment>
-<wire x1="45.72" y1="35.56" x2="43.18" y2="35.56" width="0.1524" layer="91"/>
-<pinref part="C23" gate="G$1" pin="1"/>
-</segment>
-</net>
-<net name="VCC7" class="0">
-<segment>
-<wire x1="45.72" y1="76.2" x2="43.18" y2="76.2" width="0.1524" layer="91"/>
-<pinref part="C24" gate="G$1" pin="1"/>
-</segment>
-</net>
-<net name="VCC8" class="0">
-<segment>
-<wire x1="45.72" y1="116.84" x2="43.18" y2="116.84" width="0.1524" layer="91"/>
-<pinref part="C25" gate="G$1" pin="1"/>
-</segment>
-</net>
-<net name="VCC9" class="0">
-<segment>
-<wire x1="96.52" y1="101.6" x2="99.06" y2="101.6" width="0.1524" layer="91"/>
-<pinref part="C26" gate="G$1" pin="1"/>
-</segment>
-</net>
-<net name="VCC10" class="0">
-<segment>
-<wire x1="96.52" y1="60.96" x2="99.06" y2="60.96" width="0.1524" layer="91"/>
-<pinref part="C27" gate="G$1" pin="1"/>
-</segment>
-</net>
-<net name="VCC11" class="0">
-<segment>
-<wire x1="96.52" y1="20.32" x2="99.06" y2="20.32" width="0.1524" layer="91"/>
-<pinref part="C28" gate="G$1" pin="1"/>
-</segment>
-</net>
-<net name="VCC12" class="0">
-<segment>
-<wire x1="96.52" y1="-20.32" x2="99.06" y2="-20.32" width="0.1524" layer="91"/>
-<pinref part="C29" gate="G$1" pin="1"/>
-</segment>
-</net>
-<net name="VCC13" class="0">
-<segment>
-<wire x1="121.92" y1="-5.08" x2="119.38" y2="-5.08" width="0.1524" layer="91"/>
-<pinref part="C30" gate="G$1" pin="1"/>
-</segment>
-</net>
-<net name="VCC14" class="0">
-<segment>
-<wire x1="121.92" y1="35.56" x2="119.38" y2="35.56" width="0.1524" layer="91"/>
-<pinref part="C32" gate="G$1" pin="1"/>
-</segment>
-</net>
-<net name="VCC15" class="0">
-<segment>
-<wire x1="121.92" y1="76.2" x2="119.38" y2="76.2" width="0.1524" layer="91"/>
-<pinref part="C33" gate="G$1" pin="1"/>
-</segment>
-</net>
-<net name="VCC16" class="0">
-<segment>
-<wire x1="121.92" y1="116.84" x2="119.38" y2="116.84" width="0.1524" layer="91"/>
-<pinref part="C34" gate="G$1" pin="1"/>
+<pinref part="U$8" gate="G$1" pin="DI"/>
 </segment>
 </net>
 <net name="N$5" class="0">
@@ -8672,6 +8572,88 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="U$19" gate="G$1" pin="DO"/>
 <pinref part="U$20" gate="G$1" pin="DI"/>
 <wire x1="127" y1="86.36" x2="127" y2="104.14" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="VIN" class="0">
+<segment>
+<wire x1="12.7" y1="101.6" x2="15.24" y2="101.6" width="0.1524" layer="91"/>
+<pinref part="C31" gate="G$1" pin="1"/>
+<pinref part="U$8" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="12.7" y1="60.96" x2="15.24" y2="60.96" width="0.1524" layer="91"/>
+<pinref part="C14" gate="G$1" pin="1"/>
+<pinref part="U$5" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="12.7" y1="20.32" x2="15.24" y2="20.32" width="0.1524" layer="91"/>
+<pinref part="C20" gate="G$1" pin="1"/>
+<pinref part="U$6" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="12.7" y1="-20.32" x2="15.24" y2="-20.32" width="0.1524" layer="91"/>
+<pinref part="C21" gate="G$1" pin="1"/>
+<pinref part="U$7" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="45.72" y1="-5.08" x2="43.18" y2="-5.08" width="0.1524" layer="91"/>
+<pinref part="C22" gate="G$1" pin="1"/>
+<pinref part="U$9" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="45.72" y1="35.56" x2="43.18" y2="35.56" width="0.1524" layer="91"/>
+<pinref part="C23" gate="G$1" pin="1"/>
+<pinref part="U$10" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="45.72" y1="76.2" x2="43.18" y2="76.2" width="0.1524" layer="91"/>
+<pinref part="C24" gate="G$1" pin="1"/>
+<pinref part="U$11" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="45.72" y1="116.84" x2="43.18" y2="116.84" width="0.1524" layer="91"/>
+<pinref part="C25" gate="G$1" pin="1"/>
+<pinref part="U$12" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="96.52" y1="101.6" x2="99.06" y2="101.6" width="0.1524" layer="91"/>
+<pinref part="C26" gate="G$1" pin="1"/>
+<pinref part="U$13" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="96.52" y1="60.96" x2="99.06" y2="60.96" width="0.1524" layer="91"/>
+<pinref part="C27" gate="G$1" pin="1"/>
+<pinref part="U$14" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="96.52" y1="20.32" x2="99.06" y2="20.32" width="0.1524" layer="91"/>
+<pinref part="C28" gate="G$1" pin="1"/>
+<pinref part="U$15" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="96.52" y1="-20.32" x2="99.06" y2="-20.32" width="0.1524" layer="91"/>
+<pinref part="C29" gate="G$1" pin="1"/>
+<pinref part="U$16" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="121.92" y1="-5.08" x2="119.38" y2="-5.08" width="0.1524" layer="91"/>
+<pinref part="C30" gate="G$1" pin="1"/>
+<pinref part="U$17" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="121.92" y1="35.56" x2="119.38" y2="35.56" width="0.1524" layer="91"/>
+<pinref part="C32" gate="G$1" pin="1"/>
+<pinref part="U$18" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="121.92" y1="76.2" x2="119.38" y2="76.2" width="0.1524" layer="91"/>
+<pinref part="C33" gate="G$1" pin="1"/>
+<pinref part="U$19" gate="G$1" pin="VCC"/>
+</segment>
+<segment>
+<wire x1="121.92" y1="116.84" x2="119.38" y2="116.84" width="0.1524" layer="91"/>
+<pinref part="C34" gate="G$1" pin="1"/>
+<pinref part="U$20" gate="G$1" pin="VCC"/>
 </segment>
 </net>
 </nets>
@@ -9332,6 +9314,11 @@ and ESP 32 share the same SPI</text>
 </nets>
 </sheet>
 </sheets>
+<errors>
+<approved hash="104,1,104.14,76.2,LINK1,VCC,VIN,,,"/>
+<approved hash="104,1,139.7,137.16,ESP32PH,VCC,VIN,,,"/>
+<approved hash="115,3,13.97,101.6,VCC1,,,,,"/>
+</errors>
 </schematic>
 </drawing>
 <compatibility>

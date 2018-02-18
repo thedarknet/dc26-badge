@@ -9317,7 +9317,23 @@ and ESP 32 share the same SPI</text>
 <errors>
 <approved hash="104,1,104.14,76.2,LINK1,VCC,VIN,,,"/>
 <approved hash="104,1,139.7,137.16,ESP32PH,VCC,VIN,,,"/>
-<approved hash="115,3,13.97,101.6,VCC1,,,,,"/>
+<approved hash="115,3,120.65,116.84,VIN,,,,,"/>
+<approved hash="115,3,120.65,76.2,VIN,,,,,"/>
+<approved hash="115,3,120.65,35.56,VIN,,,,,"/>
+<approved hash="115,3,120.65,-5.08,VIN,,,,,"/>
+<approved hash="115,3,97.79,-20.32,VIN,,,,,"/>
+<approved hash="115,3,97.79,20.32,VIN,,,,,"/>
+<approved hash="115,3,97.79,60.96,VIN,,,,,"/>
+<approved hash="115,3,97.79,101.6,VIN,,,,,"/>
+<approved hash="115,3,44.45,116.84,VIN,,,,,"/>
+<approved hash="115,3,44.45,76.2,VIN,,,,,"/>
+<approved hash="115,3,44.45,35.56,VIN,,,,,"/>
+<approved hash="115,3,44.45,-5.08,VIN,,,,,"/>
+<approved hash="115,3,13.97,-20.32,VIN,,,,,"/>
+<approved hash="115,3,13.97,20.32,VIN,,,,,"/>
+<approved hash="115,3,13.97,60.96,VIN,,,,,"/>
+<approved hash="115,3,13.97,101.6,VIN,,,,,"/>
+<approved hash="115,1,121.92,76.2,VIN,,,,,"/>
 </errors>
 </schematic>
 </drawing>

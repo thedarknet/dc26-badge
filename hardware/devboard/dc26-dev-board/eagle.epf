@@ -31,10 +31,5 @@ UsedLibrary="D:/My Stuff/dev/eagle/Eagle-Libraries/Voltage Regulators/l5973d.lbr
 UsedLibrary="D:/My Stuff/dev/eagle/Eagle-Libraries/Voltage Regulators/v-reg-3.lbr"
 UsedLibrary="D:/My Stuff/dev/eagle/eagle/libraries/switch-tact.lbr"
 
-[Win_1]
-Type="Control Panel"
-Number=0
-
 [Desktop]
 Screen="6000 3840"
-Window="Win_1"

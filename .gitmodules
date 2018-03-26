@@ -4,3 +4,6 @@
 [submodule "firmware/NucleoF411RE/DC26/Src/darknet/libstm32"]
 	path = firmware/NucleoF411RE/DC26/Src/darknet/libstm32
 	url = https://github.com/cmdc0de/libstm32.git
+[submodule "firmware/DevBoard/darknet-7/Src/darknet/libstm32"]
+	path = firmware/DevBoard/darknet-7/Src/darknet/libstm32
+	url = https://github.com/cmdc0de/libstm32.git

@@ -1,11 +1,3 @@
-/* Hello World Example
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
 #include <stdio.h>
 #include <stdint.h>
 #include <stddef.h>
@@ -49,19 +41,23 @@ sending a transaction. As soon as the transaction is done, the line gets set low
 Pins in use. The SPI Master can use the GPIO mux, so feel free to change these if needed.
 */
 #define GPIO_HANDSHAKE 4 //2
+//#define GPIO_MOSI 13 //14
 #define GPIO_MOSI 12 //14
+//#define GPIO_MISO 12 //16
 #define GPIO_MISO 13 //16
 #define GPIO_SCLK 15 //23 
-#define GPIO_CS 21 /21 //33
+#define GPIO_CS 21 //33
 
 
 //Called after a transaction is queued and ready for pickup by master. We use this to set the handshake line high.
 void my_post_setup_cb(spi_slave_transaction_t *trans) {
+//		  printf("post setup cb\n");
     WRITE_PERI_REG(GPIO_OUT_W1TS_REG, (1<<GPIO_HANDSHAKE));
 }
 
 //Called after transaction is sent/received. We use this to set the handshake line low.
 void my_post_trans_cb(spi_slave_transaction_t *trans) {
+//		  printf("post transmition cb\n");
     WRITE_PERI_REG(GPIO_OUT_W1TC_REG, (1<<GPIO_HANDSHAKE));
 }
 
@@ -82,7 +78,7 @@ void app_main()
             (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
             (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
 
-    printf("silicon revision %d, ", chip_info.revision);
+    printf("silicon revision %d, \n", chip_info.revision);
     fflush(stdout);
 
     printf("%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
@@ -102,6 +98,7 @@ void app_main()
         .miso_io_num=GPIO_MISO,
         .sclk_io_num=GPIO_SCLK
     };
+	 printf("1\n");
 
     //Configuration for the SPI slave interface
     spi_slave_interface_config_t slvcfg={
@@ -113,24 +110,27 @@ void app_main()
         .post_trans_cb=my_post_trans_cb
     };
 
+	 printf("2\n");
     //Configuration for the handshake line
     gpio_config_t io_conf={
         .intr_type=GPIO_INTR_DISABLE,
         .mode=GPIO_MODE_OUTPUT,
         .pin_bit_mask=(1<<GPIO_HANDSHAKE)
     };
-/*
+	 printf("3\n");
+
     //Configure handshake line as output
     gpio_config(&io_conf);
+	 printf("4\n");
     //Enable pull-ups on SPI lines so we don't detect rogue pulses when no master is connected.
     gpio_set_pull_mode(GPIO_MOSI, GPIO_PULLUP_ONLY);
     gpio_set_pull_mode(GPIO_SCLK, GPIO_PULLUP_ONLY);
     gpio_set_pull_mode(GPIO_CS, GPIO_PULLUP_ONLY);
-    printf("setup gpio for spi \n");
-    fflush(stdout);
+    printf("setup gpio for spi\n");
 
     //Initialize SPI slave interface
     ret=spi_slave_initialize(HSPI_HOST, &buscfg, &slvcfg, 1);
+    printf("ret from slave: %d \n", ret);
     assert(ret==ESP_OK);
 
     char sendbuf[129]="";
@@ -140,8 +140,9 @@ void app_main()
     memset(&t, 0, sizeof(t));
 
     while(1) {
+    	printf("while\n");
         //Clear receive buffer, set send buffer to something sane
-        memset(recvbuf, 0xA5, 129);
+        memset(recvbuf, 0x0, 129);
         sprintf(sendbuf, "This is the receiver, sending data for transmission number %04d.", n);
 
         //Set up a transaction of 128 bytes to send/receive
@@ -158,9 +159,10 @@ void app_main()
         //spi_slave_transmit does not return until the master has done a transmission, so by here we have sent our data and
         //received data from the master. Print it.
         printf("Received: %s\n", recvbuf);
+        printf("Sent: %s\n", sendbuf);
         n++;
     }
-*/	
+	
     fflush(stdout);
 	 //esp_restart();
 }

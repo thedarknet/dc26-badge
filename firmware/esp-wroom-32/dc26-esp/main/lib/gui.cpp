@@ -1,4 +1,7 @@
 #include "gui.h"
+#include <time.h>
+#include <sys/time.h>
+
 
 //current list element
 GUI_ListData *gui_CurList;
@@ -15,7 +18,7 @@ void GUI_ListItemData::setShouldScroll() {
 bool gui_init()
 {
 	gui_CurList = 0;
-	return SSD1306_Init();
+	return SSD1306_Init(0);
 }
 
 void gui_text(const char* txt, uint8_t x, uint8_t y, uint8_t col)
@@ -75,17 +78,19 @@ void gui_ticker(GUI_TickerData *dt)
 		len++;
 	if(dt->startTick == 0)
 	{
-		dt->startTick = HAL_GetTick();
+		//dt->startTick = HAL_GetTick();
+		dt->startTick = time(0);
 	}
-	shift = ((HAL_GetTick() - dt->startTick) / GUI_TickerSpeed) 
-		- maxlen/2; //start delay
+	//shift = ((HAL_GetTick() - dt->startTick) / GUI_TickerSpeed) - maxlen/2; //start delay
+	shift = ((time(0) - dt->startTick) / GUI_TickerSpeed) - maxlen/2; //start delay
 	
 	if(shift > len-maxlen)
 	{
 		if(shift > len-maxlen + GUI_TickerEndDelay)
 		{
 			shift = 0;
-			dt->startTick = HAL_GetTick();
+			//dt->startTick = HAL_GetTick();
+			dt->startTick = time(0);
 		}
 		else
 			shift = len-maxlen;
@@ -106,10 +111,13 @@ const char *GUI_ListItemData::getScrollOffset() {
 	uint16_t offSet = 0;
 	if(Scrollable) {
 		if(LastScrollTime==0) {
-			LastScrollTime=HAL_GetTick();
+			//LastScrollTime=HAL_GetTick();
+			LastScrollTime=time(0);
 		}
-		if(HAL_GetTick()-LastScrollTime>TimeBetweenScroll) {
-			LastScrollTime = HAL_GetTick();
+		//if(HAL_GetTick()-LastScrollTime>TimeBetweenScroll) {
+		if(time(0)-LastScrollTime>TimeBetweenScroll) {
+			//LastScrollTime = HAL_GetTick();
+			LastScrollTime = time(0);
 			LastScrollPosition++;
 			uint32_t l = strlen(text);
 			//char b[10];

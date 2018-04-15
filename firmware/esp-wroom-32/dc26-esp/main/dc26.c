@@ -42,12 +42,13 @@ Pins in use. The SPI Master can use the GPIO mux, so feel free to change these i
 */
 #define GPIO_HANDSHAKE 4 //2
 //#define GPIO_MOSI 13 //14
-#define GPIO_MOSI 12 //14
 //#define GPIO_MISO 12 //16
-#define GPIO_MISO 13 //16
-#define GPIO_SCLK 15 //23 
+//#define GPIO_SCLK 14 //23 
 #define GPIO_CS 21 //33
 
+#define GPIO_MOSI 12 //14
+#define GPIO_MISO 13 //16
+#define GPIO_SCLK 15 //23 
 
 //Called after a transaction is queued and ready for pickup by master. We use this to set the handshake line high.
 void my_post_setup_cb(spi_slave_transaction_t *trans) {
@@ -61,6 +62,8 @@ void my_post_trans_cb(spi_slave_transaction_t *trans) {
     WRITE_PERI_REG(GPIO_OUT_W1TC_REG, (1<<GPIO_HANDSHAKE));
 }
 
+DRAM_ATTR char sendbuf[129]="";
+DRAM_ATTR char recvbuf[129]="";
 //Main application
 void app_main()
 {
@@ -102,10 +105,10 @@ void app_main()
 
     //Configuration for the SPI slave interface
     spi_slave_interface_config_t slvcfg={
-        .mode=0,
+        .mode=3, //0,
         .spics_io_num=GPIO_CS,
-        .queue_size=3,
-        .flags=0,
+        .queue_size=7,
+        .flags=1,
         .post_setup_cb=my_post_setup_cb,
         .post_trans_cb=my_post_trans_cb
     };
@@ -130,12 +133,11 @@ void app_main()
 
     //Initialize SPI slave interface
     ret=spi_slave_initialize(HSPI_HOST, &buscfg, &slvcfg, 1);
+    //ret=spi_slave_initialize(VSPI_HOST, &buscfg, &slvcfg, 1);
     printf("ret from slave: %d \n", ret);
     assert(ret==ESP_OK);
 
-    char sendbuf[129]="";
-    char recvbuf[129]="";
-    memset(recvbuf, 0, 33);
+    memset(recvbuf, 0, 128);
     spi_slave_transaction_t t;
     memset(&t, 0, sizeof(t));
 
@@ -143,7 +145,7 @@ void app_main()
     	printf("while\n");
         //Clear receive buffer, set send buffer to something sane
         memset(recvbuf, 0x0, 129);
-        sprintf(sendbuf, "This is the receiver, sending data for transmission number %04d.", n);
+        sprintf(sendbuf, "receiver: no: %04d.", n);
 
         //Set up a transaction of 128 bytes to send/receive
         t.length=128*8;
@@ -159,7 +161,11 @@ void app_main()
         //spi_slave_transmit does not return until the master has done a transmission, so by here we have sent our data and
         //received data from the master. Print it.
         printf("Received: %s\n", recvbuf);
+        //printf("Received: %d\n", (int)i);
+    	fflush(stdout);
         printf("Sent: %s\n", sendbuf);
+        //printf("Sent: %d\n", (int)o);
+    	fflush(stdout);
         n++;
     }
 	

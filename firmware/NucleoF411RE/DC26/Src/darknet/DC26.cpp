@@ -11,6 +11,7 @@
 #include "libstm32/display/fonts.h"
 #include <main.h>
 #include "libstm32/config.h"
+#include <usart.h>
 
 using cmdc0de::ErrorType;
 using cmdc0de::DisplayST7735;
@@ -26,9 +27,8 @@ DisplayST7735 Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DisplayST7735::PORTAIT);
 uint16_t DrawBuffer[DISPLAY_WIDTH * DISPLAY_OPT_WRITE_ROWS]; //120 wide, 10 pixels high, 2 bytes per pixel (uint16_t)
 uint8_t DrawBufferRangeChange[DISPLAY_HEIGHT / DISPLAY_OPT_WRITE_ROWS + 1];
 
-cmdc0de::DrawBufferNoBuffer NoBuffer(&Display, &DrawBuffer[0], DISPLAY_OPT_WRITE_ROWS);
-
-
+cmdc0de::DrawBufferNoBuffer NoBuffer(&Display, &DrawBuffer[0],
+		DISPLAY_OPT_WRITE_ROWS);
 
 DC26::DC26() {
 	// TODO Auto-generated constructor stub
@@ -59,6 +59,32 @@ ErrorType DC26::onInit() {
 	return et;
 }
 
+static const char *TFAILED = "TRANS FAIL";
+static const char *RFAILED = "REC FAILED";
+
 ErrorType DC26::onRun() {
+	if (HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin)
+			== GPIO_PIN_RESET) {
+		Display.fillScreen(cmdc0de::RGBColor::BLACK);
+		char oBuf[129] = { '\0' };
+		char iBuf[129] = { '\0' };
+		strcpy(&oBuf[0], "1234567890");
+		//uint8_t i = 0;
+		//uint8_t o = 1;
+		Display.drawString(0, 10, &iBuf[0], cmdc0de::RGBColor::WHITE);
+		Display.drawString(0, 20, &oBuf[0], cmdc0de::RGBColor::WHITE);
+		if (HAL_OK
+				!= HAL_UART_Transmit(&huart1, (uint8_t *) &oBuf[0], 12, 1000)) {
+			Display.drawString(0, 30, TFAILED, cmdc0de::RGBColor::WHITE);
+		}
+		if (HAL_OK
+				!= HAL_UART_Receive(&huart1, (uint8_t *) &iBuf[0], 12, 1000)) {
+			Display.drawString(0, 30, RFAILED, cmdc0de::RGBColor::WHITE);
+		}
+		Display.drawString(0, 50, &oBuf[0], cmdc0de::RGBColor::WHITE);
+		Display.drawString(0, 60, &iBuf[0], cmdc0de::RGBColor::WHITE);
+		Display.swap();
+		HAL_Delay(2000);
+	}
 	return ErrorType();
 }

@@ -58,6 +58,8 @@
 
 /* Private define ------------------------------------------------------------*/
 
+#define MID_BUTTON1_Pin GPIO_PIN_13
+#define MID_BUTTON1_GPIO_Port GPIOC
 #define LCD_DATA_CMD_Pin GPIO_PIN_0
 #define LCD_DATA_CMD_GPIO_Port GPIOC
 #define LCD_CS_Pin GPIO_PIN_1
@@ -72,18 +74,28 @@
 #define LCD_BACKLIGHT_GPIO_Port GPIOB
 #define SPI2_LCD_SCK_Pin GPIO_PIN_10
 #define SPI2_LCD_SCK_GPIO_Port GPIOB
-#define SPI3_ESP_SCK_Pin GPIO_PIN_12
-#define SPI3_ESP_SCK_GPIO_Port GPIOB
+#define SPI3_SD_SCK_Pin GPIO_PIN_12
+#define SPI3_SD_SCK_GPIO_Port GPIOB
+#define APA106_DATA_Pin GPIO_PIN_7
+#define APA106_DATA_GPIO_Port GPIOC
 #define GPIO_APA102_DATA_Pin GPIO_PIN_8
 #define GPIO_APA102_DATA_GPIO_Port GPIOC
 #define TIM_APA102_CLK_Pin GPIO_PIN_9
 #define TIM_APA102_CLK_GPIO_Port GPIOC
-#define SPI3_ESP_MISO_Pin GPIO_PIN_11
-#define SPI3_ESP_MISO_GPIO_Port GPIOC
-#define SPI3_ESP_MOSI_Pin GPIO_PIN_12
-#define SPI3_ESP_MOSI_GPIO_Port GPIOC
-#define ESP_CS_Pin GPIO_PIN_2
-#define ESP_CS_GPIO_Port GPIOD
+#define USART1_TX_TO_ESP_RX_PIN_5_Pin GPIO_PIN_9
+#define USART1_TX_TO_ESP_RX_PIN_5_GPIO_Port GPIOA
+#define USART1_RX_TO_ESP_RX_PIN_4_Pin GPIO_PIN_10
+#define USART1_RX_TO_ESP_RX_PIN_4_GPIO_Port GPIOA
+#define SPI3_SD_MISO_Pin GPIO_PIN_11
+#define SPI3_SD_MISO_GPIO_Port GPIOC
+#define SPI3_SD_MOSI_Pin GPIO_PIN_12
+#define SPI3_SD_MOSI_GPIO_Port GPIOC
+#define ESP_INTER_Pin GPIO_PIN_2
+#define ESP_INTER_GPIO_Port GPIOD
+#define I2C1_SCL_MASTER_Pin GPIO_PIN_6
+#define I2C1_SCL_MASTER_GPIO_Port GPIOB
+#define I2C1_SDA_MASTER_Pin GPIO_PIN_7
+#define I2C1_SDA_MASTER_GPIO_Port GPIOB
 
 /* ########################## Assert Selection ############################## */
 /**

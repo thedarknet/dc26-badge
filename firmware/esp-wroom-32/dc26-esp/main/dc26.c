@@ -21,55 +21,151 @@
 #include "nvs_flash.h"
 #include "soc/rtc_cntl_reg.h"
 #include "rom/cache.h"
-#include "driver/spi_slave.h"
 #include "esp_log.h"
 #include "esp_spi_flash.h"
+#include "driver/i2c.h"
 
-/*
-SPI receiver (slave) example.
-
-This example is supposed to work together with the SPI sender. It uses the standard SPI pins (MISO, MOSI, SCLK, CS) to 
-transmit data over in a full-duplex fashion, that is, while the master puts data on the MOSI pin, the slave puts its own
-data on the MISO pin.
-
-This example uses one extra pin: GPIO_HANDSHAKE is used as a handshake pin. After a transmission has been set up and we're
-ready to send/receive data, this code uses a callback to set the handshake pin high. The sender will detect this and start
-sending a transaction. As soon as the transaction is done, the line gets set low again.
-*/
-
-/*
-Pins in use. The SPI Master can use the GPIO mux, so feel free to change these if needed.
-*/
-#define GPIO_HANDSHAKE 4 //2
-//#define GPIO_MOSI 13 //14
-//#define GPIO_MISO 12 //16
-//#define GPIO_SCLK 14 //23 
-#define GPIO_CS 21 //33
-
-#define GPIO_MOSI 12 //14
-#define GPIO_MISO 13 //16
-#define GPIO_SCLK 15 //23 
-
-//Called after a transaction is queued and ready for pickup by master. We use this to set the handshake line high.
-void my_post_setup_cb(spi_slave_transaction_t *trans) {
-//		  printf("post setup cb\n");
-    WRITE_PERI_REG(GPIO_OUT_W1TS_REG, (1<<GPIO_HANDSHAKE));
-}
-
-//Called after transaction is sent/received. We use this to set the handshake line low.
-void my_post_trans_cb(spi_slave_transaction_t *trans) {
-//		  printf("post transmition cb\n");
-    WRITE_PERI_REG(GPIO_OUT_W1TC_REG, (1<<GPIO_HANDSHAKE));
-}
-
-DRAM_ATTR char sendbuf[129]="";
-DRAM_ATTR char recvbuf[129]="";
+//DRAM_ATTR char sendbuf[129]="";
+//DRAM_ATTR char recvbuf[129]="";
 //Main application
+
+
+
+/**
+ * TEST CODE BRIEF
+ *
+ * This example will show you how to use I2C module by running two tasks on i2c bus:
+ *
+ * - read external i2c sensor, here we use a BH1750 light sensor(GY-30 module) for instance.
+ * - Use one I2C port(master mode) to read or write the other I2C port(slave mode) on one ESP32 chip.
+ *
+ * Pin assignment:
+ *
+ * - slave :
+ *    GPIO25 is assigned as the data signal of i2c slave port
+ *    GPIO26 is assigned as the clock signal of i2c slave port
+ *
+ */
+
+#define DATA_LENGTH                        512              /*!<Data buffer length for test buffer*/
+#define RW_TEST_LENGTH                     129              /*!<Data length for r/w test, any value from 0-DATA_LENGTH*/
+#define DELAY_TIME_BETWEEN_ITEMS_MS        1234             /*!< delay time between different test items */
+
+#define I2C_SLAVE_SCL_IO           26               /*!<gpio number for i2c slave clock  */
+#define I2C_SLAVE_SDA_IO           25               /*!<gpio number for i2c slave data */
+#define I2C_SLAVE_NUM              I2C_NUM_0        /*!<I2C port number for slave dev */
+#define I2C_SLAVE_TX_BUF_LEN       (2*DATA_LENGTH)  /*!<I2C slave tx buffer size */
+#define I2C_SLAVE_RX_BUF_LEN       (2*DATA_LENGTH)  /*!<I2C slave rx buffer size */
+
+#define I2C_EXAMPLE_MASTER_FREQ_HZ         100000           /*!< I2C master clock frequency */
+
+#define ESP_SLAVE_ADDR                     1             /*!< ESP32 slave address, you can set any 7bit value */
+#define WRITE_BIT                          I2C_MASTER_WRITE /*!< I2C master write */
+#define READ_BIT                           I2C_MASTER_READ  /*!< I2C master read */
+#define ACK_CHECK_EN                       0x1              /*!< I2C master will check ack from slave*/
+#define ACK_CHECK_DIS                      0x0              /*!< I2C master will not check ack from slave */
+#define ACK_VAL                            0x0              /*!< I2C ack value */
+#define NACK_VAL                           0x1              /*!< I2C nack value */
+
+#define I2C_EXAMPLE_MASTER_SCL_IO          19               /*!< gpio number for I2C master clock */
+#define I2C_EXAMPLE_MASTER_SDA_IO          18               /*!< gpio number for I2C master data  */
+#define I2C_EXAMPLE_MASTER_NUM             I2C_NUM_1        /*!< I2C port number for master dev */
+#define I2C_EXAMPLE_MASTER_TX_BUF_DISABLE  0                /*!< I2C master do not need buffer */
+#define I2C_EXAMPLE_MASTER_RX_BUF_DISABLE  0                /*!< I2C master do not need buffer */
+#define I2C_EXAMPLE_MASTER_FREQ_HZ         100000           /*!< I2C master clock frequency */
+SemaphoreHandle_t print_mux = NULL;
+
+static void i2c_master_init()
+{
+    int i2c_master_port = I2C_EXAMPLE_MASTER_NUM;
+    i2c_config_t conf;
+    conf.mode = I2C_MODE_MASTER;
+    conf.sda_io_num = I2C_EXAMPLE_MASTER_SDA_IO;
+    conf.sda_pullup_en = GPIO_PULLUP_ENABLE;
+    conf.scl_io_num = I2C_EXAMPLE_MASTER_SCL_IO;
+    conf.scl_pullup_en = GPIO_PULLUP_ENABLE;
+    conf.master.clk_speed = I2C_EXAMPLE_MASTER_FREQ_HZ;
+    i2c_param_config(i2c_master_port, &conf);
+    i2c_driver_install(i2c_master_port, conf.mode,
+                       I2C_EXAMPLE_MASTER_RX_BUF_DISABLE,
+                       I2C_EXAMPLE_MASTER_TX_BUF_DISABLE, 0);
+}
+/**
+ * @brief i2c slave initialization
+ */
+static void i2c_slave_init()
+{
+    int i2c_slave_port = I2C_SLAVE_NUM;
+    i2c_config_t conf_slave;
+    conf_slave.sda_io_num = I2C_SLAVE_SDA_IO;
+    conf_slave.sda_pullup_en = GPIO_PULLUP_ENABLE;
+    conf_slave.scl_io_num = I2C_SLAVE_SCL_IO;
+    conf_slave.scl_pullup_en = GPIO_PULLUP_ENABLE;
+    conf_slave.mode = I2C_MODE_SLAVE;
+    conf_slave.slave.addr_10bit_en = 0;
+    conf_slave.slave.slave_addr = ESP_SLAVE_ADDR;
+    if(ESP_OK!=i2c_param_config(i2c_slave_port, &conf_slave)) {
+		printf("param failed\n");
+	 } else {
+		printf("param successfull\n");
+	 }
+    if(ESP_OK!=i2c_driver_install(i2c_slave_port, conf_slave.mode,
+                       I2C_SLAVE_RX_BUF_LEN,
+                       I2C_SLAVE_TX_BUF_LEN, 0)) {
+		printf("driver failed\n");
+	 } else {
+		printf("driver installed\n");
+	 }
+}
+
+/**
+ * @brief test function to show buffer
+ */
+static void disp_buf(uint8_t* buf, int len)
+{
+    int i;
+    for (i = 0; i < len; i++) {
+        printf("%02x ", buf[i]);
+        if (( i + 1 ) % 16 == 0) {
+            printf("\n");
+        }
+    }
+    printf("\n");
+}
+
+static void i2c_test_task(void* arg)
+{
+    uint32_t task_idx = (uint32_t) arg;
+    uint8_t* data = (uint8_t*) malloc(DATA_LENGTH);
+    int cnt = 0;
+    while (1) {
+        //printf("test cnt: %d\n", cnt++);
+		  cnt++;
+		  memset(data,0,DATA_LENGTH);
+        xSemaphoreTake(print_mux, portMAX_DELAY);
+		  size_t receiveSize = i2c_slave_read_buffer(I2C_SLAVE_NUM, data, RW_TEST_LENGTH, 1000/portTICK_RATE_MS);
+		  if (ESP_FAIL == receiveSize) {
+				printf("failed to read\n");
+		  } else if (receiveSize >0) {
+				//echo back
+				printf("received %u bytes\n",receiveSize);
+				disp_buf(data, receiveSize);
+        		size_t tx_size = i2c_slave_write_buffer(I2C_SLAVE_NUM, data, RW_TEST_LENGTH, 1000 / portTICK_RATE_MS);
+		  		if (ESP_FAIL == tx_size) {
+					printf("failed to write\n");
+		  		} else  {
+					printf("send %u bytes\n",tx_size);
+				}
+		  } else if (receiveSize ==0) {
+				printf("received %u bytes\n",receiveSize);
+		  }
+        xSemaphoreGive(print_mux);
+        vTaskDelay(( DELAY_TIME_BETWEEN_ITEMS_MS * ( task_idx + 1 ) ) / portTICK_RATE_MS);
+    }
+}
+
 void app_main()
 {
-    int n=0;
-    esp_err_t ret;
-   
 	 /////////////////////////////////////////////////////////
 	 printf("Hello world!\n");
 
@@ -88,89 +184,10 @@ void app_main()
             (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
     fflush(stdout);
 
-    //for (int i = 10; i >= 0; i--) {
-     //   printf("Restarting in %d seconds...\n", i);
-      //  vTaskDelay(1000 / portTICK_PERIOD_MS);
-    //}
-   // printf("Restarting now.\n");
-	 ////////////////////////////////////////////////////////////
-	 //
-    //Configuration for the SPI bus
-    spi_bus_config_t buscfg={
-        .mosi_io_num=GPIO_MOSI,
-        .miso_io_num=GPIO_MISO,
-        .sclk_io_num=GPIO_SCLK
-    };
-	 printf("1\n");
-
-    //Configuration for the SPI slave interface
-    spi_slave_interface_config_t slvcfg={
-        .mode=3, //0,
-        .spics_io_num=GPIO_CS,
-        .queue_size=7,
-        .flags=1,
-        .post_setup_cb=my_post_setup_cb,
-        .post_trans_cb=my_post_trans_cb
-    };
-
-	 printf("2\n");
-    //Configuration for the handshake line
-    gpio_config_t io_conf={
-        .intr_type=GPIO_INTR_DISABLE,
-        .mode=GPIO_MODE_OUTPUT,
-        .pin_bit_mask=(1<<GPIO_HANDSHAKE)
-    };
-	 printf("3\n");
-
-    //Configure handshake line as output
-    gpio_config(&io_conf);
-	 printf("4\n");
-    //Enable pull-ups on SPI lines so we don't detect rogue pulses when no master is connected.
-    gpio_set_pull_mode(GPIO_MOSI, GPIO_PULLUP_ONLY);
-    gpio_set_pull_mode(GPIO_SCLK, GPIO_PULLUP_ONLY);
-    gpio_set_pull_mode(GPIO_CS, GPIO_PULLUP_ONLY);
-    printf("setup gpio for spi\n");
-
-    //Initialize SPI slave interface
-    ret=spi_slave_initialize(HSPI_HOST, &buscfg, &slvcfg, 1);
-    //ret=spi_slave_initialize(VSPI_HOST, &buscfg, &slvcfg, 1);
-    printf("ret from slave: %d \n", ret);
-    assert(ret==ESP_OK);
-
-    memset(recvbuf, 0, 128);
-    spi_slave_transaction_t t;
-    memset(&t, 0, sizeof(t));
-
-    while(1) {
-    	printf("while\n");
-        //Clear receive buffer, set send buffer to something sane
-        memset(recvbuf, 0x0, 129);
-        sprintf(sendbuf, "receiver: no: %04d.", n);
-
-        //Set up a transaction of 128 bytes to send/receive
-        t.length=128*8;
-        t.tx_buffer=sendbuf;
-        t.rx_buffer=recvbuf;
-        // This call enables the SPI slave interface to send/receive to the sendbuf and recvbuf. The transaction is
-        //initialized by the SPI master, however, so it will not actually happen until the master starts a hardware transaction
-        //by pulling CS low and pulsing the clock etc. In this specific example, we use the handshake line, pulled up by the
-        //.post_setup_cb callback that is called as soon as a transaction is ready, to let the master know it is free to transfer
-        //data.
-        ret=spi_slave_transmit(HSPI_HOST, &t, portMAX_DELAY);
-
-        //spi_slave_transmit does not return until the master has done a transmission, so by here we have sent our data and
-        //received data from the master. Print it.
-        printf("Received: %s\n", recvbuf);
-        //printf("Received: %d\n", (int)i);
-    	fflush(stdout);
-        printf("Sent: %s\n", sendbuf);
-        //printf("Sent: %d\n", (int)o);
-    	fflush(stdout);
-        n++;
-    }
-	
+    print_mux = xSemaphoreCreateMutex();
+    //i2c_master_init();
+    i2c_slave_init();
+	 printf("slave inited\n");
     fflush(stdout);
-	 //esp_restart();
+    xTaskCreate(i2c_test_task, "i2c_test_task_0", 1024 * 2, (void* ) 0, 10, NULL);
 }
-
-

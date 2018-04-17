@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP LDL112D33R
+D LDO Voltage Regulators 1.2 A low quiescent current LDO with reverse current protection
+K
+F https://www.arrow.com/en/products/ldl112d33r/stmicroelectronics
+$ENDCMP
+#
+#End Doc Library

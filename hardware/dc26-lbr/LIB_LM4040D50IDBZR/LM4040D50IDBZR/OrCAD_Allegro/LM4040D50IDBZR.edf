@@ -1,0 +1,106 @@
+
+(EDIF
+  (rename &LM4040D50IDBZR "LM4040D50IDBZR")
+  (EDIFVersion 2 0 0)
+  (EDIFLevel 0)
+  (keywordMap (keywordLevel 0))
+  (status
+    (written
+      (timestamp 2018 04 18 07 51 42)
+      (dataOrigin "414722/28562/2.25/3/0/Integrated Circuit")
+      (program "SamacSys ECAD Model LM4040D50IDBZR"
+        (version "1.1"))))
+  (library
+  (rename &LM4040D50IDBZR "LM4040D50IDBZR")
+    (EDIFLevel 0)
+    (technology
+      (numberDefinition (scale 1 (e 254 -6) (unit DISTANCE)))
+      (userData GRIDRESOLUTION (integer 50 50))
+      (figureGroup DEFAULT (pathWidth 10) (textHeight 100))
+      (figureGroup PROPERTY (pathWidth 10) (textHeight 90))
+      (figureGroup PINNUMBER (pathWidth 10) (textHeight 90))
+      (figureGroup PINNAME (pathWidth 10) (textHeight 90))
+      (figureGroup COMMENT (pathWidth 10) (textHeight 90))
+      (figureGroup PIN (pathWidth 10) (textHeight 90))
+      (figureGroup GRAPHIC (pathWidth 10) (textHeight 100))
+    )
+    (cell
+      (rename &LM4040D50IDBZR "LM4040D50IDBZR")
+      (cellType GENERIC)
+      (view
+        (rename NORMAL "Normal")
+        (viewType SCHEMATIC)
+        (interface
+          (designator "IC")
+          (property (rename PACKAGENAME "PackageName") (string "LM4040D50IDBZR"))
+          (property (rename ISHETEROGENEOUS "IsHeterogeneous") (string "False"))
+          (property (rename DEVICESINVIEW "DevicesInView") (string "1"))
+          (property (rename DEVICESINPACKAGE "DevicesInPackage") (string "1"))
+          (property (rename DEVICEDESIGNATOR "DeviceDesignator") (string "A"))
+          (property (rename DEVICENUMBERING "DeviceNumbering") (string "Alpha"))
+          (property (rename PCB_32_FOOTPRINT "PCB Footprint") (string "SOT95P237X112-3N"))
+          (property (rename &Manufacturer_Name "Manufacturer_Name") (string "Texas Instruments"))
+          (property (rename &Manufacturer_Part_Number "Manufacturer_Part_Number") (string "LM4040D50IDBZR"))
+          (property (rename &RS_Part_Number "RS Part Number") (string "6619385"))
+          (property (rename &RS_Price/Stock "RS Price/Stock") (string "http://uk.rs-online.com/web/p/products/6619385"))
+          (property (rename &Arrow_Part_Number "Arrow Part Number") (string "LM4040D50IDBZR"))
+          (property (rename &Arrow_Price/Stock "Arrow Price/Stock") (string "https://www.arrow.com/en/products/lm4040d50idbzr/texas-instruments"))
+          (property (rename &Description "Description") (string "Texas Instruments LM4040D50IDBZR, Shunt Voltage Reference 5V, 1%, 3-Pin SOT-23"))
+          (property (rename &Datasheet_Link "Datasheet Link") (string "http://www.ti.com/lit/gpn/lm4040"))
+          (property (rename &_60__32_VALUE_32__62_ "< Value >") (string "LM4040D50IDBZR"))
+          (property (rename VALUE "Value") (string "Value"))
+          (port
+            (rename &CATHODE "CATHODE")
+            (designator "1")
+            (property (rename ORDER "Order") (string "0") (owner "OrCAD"))
+          )
+          (port
+            (rename &ANODE "ANODE")
+            (designator "2")
+            (property (rename ORDER "Order") (string "1") (owner "OrCAD"))
+          )
+          (port
+            (rename &NC "NC")
+            (designator "3")
+            (property (rename ORDER "Order") (string "2") (owner "OrCAD"))
+          )
+          (symbol
+            (portImplementation
+              (name &CATHODE (display PINNAME))
+              (keywordDisplay DESIGNATOR (display PINNUMBER))
+              (figure PIN (path (pointList (pt -200 -100) (pt 0 -100))))
+              (connectLocation (figure GRAPHIC (dot (pt -200 -100))))
+            )
+            (portImplementation
+              (name &ANODE (display PINNAME))
+              (keywordDisplay DESIGNATOR (display PINNUMBER))
+              (figure PIN (path (pointList (pt -200 -200) (pt 0 -200))))
+              (connectLocation (figure GRAPHIC (dot (pt -200 -200))))
+            )
+            (portImplementation
+              (name &NC (display PINNAME))
+              (keywordDisplay DESIGNATOR (display PINNUMBER))
+              (figure PIN (path (pointList (pt 800 -100) (pt 1000 -100))))
+              (connectLocation (figure GRAPHIC (dot (pt 1000 -100))))
+            )
+            (figure GRAPHIC
+              (figureGroupOverride GRAPHIC
+                (pathWidth 10))
+              (path
+                (pointList
+                  (pt 0 0)
+                  (pt 800 0)
+                  (pt 800 -300)
+                  (pt 0 -300)
+                  (pt 0 0)
+                )
+              )
+            )
+            (keywordDisplay DESIGNATOR (display PROPERTY (justify LOWERLEFT) (orientation R0) (origin (pt 850 130))))
+            (propertyDisplay &_60__32_VALUE_32__62_ (display PROPERTY (justify LOWERLEFT) (orientation R0) (origin (pt 850 30))))
+          )
+        )
+      )
+    )
+  )
+)

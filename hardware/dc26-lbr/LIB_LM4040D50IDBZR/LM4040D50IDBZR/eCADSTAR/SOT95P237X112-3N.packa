@@ -1,0 +1,13 @@
+(unit MM)
+
+(package "LM4040D50IDBZR"
+    (type UNDEF)
+    (uver 2)
+    (cuser "SamacSys")
+    (uuser "SamacSys")
+    (utime 2017-01-12-12:59:52)
+    (mountForm default
+        (footprintRef "SOT95P237X112-3N")
+        (spec "System")
+    )
+)

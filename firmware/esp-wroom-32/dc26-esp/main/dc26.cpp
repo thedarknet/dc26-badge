@@ -1,11 +1,4 @@
-/* UART asynchronous example, that uses separate RX and TX tasks
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
+#if 1
 #include "esp_system.h"
 #include "esp_log.h"
 #include "driver/uart.h"
@@ -79,6 +72,7 @@ wifi_auth_mode_t ap_mode = WIFI_AUTH_WPA_WPA2_PSK;
 
 static char tag[] = "myTag";
 
+/*
 class MyWiFiEventHandler: public WiFiEventHandler {
 
 		esp_err_t staGotIp(system_event_sta_got_ip_t event_sta_got_ip) {
@@ -86,15 +80,30 @@ class MyWiFiEventHandler: public WiFiEventHandler {
 					return ESP_OK;
 		}
 };
+*/
 
 void app_main()
 {
-    init();
-    xTaskCreate(rx_task, "uart_rx_task", 1024*2, NULL, configMAX_PRIORITIES, NULL);
-	 System::logSystemInfo();
-	 WiFi wifi;
-	 WiFiEventHandler *handler = new MyWiFiEventHandler();
-	 wifi.setWifiEventHandler(nullptr);
-	 wifi.startAP(ssid,passwd,ap_mode,0,false,4);
+	nvs_flash_init();
+	init();
+	xTaskCreate(rx_task, "uart_rx_task", 1024*2, NULL, configMAX_PRIORITIES, NULL);
+	System::logSystemInfo();
+	//WiFiEventHandler *handler = new MyWiFiEventHandler();
+	wifi_config_t wifi_config;
+	std::string ssid("ESP32");
+	std::string passwd("1234567890");
+	bool isHidden = false;
+	uint8_t max_con = 4;
+	uint16_t beacon_interval = 1000;
+	WIFI wifi;
+	wifi.initWiFiConfig(wifi_config, ssid, passwd, WIFI_AUTH_WPA2_PSK, isHidden, max_con, beacon_interval);
+	tcpip_adapter_ip_info_t ipInfo;
+	wifi.initAdapterIp(ipInfo);
+	dhcps_lease_t l;
+	wifi.initDHCPSLeaseInfo(l);
+	wifi.wifi_start_access_point(wifi_config,ipInfo,l);
+	vTaskDelete(NULL);
 //    xTaskCreate(tx_task, "uart_tx_task", 1024*2, NULL, configMAX_PRIORITIES-1, NULL);
 }
+
+#endif

@@ -114,5 +114,8 @@ ErrorType DC26::onRun() {
 		Display.swap();
 		HAL_Delay(2000);
 	}
+
+	cmdc0de::StateBase *cs = getCurrentState();
+
 	return ErrorType();
 }

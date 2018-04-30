@@ -90,8 +90,6 @@ void app_main()
 	System::logSystemInfo();
 	//WiFiEventHandler *handler = new MyWiFiEventHandler();
 	wifi_config_t wifi_config;
-	std::string ssid("ESP32");
-	std::string passwd("1234567890");
 	bool isHidden = false;
 	uint8_t max_con = 4;
 	uint16_t beacon_interval = 1000;

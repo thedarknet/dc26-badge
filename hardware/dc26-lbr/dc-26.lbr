@@ -2927,6 +2927,7 @@ Metric Code Size 5664</description>
 <text x="-3.81" y="-2.14" size="0.4318" layer="27">&gt;Value</text>
 </package>
 <package name="PTC-1206">
+<description>PTC RESET FUSE 6V NANOSMDH075F-02</description>
 <wire x1="-1.5" y1="0.75" x2="1.5" y2="0.75" width="0.127" layer="51"/>
 <wire x1="1.5" y1="0.75" x2="1.5" y2="-0.75" width="0.127" layer="51"/>
 <wire x1="1.5" y1="-0.75" x2="-1.5" y2="-0.75" width="0.127" layer="51"/>
@@ -11400,7 +11401,7 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/BU33SD5WG-TR.
 </deviceset>
 <deviceset name="PTC" prefix="F">
 <description>&lt;b&gt;Resettable Fuse PTC&lt;/b&gt;
-Resettable Fuse. Spark Fun Electronics SKU : COM-08357</description>
+Littlefuse Inc: NANOSMDH075F-02</description>
 <gates>
 <gate name="G$1" symbol="PTC" x="0" y="0"/>
 </gates>
@@ -11421,26 +11422,9 @@ Resettable Fuse. Spark Fun Electronics SKU : COM-08357</description>
 </connects>
 <technologies>
 <technology name="">
-<attribute name="PROD_ID" value="RES-11150"/>
+<attribute name="MANUFACTURE_ID" value="NANOSMDH075F-02" constant="no"/>
+<attribute name="PROD_ID" value="NANOSMDH075F-02"/>
 </technology>
-</technologies>
-</device>
-<device name="0603" package="0603">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-<device name="SMD-W" package="PTC-1206-WIDE">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<technologies>
-<technology name=""/>
 </technologies>
 </device>
 <device name="THERMISTOR1206" package="PTC-1206">

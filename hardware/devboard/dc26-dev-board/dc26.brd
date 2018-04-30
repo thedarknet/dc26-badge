@@ -228,9 +228,10 @@
 <circle x="38" y="10.5" radius="1.425" width="0.1524" layer="20"/>
 <circle x="91" y="10.5" radius="1.425" width="0.1524" layer="20"/>
 <circle x="103" y="59.5" radius="1.425" width="0.1524" layer="20"/>
-<text x="104" y="11" size="1.4224" layer="29">Darknet 
-Indusries LLC</text>
-<text x="14.5" y="15" size="0.8128" layer="21">DN-Model#: T-1001</text>
+<text x="102" y="13" size="1.4224" layer="29">Personal Hyperwave
+Communicator</text>
+<text x="15.5" y="12" size="1.4224" layer="21">DN-Model#: 
+   PhC-2000</text>
 </plain>
 <libraries>
 <library name="dc-26">
@@ -764,6 +765,7 @@ JST PH 2-pin thru-home side entry</description>
 <text x="-1.016" y="-1.397" size="0.4064" layer="27">&gt;VALUE</text>
 </package>
 <package name="PTC-1206">
+<description>PTC RESET FUSE 6V NANOSMDH075F-02</description>
 <wire x1="-1.5" y1="0.75" x2="1.5" y2="0.75" width="0.127" layer="51"/>
 <wire x1="1.5" y1="0.75" x2="1.5" y2="-0.75" width="0.127" layer="51"/>
 <wire x1="1.5" y1="-0.75" x2="-1.5" y2="-0.75" width="0.127" layer="51"/>
@@ -1927,8 +1929,9 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <element name="R7" library="dc-26" package="0805" value="4K7" x="109" y="33" rot="MR0"/>
 <element name="R8" library="dc-26" package="0805" value="4K7" x="119" y="47" rot="MR180"/>
 <element name="R9" library="dc-26" package="0805" value="1M" x="60" y="32" rot="MR270"/>
-<element name="RESETTABLE-FUSE" library="dc-26" package="PTC-1206" value="SSSS811101" x="28.61" y="10.22" rot="MR270">
-<attribute name="PROD_ID" value="RES-11150" x="28.61" y="10.22" size="1.778" layer="28" rot="MR270" display="off"/>
+<element name="RESETTABLE-FUSE" library="dc-26" package="PTC-1206" value="NANOSMDH075F-02" x="28.61" y="10.22" rot="MR270">
+<attribute name="MANUFACTURE_ID" value="NANOSMDH075F-02" x="28.61" y="10.22" size="1.778" layer="28" rot="MR270" display="off"/>
+<attribute name="PROD_ID" value="NANOSMDH075F-02" x="28.61" y="10.22" size="1.778" layer="28" rot="MR270" display="off"/>
 </element>
 <element name="RTB" library="dc-26" package="TACTILE-2PIN-NARROW" value="UserButton" x="25.58" y="27.22"/>
 <element name="SOC1" library="STM32F411RET6" package="QFP50P1200X1200X160-64N" value="STM32F411RET6" x="72.69" y="22.04">

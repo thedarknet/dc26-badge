@@ -2458,6 +2458,7 @@ Metric Code Size 5664</description>
 <text x="-3.81" y="-2.14" size="0.4318" layer="27">&gt;Value</text>
 </package>
 <package name="PTC-1206">
+<description>PTC RESET FUSE 6V NANOSMDH075F-02</description>
 <wire x1="-1.5" y1="0.75" x2="1.5" y2="0.75" width="0.127" layer="51"/>
 <wire x1="1.5" y1="0.75" x2="1.5" y2="-0.75" width="0.127" layer="51"/>
 <wire x1="1.5" y1="-0.75" x2="-1.5" y2="-0.75" width="0.127" layer="51"/>
@@ -2468,35 +2469,6 @@ Metric Code Size 5664</description>
 <wire x1="0.254" y1="1.016" x2="1.143" y2="1.016" width="0.127" layer="51"/>
 <smd name="1" x="-1.4" y="0" dx="1" dy="1.8" layer="1"/>
 <smd name="2" x="1.4" y="0" dx="1" dy="1.8" layer="1"/>
-<text x="-1.524" y="1.27" size="0.4064" layer="25">&gt;Name</text>
-<text x="-1.524" y="-1.651" size="0.4064" layer="27">&gt;Value</text>
-</package>
-<package name="0603">
-<wire x1="-1.473" y1="0.983" x2="1.473" y2="0.983" width="0.0508" layer="39"/>
-<wire x1="1.473" y1="0.983" x2="1.473" y2="-0.983" width="0.0508" layer="39"/>
-<wire x1="1.473" y1="-0.983" x2="-1.473" y2="-0.983" width="0.0508" layer="39"/>
-<wire x1="-1.473" y1="-0.983" x2="-1.473" y2="0.983" width="0.0508" layer="39"/>
-<wire x1="-0.356" y1="0.432" x2="0.356" y2="0.432" width="0.1016" layer="51"/>
-<wire x1="-0.356" y1="-0.419" x2="0.356" y2="-0.419" width="0.1016" layer="51"/>
-<smd name="1" x="-0.85" y="0" dx="1.1" dy="1" layer="1"/>
-<smd name="2" x="0.85" y="0" dx="1.1" dy="1" layer="1"/>
-<text x="-0.889" y="0.762" size="0.4064" layer="25" font="vector">&gt;NAME</text>
-<text x="-1.016" y="-1.143" size="0.4064" layer="27" font="vector">&gt;VALUE</text>
-<rectangle x1="-0.8382" y1="-0.4699" x2="-0.3381" y2="0.4801" layer="51"/>
-<rectangle x1="0.3302" y1="-0.4699" x2="0.8303" y2="0.4801" layer="51"/>
-<rectangle x1="-0.1999" y1="-0.3" x2="0.1999" y2="0.3" layer="35"/>
-</package>
-<package name="PTC-1206-WIDE">
-<wire x1="-1.5" y1="0.75" x2="1.5" y2="0.75" width="0.127" layer="51"/>
-<wire x1="1.5" y1="0.75" x2="1.5" y2="-0.75" width="0.127" layer="51"/>
-<wire x1="1.5" y1="-0.75" x2="-1.5" y2="-0.75" width="0.127" layer="51"/>
-<wire x1="-1.5" y1="-0.75" x2="-1.5" y2="0.75" width="0.127" layer="51"/>
-<wire x1="0.635" y1="-0.762" x2="-0.635" y2="-0.762" width="0.2032" layer="21"/>
-<wire x1="-0.635" y1="0.762" x2="0.635" y2="0.762" width="0.2032" layer="21"/>
-<wire x1="-1.143" y1="-1.016" x2="0.254" y2="1.016" width="0.127" layer="51"/>
-<wire x1="0.254" y1="1.016" x2="1.143" y2="1.016" width="0.127" layer="51"/>
-<smd name="1" x="-1.654" y="0" dx="1" dy="1.8" layer="1"/>
-<smd name="2" x="1.654" y="0" dx="1" dy="1.8" layer="1"/>
 <text x="-1.524" y="1.27" size="0.4064" layer="25">&gt;Name</text>
 <text x="-1.524" y="-1.651" size="0.4064" layer="27">&gt;Value</text>
 </package>
@@ -6310,7 +6282,7 @@ Standard schematic elements and footprints for 5mm, 3mm, 1206, and 0603 sized LE
 </deviceset>
 <deviceset name="PTC" prefix="F">
 <description>&lt;b&gt;Resettable Fuse PTC&lt;/b&gt;
-Resettable Fuse. Spark Fun Electronics SKU : COM-08357</description>
+Littlefuse Inc: NANOSMDH075F-02</description>
 <gates>
 <gate name="G$1" symbol="PTC" x="0" y="0"/>
 </gates>
@@ -6331,26 +6303,9 @@ Resettable Fuse. Spark Fun Electronics SKU : COM-08357</description>
 </connects>
 <technologies>
 <technology name="">
-<attribute name="PROD_ID" value="RES-11150"/>
+<attribute name="MANUFACTURE_ID" value="NANOSMDH075F-02" constant="no"/>
+<attribute name="PROD_ID" value="NANOSMDH075F-02"/>
 </technology>
-</technologies>
-</device>
-<device name="0603" package="0603">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<technologies>
-<technology name=""/>
-</technologies>
-</device>
-<device name="SMD-W" package="PTC-1206-WIDE">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<technologies>
-<technology name=""/>
 </technologies>
 </device>
 <device name="THERMISTOR1206" package="PTC-1206">
@@ -7189,7 +7144,7 @@ Source: &lt;a href="https://www.arrow.com/en/products/ldl112d33r/stmicroelectron
 <part name="LED1" library="dc-26" deviceset="LED" device="1206" value="MF-LED-1206-GREEN"/>
 <part name="LINK1" library="dc-26" deviceset="STLINK-V2-CONNECTOR" device=""/>
 <part name="GND5" library="dc-26" deviceset="GND" device=""/>
-<part name="RESETTABLE-FUSE" library="dc-26" deviceset="PTC" device="SMD" value="SSSS811101"/>
+<part name="RESETTABLE-FUSE" library="dc-26" deviceset="PTC" device="SMD" value="NANOSMDH075F-02"/>
 <part name="P1" library="dc-26" deviceset="SWITCH_SPDT" device="" value="SSSS811101"/>
 <part name="R2" library="dc-26" deviceset="RESISTOR" device="0805-RES" value="470"/>
 <part name="R3" library="dc-26" deviceset="RESISTOR" device="0805-RES" value="2k"/>

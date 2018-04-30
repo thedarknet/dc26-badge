@@ -1,6 +1,8 @@
+#include <esp_log.h>
 #include "i2c.hpp"
 #include "driver/i2c.h"
 
+static const char tag[] = "I2C";
 
 ESP32_I2CDevice::ESP32_I2CDevice(gpio_num_t scl, gpio_num_t sda, i2c_port_t p, uint32_t rxBufSize, uint32_t txBufSize) 
 	: SCL(scl), SDA(sda), Port(p), RXBufferSize(rxBufSize), TXBufferSize(txBufSize) {
@@ -61,6 +63,9 @@ ESP32_I2CMaster::ESP32_I2CMaster(gpio_num_t scl, gpio_num_t sda, uint32_t clock,
 
 }
 
+ESP32_I2CMaster::~ESP32_I2CMaster() {
+
+}
 
 bool ESP32_I2CMaster::init() {
 	bool bRetVal = false;
@@ -74,7 +79,11 @@ bool ESP32_I2CMaster::init() {
 	if(ESP_OK==i2c_param_config(Port,&conf)) {
 		if(ESP_OK==i2c_driver_install(Port, conf.mode, RXBufferSize, TXBufferSize, 0)) {
 			bRetVal = true;
+		} else {
+			ESP_LOGE(tag,"ESP_OK==i2c_driver_install");
 		}
+	} else {
+		ESP_LOGE(tag,"ESP_OK==i2c_param_config");
 	}
 	return bRetVal;
 }
@@ -86,13 +95,21 @@ bool ESP32_I2CMaster::start(uint8_t addr, bool forWrite) {
 			if(forWrite) {
 				if(ESP_OK==i2c_master_write_byte(CmdHandle, addr<<1|I2C_MASTER_WRITE, true)) { //check the ack since its a command
 					bRetVal = true;
+				} else {
+					ESP_LOGE(tag,"WRITE:  ESP_OK==i2c_master_write_byte");
 				}
 			} else {
 				if(ESP_OK==i2c_master_write_byte(CmdHandle, addr<<1|I2C_MASTER_READ, true)) { //check the ack since its a command
 					bRetVal = true;
+				} else {
+					ESP_LOGE(tag,"READ:  ESP_OK==i2c_master_write_byte");
 				}
 			}
+		} else {
+			ESP_LOGE(tag,"ESP_OK==i2c_master_start");
 		}
+	} else {
+		ESP_LOGE(tag,"CmdHandle=i2c_cmd_link_create");
 	}
 	return bRetVal;
 }
@@ -104,9 +121,14 @@ bool ESP32_I2CMaster::write(uint8_t *data, uint16_t size, bool ack) {
 bool ESP32_I2CMaster::stop(uint16_t ticksToWait) {
 	bool bRetVal = false;
 	if(ESP_OK==i2c_master_stop(CmdHandle)) {
-		if(ESP_OK==i2c_master_cmd_begin(getPort(), CmdHandle, ticksToWait)) {
+	   esp_err_t retVal;
+		if((retVal=i2c_master_cmd_begin(Port, CmdHandle, ticksToWait))==ESP_OK) {
 			bRetVal = true;
+		} else {
+			ESP_LOGE(tag,"ESP_OK==i2c_master_cmd_begin: %s\n",esp_err_to_name(retVal));
 		}
+	} else {
+		ESP_LOGE(tag,"ESP_OK==i2c_master_stop");
 	}
 	return bRetVal;
 }

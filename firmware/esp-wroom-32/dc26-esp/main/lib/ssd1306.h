@@ -51,7 +51,8 @@ SDA        |PB7          |Serial data line
 
 /* I2C address */
 #ifndef SSD1306_I2C_ADDR
-#define SSD1306_I2C_ADDR         0x78
+//#define SSD1306_I2C_ADDR         0x78
+#define SSD1306_I2C_ADDR         0x3C
 //#define SSD1306_I2C_ADDR       0x7A
 #endif
 

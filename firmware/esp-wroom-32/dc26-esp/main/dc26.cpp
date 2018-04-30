@@ -6,6 +6,8 @@
 #include "string.h"
 #include "lib/System.h"
 #include "lib/wifi/WiFi.h"
+#include "lib/i2c.hpp"
+#include "lib/ssd1306.h"
 
 static const int RX_BUF_SIZE = 1024;
 
@@ -70,8 +72,6 @@ std::string ssid = "dc26";
 std::string passwd = "1234567890";
 wifi_auth_mode_t ap_mode = WIFI_AUTH_WPA_WPA2_PSK;
 
-static char tag[] = "myTag";
-
 /*
 class MyWiFiEventHandler: public WiFiEventHandler {
 
@@ -82,9 +82,19 @@ class MyWiFiEventHandler: public WiFiEventHandler {
 };
 */
 
+ESP32_I2CMaster I2cDisplay(GPIO_NUM_19,GPIO_NUM_18,1000000, I2C_NUM_0, 1024, 1024);
+static char tag[] = "main";
+
 void app_main()
 {
 	nvs_flash_init();
+	if(SSD1306_Init(&I2cDisplay)>0) {
+		ESP_LOGI(tag,"display init successful");
+		SSD1306_DrawFilledRectangle(0,0,64,32,SSD1306_COLOR_WHITE);
+		SSD1306_UpdateScreen();
+	} else {
+		ESP_LOGI(tag,"display init UN-successful");
+	}
 	init();
 	xTaskCreate(rx_task, "uart_rx_task", 1024*2, NULL, configMAX_PRIORITIES, NULL);
 	System::logSystemInfo();

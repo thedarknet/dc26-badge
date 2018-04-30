@@ -4,6 +4,7 @@
 #
 
 PROJECT_NAME := dc26esp
+CPPFLAGES += "-I $HOME/opt/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0"
 
 include $(IDF_PATH)/make/project.mk
 

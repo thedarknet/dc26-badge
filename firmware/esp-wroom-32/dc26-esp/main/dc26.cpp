@@ -8,6 +8,7 @@
 #include "lib/wifi/WiFi.h"
 #include "lib/i2c.hpp"
 #include "lib/ssd1306.h"
+#include "stm_to_esp_generated.h"
 
 static const int RX_BUF_SIZE = 1024;
 

@@ -15,3 +15,6 @@ fileImage:
 	sudo mount -o loop  fat.fs /home/cmdc0de/dev/defcon/dc26-badge/firmware/esp-wroom-32/dc26-esp/mnt
 	sudo chmod -R 777 ./mnt
 	cp -R ./files/* ./mnt
+
+main/stm_to_esp_generated.h: ../../common/stm_to_esp.fbs
+	../../tools/bin/linux/flatc --cpp -o main -M ../../common/stm_to_esp.fbs

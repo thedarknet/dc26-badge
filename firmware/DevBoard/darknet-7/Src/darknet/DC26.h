@@ -19,4 +19,18 @@ protected:
 	virtual cmdc0de::ErrorType onRun();
 };
 
+
+namespace cmdc0de {
+	class DisplayMessageState;
+}
+
+class MenuState;
+
+class StateCollection {
+public:
+	static cmdc0de::DisplayMessageState *getDisplayMessageState(cmdc0de::StateBase *bm, const char *message, uint16_t timeToDisplay);
+	static MenuState *getDisplayMenuState();
+
+};
+
 #endif /* DARKNET_DC26_H_ */

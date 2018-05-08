@@ -1,0 +1,19 @@
+namespace darknet7;
+
+enum MsgType : byte { RESERVED = 0, SETUP_AP }
+
+enum WifiMode : byte { OPEN, WPA2, WPA }
+
+union STMToESPAny { SetupAP }
+
+table SetupAP {
+	ssid:string;
+	passwd:string;
+	mode:WifiMode;
+}
+
+table STMToESPRequest {
+	MType:MsgType;
+	Msg:STMToESPAny;
+}
+

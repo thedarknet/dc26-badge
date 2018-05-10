@@ -1,0 +1,18 @@
+include "common.fbs";
+
+namespace darknet7;
+
+enum RESPONSE_SUCCESS : byte { False = 0, True = 1 }
+
+union ESPToSTMAny { GenericResponse }
+
+table GenericResponse {
+	successful:RESPONSE_SUCCESS;
+	message:string;
+}
+
+table ESPToSTM {
+	MType:MsgType;
+	Msg:ESPToSTMAny;
+}
+

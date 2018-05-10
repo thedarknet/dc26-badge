@@ -6,72 +6,13 @@
 
 #include "flatbuffers/flatbuffers.h"
 
+#include "common_generated.h"
+
 namespace darknet7 {
 
 struct SetupAP;
 
 struct STMToESPRequest;
-
-enum MsgType {
-  MsgType_RESERVED = 0,
-  MsgType_SETUP_AP = 1,
-  MsgType_MIN = MsgType_RESERVED,
-  MsgType_MAX = MsgType_SETUP_AP
-};
-
-inline const MsgType (&EnumValuesMsgType())[2] {
-  static const MsgType values[] = {
-    MsgType_RESERVED,
-    MsgType_SETUP_AP
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesMsgType() {
-  static const char * const names[] = {
-    "RESERVED",
-    "SETUP_AP",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameMsgType(MsgType e) {
-  const size_t index = static_cast<int>(e);
-  return EnumNamesMsgType()[index];
-}
-
-enum WifiMode {
-  WifiMode_OPEN = 0,
-  WifiMode_WPA2 = 1,
-  WifiMode_WPA = 2,
-  WifiMode_MIN = WifiMode_OPEN,
-  WifiMode_MAX = WifiMode_WPA
-};
-
-inline const WifiMode (&EnumValuesWifiMode())[3] {
-  static const WifiMode values[] = {
-    WifiMode_OPEN,
-    WifiMode_WPA2,
-    WifiMode_WPA
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesWifiMode() {
-  static const char * const names[] = {
-    "OPEN",
-    "WPA2",
-    "WPA",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameWifiMode(WifiMode e) {
-  const size_t index = static_cast<int>(e);
-  return EnumNamesWifiMode()[index];
-}
 
 enum STMToESPAny {
   STMToESPAny_NONE = 0,

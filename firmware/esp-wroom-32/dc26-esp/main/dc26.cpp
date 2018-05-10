@@ -9,6 +9,7 @@
 #include "lib/i2c.hpp"
 #include "lib/ssd1306.h"
 #include "stm_to_esp_generated.h"
+#include "esp_to_stm_generated.h"
 
 static const int RX_BUF_SIZE = 1024;
 
@@ -20,7 +21,22 @@ extern "C" {
 		static void rx_task(void *);
 }
 
+static const int STM_TO_ESP_MSG_QUEUE_SIZE = 10;
+static const int STM_TO_ESP_MSG_ITEM_SIZE = sizeof(darknet7::STMToESPRequest*);
+static StaticQueue_t STMToESPQueue;
+static QueueHandle_t STMToESPQueueHandle = nullptr;
+static uint8_t STMToESPBuffer[STM_TO_ESP_MSG_QUEUE_SIZE*STM_TO_ESP_MSG_ITEM_SIZE];
+static const int ESP_TO_STM_MSG_QUEUE_SIZE = 10;
+static const int ESP_TO_STM_MSG_ITEM_SIZE = sizeof(darknet7::ESPToSTM*);
+static uint8_t ESPToSTMBuffer[ESP_TO_STM_MSG_QUEUE_SIZE*ESP_TO_STM_MSG_ITEM_SIZE];
+static StaticQueue_t ESPToSTMQueue;
+static QueueHandle_t ESPToSTMQueueHandle = nullptr;
+
 void init() {
+	//create queues
+	STMToESPQueueHandle = xQueueCreateStatic(STM_TO_ESP_MSG_QUEUE_SIZE, STM_TO_ESP_MSG_ITEM_SIZE, STMToESPBuffer, &STMToESPQueue );
+	ESPToSTMQueueHandle = xQueueCreateStatic(ESP_TO_STM_MSG_QUEUE_SIZE, ESP_TO_STM_MSG_ITEM_SIZE, ESPToSTMBuffer, &ESPToSTMQueue );
+
     const uart_config_t uart_config = {
         .baud_rate = 115200,
         .data_bits = UART_DATA_8_BITS,

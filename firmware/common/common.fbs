@@ -1,0 +1,5 @@
+namespace darknet7;
+
+enum MsgType : byte { RESERVED = 0, SETUP_AP, GENERIC_RESPONSE }
+enum WifiMode : byte { OPEN, WPA2, WPA }
+

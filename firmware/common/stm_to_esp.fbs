@@ -1,8 +1,6 @@
+include "common.fbs";
+
 namespace darknet7;
-
-enum MsgType : byte { RESERVED = 0, SETUP_AP }
-
-enum WifiMode : byte { OPEN, WPA2, WPA }
 
 union STMToESPAny { SetupAP }
 

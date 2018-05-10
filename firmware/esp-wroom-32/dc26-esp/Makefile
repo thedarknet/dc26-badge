@@ -16,5 +16,14 @@ fileImage:
 	sudo chmod -R 777 ./mnt
 	cp -R ./files/* ./mnt
 
+flatBuffers: main/stm_to_esp_generated.h main/esp_to_stm_generated.h main/common_generated.h
+
 main/stm_to_esp_generated.h: ../../common/stm_to_esp.fbs
-	../../tools/bin/linux/flatc --cpp -o main -M ../../common/stm_to_esp.fbs
+	#../../tools/bin/linux/flatc --cpp -o main -M ../../common/stm_to_esp.fbs
+	../../tools/bin/linux/flatc --cpp -o main ../../common/stm_to_esp.fbs
+
+main/esp_to_stm_generated.h: ../../common/esp_to_stm.fbs
+	../../tools/bin/linux/flatc --cpp -o main ../../common/esp_to_stm.fbs
+
+main/common_generated.h: ../../common/common.fbs
+	../../tools/bin/linux/flatc --cpp -o main ../../common/common.fbs

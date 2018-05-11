@@ -1,5 +1,7 @@
-# Hello World Example
+### DarkNet 7 ESP WROOM 32 code
 
-Starts a FreeRTOS task to print "Hello World"
+First thing is to thank nkolban for his book, for his great code snippets.
+https://github.com/nkolban/esp32-snippets.git
 
-See the README.md file in the upper level 'examples' directory for more information about examples.
+If you working on ESP get his book:  https://leanpub.com/kolban-ESP32
+

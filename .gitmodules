@@ -10,3 +10,7 @@
 [submodule "firmware/tools/flatbuffers"]
 	path = firmware/tools/flatbuffers
 	url = https://github.com/google/flatbuffers.git
+[submodule "firmware/esp-wroom-32/dc26-esp/components/libesphttpd"]
+	path = firmware/esp-wroom-32/dc26-esp/components/libesphttpd
+	url = https://github.com/cmdc0de/libesphttpd.git
+	branch = esp-idf

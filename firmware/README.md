@@ -1,4 +1,4 @@
-#Software for the Darknet-7 badge
+# Software for the Darknet-7 badge
 
 DevBoard/Darknet-7:
 * STM32 firmware
@@ -16,5 +16,9 @@ DevBoard/Darknet-7:
   * Debug -> Debug Configurations -> highlight Ac6 STM32 Debugging
   * Click new launch configuration
   * Ensure main looks like this:
+  ![alt text](https://github.com/thedarknet/dc26-badge/blob/master/firmware/main1.PNG "Main")
+
   * Ensure debugger looks like this.
+  ![alt text](https://github.com/thedarknet/dc26-badge/blob/master/firmware/main2.PNG "Debug")
+
   * Then launch debug build.

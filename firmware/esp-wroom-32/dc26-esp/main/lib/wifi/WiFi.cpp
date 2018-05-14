@@ -17,7 +17,7 @@
 
 const char WIFI::LogTag[] = "WIFI";
 
-WIFI::WIFI() {
+WIFI::WIFI() : mpWifiEventHandler(0) {
 
 }
 
@@ -26,8 +26,20 @@ WIFI::~WIFI() {
 }
 
 esp_err_t wifi_event_handler(void *ctx, system_event_t *event) {
-	ESP_LOGI(WIFI::LogTag, "event");
-	return ESP_OK;
+	WIFI *pWiFi = (WIFI *)ctx;   // retrieve the WiFi object from the passed in context.
+
+	// Invoke the event handler.
+	esp_err_t rc;
+	if (pWiFi->getWifiEventHandler() != nullptr) {
+		rc = pWiFi->getWifiEventHandler()->getEventHandler()(pWiFi->getWifiEventHandler(), event);
+	} else {
+		rc = ESP_OK;
+	}
+	return rc;
+}
+
+void WIFI::setWifiEventHandler(WiFiEventHandler *wifiEventHandler) {
+	mpWifiEventHandler = wifiEventHandler;
 }
 
 //create wificonfig that has ssid and open auth
@@ -79,7 +91,7 @@ void WIFI::wifi_start_access_point(wifi_config_t &wifi_config, tcpip_adapter_ip_
 		dhcps_lease_t &lease) {
 
 	tcpip_adapter_init();
-	esp_event_loop_init(wifi_event_handler, NULL);
+	esp_event_loop_init(wifi_event_handler, this);
 	wifi_init_config_t wifi_init_config = WIFI_INIT_CONFIG_DEFAULT();
 	esp_wifi_init(&wifi_init_config);
 	esp_wifi_set_storage(WIFI_STORAGE_RAM);

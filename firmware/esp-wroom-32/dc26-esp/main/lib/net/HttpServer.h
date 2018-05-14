@@ -58,17 +58,13 @@ public:
 	HttpServer();
 	virtual ~HttpServer();
 
-	void        addPathHandler(
-		std::string method,
-		std::string pathExpr,
+	void addPathHandler( std::string method, std::string pathExpr,
 		void (*webServerRequestHandler)
 		(
 			HttpRequest*  pHttpRequest,
 			HttpResponse* pHttpResponse)
 		);
-	void        addPathHandler(
-		std::string method,
-		std::regex* pRegex,
+	void addPathHandler( std::string method, std::regex* pRegex,
 		void (*webServerRequestHandler)
 		(
 			HttpRequest*  pHttpRequest,
@@ -80,12 +76,11 @@ public:
 	std::string getRootPath();        // Get the root of the file system path.
 	bool        getSSL();             // Are we using SSL?
 	void        setClientTimeout(uint32_t timeout);			   // Set client's socket timeout
-	void        setDirectoryListing(bool use);             // Should we list the content of directories?
+	void        setDirectoryListing(bool use); // Should we list the content of directories?
 	void        setFileBufferSize(size_t fileBufferSize);  // Set the size of the file buffer
 	void        setRootPath(std::string path);             // Set the root of the file system path.
 	void        start(uint16_t portNumber, bool useSSL=false);
 	void        stop();          // Stop a previously started server.
-
 private:
 	friend class HttpServerTask;
 	friend class WebSocket;

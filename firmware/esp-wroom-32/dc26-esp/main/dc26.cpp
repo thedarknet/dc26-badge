@@ -24,13 +24,18 @@ extern "C" {
 		static void generalCmdTask(void *);
 }
 
+struct OutgoingMsg {
+	uint8_t *MsgBytes;
+	uint32_t Size;
+};
+
 static const int STM_TO_ESP_MSG_QUEUE_SIZE = 10;
 static const int STM_TO_ESP_MSG_ITEM_SIZE = sizeof(darknet7::STMToESPRequest*);
 static StaticQueue_t STMToESPQueue;
 static QueueHandle_t STMToESPQueueHandle = nullptr;
 static uint8_t STMToESPBuffer[STM_TO_ESP_MSG_QUEUE_SIZE*STM_TO_ESP_MSG_ITEM_SIZE];
 static const int ESP_TO_STM_MSG_QUEUE_SIZE = 10;
-static const int ESP_TO_STM_MSG_ITEM_SIZE = sizeof(darknet7::ESPToSTM*);
+static const int ESP_TO_STM_MSG_ITEM_SIZE = sizeof(OutgoingMsg);
 static uint8_t ESPToSTMBuffer[ESP_TO_STM_MSG_QUEUE_SIZE*ESP_TO_STM_MSG_ITEM_SIZE];
 static StaticQueue_t ESPToSTMQueue;
 static QueueHandle_t ESPToSTMQueueHandle = nullptr;
@@ -70,14 +75,25 @@ int sendData(const char* logName, const char* data)
     return txBytes;
 }
 
-static void tx_task()
+
+static void tx_task(void *)
 {
-    static const char *TX_TASK_TAG = "TX_TASK";
-    esp_log_level_set(TX_TASK_TAG, ESP_LOG_INFO);
-    while (1) {
-        sendData(TX_TASK_TAG, "Hello world");
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
-    }
+	static const char *TX_TASK_TAG = "TX_TASK";
+	esp_log_level_set(TX_TASK_TAG, ESP_LOG_INFO);
+	OutgoingMsg *msgToSend =0;
+	while (1) {
+		if(xQueueReceive(ESPToSTMQueueHandle, &msgToSend, ( TickType_t ) 1000)) {
+			uint32_t bytesSent = 0;
+			while(bytesSent < msgToSend->Size) {
+    			const int txBytes = uart_write_bytes(UART_NUM_1, (char *)msgToSend->MsgBytes+bytesSent
+					, msgToSend->Size-bytesSent);
+				bytesSent+=txBytes;
+				vTaskDelay(portTICK_PERIOD_MS*10);
+			}
+		}
+		//sendData(TX_TASK_TAG, "Hello world");
+		vTaskDelay(2000 / portTICK_PERIOD_MS);
+	}
 }
 //
 // wait on queue from uart 
@@ -164,8 +180,8 @@ void app_main()
 	wifi.initDHCPSLeaseInfo(l);
 	wifi.wifi_start_access_point(wifi_config,ipInfo,l);
 	xTaskCreate(generalCmdTask, "generalCmdTask", 1024*2, NULL, configMAX_PRIORITIES, NULL);
+   xTaskCreate(tx_task, "uart_tx_task", 1024*2, NULL, configMAX_PRIORITIES-1, NULL);
 	vTaskDelete(NULL);
-//    xTaskCreate(tx_task, "uart_tx_task", 1024*2, NULL, configMAX_PRIORITIES-1, NULL);
 }
 
 #endif

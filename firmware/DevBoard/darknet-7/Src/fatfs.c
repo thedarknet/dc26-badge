@@ -1,9 +1,7 @@
 /**
- ******************************************************************************
-  * File Name          : jdata_conf.h
-  * Description        : This file provides header to "jdata_conf.h" module.
-  *                      It implements also file based read/write functions.
-  *
+  ******************************************************************************
+  * @file   fatfs.c
+  * @brief  Code for fatfs applications
   ******************************************************************************
   * This notice applies to any and all portions of this file
   * that are not between comment pairs USER CODE BEGIN and
@@ -48,32 +46,41 @@
   ******************************************************************************
   */
 
-/* Includes ------------------------------------------------------------------*/
+#include "fatfs.h"
 
-/*FatFS is chosen for File storage*/
-#include "ff.h"
+uint8_t retUSER;    /* Return value for USER */
+char USERPath[4];   /* USER logical drive path */
+FATFS USERFatFS;    /* File system object for USER logical drive */
+FIL USERFile;       /* File object for USER */
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
+/* USER CODE BEGIN Variables */
 
-/*This defines the memory allocation methods.*/
-#define JMALLOC   malloc
-#define JFREE     free
+/* USER CODE END Variables */    
 
-/*This defines the File data manager type.*/
-#define JFILE            FIL
+void MX_FATFS_Init(void) 
+{
+  /*## FatFS: Link the USER driver ###########################*/
+  retUSER = FATFS_LinkDriver(&USER_Driver, USERPath);
 
-size_t read_file (FIL  *file, uint8_t *buf, uint32_t sizeofbuf);
-size_t write_file (FIL  *file, uint8_t *buf, uint32_t sizeofbuf) ;
+  /* USER CODE BEGIN Init */
+  /* additional user code for init */     
+  /* USER CODE END Init */
+}
 
-#define JFREAD(file,buf,sizeofbuf)  \
-read_file (file,buf,sizeofbuf)
+/**
+  * @brief  Gets Time from RTC 
+  * @param  None
+  * @retval Time in DWORD
+  */
+DWORD get_fattime(void)
+{
+  /* USER CODE BEGIN get_fattime */
+  return 0;
+  /* USER CODE END get_fattime */  
+}
 
-#define JFWRITE(file,buf,sizeofbuf)  \
-write_file (file,buf,sizeofbuf)
+/* USER CODE BEGIN Application */
+     
+/* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

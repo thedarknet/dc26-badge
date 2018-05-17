@@ -1,9 +1,8 @@
 /**
  ******************************************************************************
-  * File Name          : jdata_conf.h
-  * Description        : This file provides header to "jdata_conf.h" module.
-  *                      It implements also file based read/write functions.
-  *
+  * @file    user_diskio.h
+  * @brief   This file contains the common defines and functions prototypes for  
+  *          the user_diskio driver.
   ******************************************************************************
   * This notice applies to any and all portions of this file
   * that are not between comment pairs USER CODE BEGIN and
@@ -47,33 +46,29 @@
   *
   ******************************************************************************
   */
+  
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __USER_DISKIO_H
+#define __USER_DISKIO_H
+
+#ifdef __cplusplus
+ extern "C" {
+#endif 
+
+/* USER CODE BEGIN 0 */
 
 /* Includes ------------------------------------------------------------------*/
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------- */
+extern Diskio_drvTypeDef  USER_Driver;
 
-/*FatFS is chosen for File storage*/
-#include "ff.h"
+/* USER CODE END 0 */
+   
+#ifdef __cplusplus
+}
+#endif
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
-
-/*This defines the memory allocation methods.*/
-#define JMALLOC   malloc
-#define JFREE     free
-
-/*This defines the File data manager type.*/
-#define JFILE            FIL
-
-size_t read_file (FIL  *file, uint8_t *buf, uint32_t sizeofbuf);
-size_t write_file (FIL  *file, uint8_t *buf, uint32_t sizeofbuf) ;
-
-#define JFREAD(file,buf,sizeofbuf)  \
-read_file (file,buf,sizeofbuf)
-
-#define JFWRITE(file,buf,sizeofbuf)  \
-write_file (file,buf,sizeofbuf)
+#endif /* __USER_DISKIO_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

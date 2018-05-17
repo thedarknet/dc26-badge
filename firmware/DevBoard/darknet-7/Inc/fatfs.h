@@ -1,9 +1,7 @@
 /**
- ******************************************************************************
-  * File Name          : jdata_conf.h
-  * Description        : This file provides header to "jdata_conf.h" module.
-  *                      It implements also file based read/write functions.
-  *
+  ******************************************************************************
+  * @file   fatfs.h
+  * @brief  Header for fatfs applications
   ******************************************************************************
   * This notice applies to any and all portions of this file
   * that are not between comment pairs USER CODE BEGIN and
@@ -48,32 +46,34 @@
   ******************************************************************************
   */
 
-/* Includes ------------------------------------------------------------------*/
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __fatfs_H
+#define __fatfs_H
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
-/*FatFS is chosen for File storage*/
 #include "ff.h"
+#include "ff_gen_drv.h"
+#include "user_diskio.h" /* defines USER_Driver as external */
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
 
-/*This defines the memory allocation methods.*/
-#define JMALLOC   malloc
-#define JFREE     free
+/* USER CODE END Includes */
 
-/*This defines the File data manager type.*/
-#define JFILE            FIL
+extern uint8_t retUSER; /* Return value for USER */
+extern char USERPath[4]; /* USER logical drive path */
+extern FATFS USERFatFS; /* File system object for USER logical drive */
+extern FIL USERFile; /* File object for USER */
 
-size_t read_file (FIL  *file, uint8_t *buf, uint32_t sizeofbuf);
-size_t write_file (FIL  *file, uint8_t *buf, uint32_t sizeofbuf) ;
+void MX_FATFS_Init(void);
 
-#define JFREAD(file,buf,sizeofbuf)  \
-read_file (file,buf,sizeofbuf)
+/* USER CODE BEGIN Prototypes */
 
-#define JFWRITE(file,buf,sizeofbuf)  \
-write_file (file,buf,sizeofbuf)
+/* USER CODE END Prototypes */
+#ifdef __cplusplus
+}
+#endif
+#endif /*__fatfs_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -7674,9 +7674,6 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <instance part="R20" gate="G$1" x="246.38" y="-78.74" rot="R270"/>
 <instance part="C39" gate="G$1" x="256.54" y="-96.52"/>
 <instance part="GND64" gate="1" x="241.3" y="-119.38"/>
-<instance part="LED3" gate="G$1" x="151.638" y="149.86"/>
-<instance part="R23" gate="G$1" x="151.638" y="137.16" rot="R90"/>
-<instance part="GND34" gate="1" x="151.638" y="157.48" rot="R180"/>
 <instance part="J1" gate="G$1" x="157.48" y="-30.48"/>
 <instance part="J2" gate="G$1" x="88.9" y="-43.18"/>
 </instances>
@@ -7850,11 +7847,6 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <wire x1="151.384" y1="-30.48" x2="147.32" y2="-30.48" width="0.1524" layer="91"/>
 <pinref part="J1" gate="G$1" pin="GND"/>
 <label x="142.24" y="-30.48" size="1.778" layer="95"/>
-</segment>
-<segment>
-<pinref part="LED3" gate="G$1" pin="A"/>
-<pinref part="GND34" gate="1" pin="GND"/>
-<wire x1="151.638" y1="152.4" x2="151.638" y2="154.94" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="J2" gate="G$1" pin="GND"/>
@@ -8689,18 +8681,6 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <wire x1="127" y1="33.02" x2="132.08" y2="33.02" width="0.1524" layer="91"/>
 <label x="132.08" y="33.02" size="1.778" layer="95"/>
 </segment>
-<segment>
-<pinref part="R23" gate="G$1" pin="1"/>
-<wire x1="151.638" y1="132.08" x2="151.638" y2="129.54" width="0.1524" layer="91"/>
-<label x="151.638" y="116.84" size="1.778" layer="95" rot="R90"/>
-</segment>
-</net>
-<net name="N$16" class="0">
-<segment>
-<pinref part="R23" gate="G$1" pin="2"/>
-<pinref part="LED3" gate="G$1" pin="C"/>
-<wire x1="151.638" y1="144.78" x2="151.638" y2="142.24" width="0.1524" layer="91"/>
-</segment>
 </net>
 </nets>
 </sheet>
@@ -9052,6 +9032,9 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <instance part="D1" gate="G$1" x="50.8" y="0" rot="R270"/>
 <instance part="R21" gate="G$1" x="45.72" y="101.6"/>
 <instance part="R22" gate="G$1" x="45.72" y="91.44"/>
+<instance part="LED3" gate="G$1" x="22.098" y="10.16"/>
+<instance part="R23" gate="G$1" x="22.098" y="-2.54" rot="R90"/>
+<instance part="GND34" gate="1" x="22.098" y="17.78" rot="R180"/>
 </instances>
 <busses>
 </busses>
@@ -9117,6 +9100,11 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="ESP-BREAKOUT" gate="G$1" pin="40"/>
 <wire x1="-40.64" y1="-48.26" x2="-35.56" y2="-48.26" width="0.1524" layer="91"/>
 <label x="-35.56" y="-48.26" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="LED3" gate="G$1" pin="A"/>
+<pinref part="GND34" gate="1" pin="GND"/>
+<wire x1="22.098" y1="12.7" x2="22.098" y2="15.24" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="VCC" class="0">
@@ -9306,6 +9294,11 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="SOC2" gate="G$1" pin="IO14"/>
 <wire x1="-43.18" y1="45.72" x2="-45.72" y2="45.72" width="0.1524" layer="91"/>
 <label x="-50.8" y="45.72" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="R23" gate="G$1" pin="1"/>
+<wire x1="22.098" y1="-7.62" x2="22.098" y2="-10.16" width="0.1524" layer="91"/>
+<label x="22.098" y="-12.7" size="1.778" layer="95" rot="R90"/>
 </segment>
 </net>
 <net name="SD2" class="0">
@@ -9562,6 +9555,13 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="ESP-BREAKOUT" gate="G$1" pin="38"/>
 <wire x1="-40.64" y1="-45.72" x2="-35.56" y2="-45.72" width="0.1524" layer="91"/>
 <label x="-35.56" y="-45.72" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="N$16" class="0">
+<segment>
+<pinref part="R23" gate="G$1" pin="2"/>
+<pinref part="LED3" gate="G$1" pin="C"/>
+<wire x1="22.098" y1="5.08" x2="22.098" y2="2.54" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

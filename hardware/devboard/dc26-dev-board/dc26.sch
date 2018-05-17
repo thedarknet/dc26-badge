@@ -3684,10 +3684,10 @@ Connector</text>
 <package name="WS2812F5_STRAIGHT">
 <wire x1="2.5" y1="-1" x2="2.5" y2="1" width="0.127" layer="21"/>
 <wire x1="2.5" y1="-1" x2="2.5" y2="1" width="0.127" layer="21" curve="-316.397181"/>
-<pad name="2" x="0.65" y="-0.005" drill="0.6" shape="long" rot="R90"/>
-<pad name="1" x="1.95" y="0.005" drill="0.6" shape="long" rot="R90"/>
-<pad name="3" x="-0.65" y="0.005" drill="0.6" shape="long" rot="R90"/>
-<pad name="4" x="-1.95" y="-0.005" drill="0.6" shape="long" rot="R90"/>
+<pad name="2" x="0.65" y="-0.005" drill="0.75" diameter="1.05" shape="long" rot="R90"/>
+<pad name="1" x="1.95" y="0.005" drill="0.75" diameter="1.05" shape="long" rot="R90"/>
+<pad name="3" x="-0.65" y="0.005" drill="0.75" diameter="1.05" shape="long" rot="R90"/>
+<pad name="4" x="-1.95" y="-0.005" drill="0.75" diameter="1.05" shape="long" rot="R90"/>
 <wire x1="3.135" y1="-1.635" x2="3.135" y2="1.635" width="0.127" layer="21"/>
 </package>
 <package name="CMD_C0DE_LOGO">
@@ -7509,6 +7509,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="P1" gate="G$1" pin="C"/>
 <wire x1="167.64" y1="50.8" x2="167.64" y2="55.88" width="0.1524" layer="91"/>
 <pinref part="IC3" gate="G$1" pin="EN"/>
+<label x="157.48" y="55.88" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SYS_JTCK_SWCLK" class="0">
@@ -7571,6 +7572,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <pinref part="ESP32PH" gate="G$1" pin="VCC"/>
 <wire x1="139.7" y1="137.16" x2="139.7" y2="96.52" width="0.1524" layer="91"/>
 <pinref part="IC3" gate="G$1" pin="VIN"/>
+<label x="116.84" y="78.74" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="ESP-RX" class="0">
@@ -8675,13 +8677,6 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <label x="99.06" y="-40.64" size="1.778" layer="95"/>
 </segment>
 </net>
-<net name="SIMPLE_LED2" class="0">
-<segment>
-<pinref part="SOC1" gate="G$1" pin="PB14"/>
-<wire x1="127" y1="33.02" x2="132.08" y2="33.02" width="0.1524" layer="91"/>
-<label x="132.08" y="33.02" size="1.778" layer="95"/>
-</segment>
-</net>
 </nets>
 </sheet>
 <sheet>
@@ -8896,21 +8891,25 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <wire x1="12.7" y1="101.6" x2="15.24" y2="101.6" width="0.1524" layer="91"/>
 <pinref part="C31" gate="G$1" pin="1"/>
 <pinref part="102-1" gate="G$1" pin="VCC"/>
+<label x="12.7" y="99.06" size="1.778" layer="95" rot="R270"/>
 </segment>
 <segment>
 <wire x1="12.7" y1="60.96" x2="15.24" y2="60.96" width="0.1524" layer="91"/>
 <pinref part="C14" gate="G$1" pin="1"/>
 <pinref part="102-2" gate="G$1" pin="VCC"/>
+<label x="12.7" y="55.88" size="1.778" layer="95" rot="R270"/>
 </segment>
 <segment>
 <wire x1="12.7" y1="20.32" x2="15.24" y2="20.32" width="0.1524" layer="91"/>
 <pinref part="C20" gate="G$1" pin="1"/>
 <pinref part="102-3" gate="G$1" pin="VCC"/>
+<label x="12.7" y="17.78" size="1.778" layer="95" rot="R270"/>
 </segment>
 <segment>
 <wire x1="12.7" y1="-20.32" x2="15.24" y2="-20.32" width="0.1524" layer="91"/>
 <pinref part="C21" gate="G$1" pin="1"/>
 <pinref part="102-4" gate="G$1" pin="VCC"/>
+<label x="12.7" y="-22.86" size="1.778" layer="95" rot="R270"/>
 </segment>
 <segment>
 <wire x1="142.24" y1="5.08" x2="142.24" y2="22.86" width="0.1524" layer="91"/>

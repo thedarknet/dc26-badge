@@ -6,7 +6,7 @@
 #include "spi.h"
 #include "gpio.h"
 
-#define FAT_SD_SPI hspi1
+#define FAT_SD_SPI hspi3
 #define FAT_SD_CS GPIOA, GPIO_PIN_4
 
 

@@ -57,7 +57,7 @@ ErrorType DC26::onInit() {
 	}
 #if 1
 	HAL_GPIO_WritePin(SIMPLE_LED1_GPIO_Port, SIMPLE_LED1_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(SIMPLE_LED2_GPIO_Port, SIMPLE_LED2_Pin, GPIO_PIN_SET);
+	//HAL_GPIO_WritePin(SIMPLE_LED2_GPIO_Port, SIMPLE_LED2_Pin, GPIO_PIN_SET);
 #endif
 	GUI gui(&Display);
 	gui.drawList(&DrawList);

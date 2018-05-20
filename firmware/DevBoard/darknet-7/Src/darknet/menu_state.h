@@ -2,6 +2,7 @@
 #define MENU_STATE_H
 
 #include "libstm32/app/state_base.h"
+#include "messaging/stm_to_esp_generated.h"
 
 
 class MenuState: public cmdc0de::StateBase {

@@ -23,15 +23,26 @@ using cmdc0de::GUIListData;
 using cmdc0de::GUIListItemData;
 using cmdc0de::GUI;
 
+//TODO Can't swap between landscape and portait
+#define START_LANDSCAPE
+#ifdef START_LANDSCAPE
+static const uint32_t DISPLAY_WIDTH = 160;
+static const uint32_t DISPLAY_HEIGHT = 128;
+#define START_ROT DisplayST7735::LANDSCAPE_TOP_LEFT
+#else
 static const uint32_t DISPLAY_WIDTH = 128;
 static const uint32_t DISPLAY_HEIGHT = 160;
-static const uint32_t DISPLAY_OPT_WRITE_ROWS = 2;
-DisplayST7735 Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, DisplayST7735::PORTAIT);
-uint16_t DrawBuffer[DISPLAY_WIDTH * DISPLAY_OPT_WRITE_ROWS]; //120 wide, 10 pixels high, 2 bytes per pixel (uint16_t)
-uint8_t DrawBufferRangeChange[DISPLAY_HEIGHT / DISPLAY_OPT_WRITE_ROWS + 1];
+#define START_ROT DisplayST7735::PORTAIT_TOP_LEFT
+#endif
 
-cmdc0de::DrawBufferNoBuffer NoBuffer(&Display, &DrawBuffer[0],
-		DISPLAY_OPT_WRITE_ROWS);
+static const uint32_t DISPLAY_OPT_WRITE_ROWS = DISPLAY_HEIGHT;
+DisplayST7735 Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT);
+uint16_t DrawBuffer[DISPLAY_WIDTH * DISPLAY_OPT_WRITE_ROWS]; //120 wide, 10 pixels high, 2 bytes per pixel (uint16_t)
+
+cmdc0de::DrawBufferNoBuffer NoBuffer(&Display, &DrawBuffer[0],DISPLAY_OPT_WRITE_ROWS);
+
+cmdc0de::DrawBuffer2D16BitColor16BitPerPixel1Buffer DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH),static_cast<uint8_t>(DISPLAY_HEIGHT),
+		&DrawBuffer[0],&Display);
 
 DC26::DC26() {
 	// TODO Auto-generated constructor stub
@@ -47,10 +58,10 @@ ErrorType DC26::onInit() {
 
 	GUIListItemData items[4];
 	GUIListData DrawList((const char *) "Self Check", items, uint8_t(0),
-			uint8_t(0), uint8_t(128), uint8_t(64), uint8_t(0), uint8_t(0));
+			uint8_t(0), uint8_t(DISPLAY_WIDTH), uint8_t(DISPLAY_HEIGHT/2), uint8_t(0), uint8_t(0));
 	//DO SELF CHECK
-	if ((et = Display.init(DisplayST7735::FORMAT_16_BIT,
-			DisplayST7735::ROW_COLUMN_ORDER, &Font_6x10, &NoBuffer)).ok()) {
+	if ((et = Display.init(DisplayST7735::FORMAT_16_BIT, &Font_6x10, &DisplayBuffer)).ok()) {
+			//DisplayST7735::MADCTL_MY, &Font_6x10, &DisplayBuffer)).ok()) {
 		HAL_Delay(1000);
 		items[0].set(0, "OLED_INIT");
 		DrawList.ItemsCount++;
@@ -61,6 +72,38 @@ ErrorType DC26::onInit() {
 #endif
 	GUI gui(&Display);
 	gui.drawList(&DrawList);
+	Display.swap();
+	Display.fillScreen(cmdc0de::RGBColor::BLACK);
+	Display.swap();
+	Display.fillRec(30,10,80,40,cmdc0de::RGBColor(0,255,0));
+	Display.swap();
+#if DEBUG_WHY_CANT_CHANGE_ROTATION
+	//Display.setRotation(cmdc0de::DisplayDevice::LANDSCAPE_TOP_LEFT,true);
+	Display.fillScreen(cmdc0de::RGBColor::BLACK);
+	Display.swap();
+	gui.drawList(&DrawList);
+	Display.swap();
+	Display.fillRec(30,10,80,40,cmdc0de::RGBColor(0,255,0));
+	Display.swap();
+#endif
+
+	uint16_t r = 0, g= 0, b = 0;
+	uint16_t y = 0;
+	while(y<Display.getHeight()) {
+		for(uint32_t i=0;i<Display.getWidth();i++) {
+			Display.drawPixel(i,y,cmdc0de::RGBColor(r,g,b));
+			if(r==0xFF && g==0xFF && b==0xFF) {
+				r=g=b=0;
+			} else if (r==0xFF && g==0xFF) {
+				++b;
+			} else if (r==0xFF) {
+				++g;
+			} else {
+				++r;
+			}
+		}
+		++y;
+	}
 	Display.swap();
 
 	return et;

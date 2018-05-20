@@ -64,11 +64,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include <string.h>
 #include "ff_gen_drv.h"
+#include "sd_spi/fat_sd_spi.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
+static hwif hw1;
 /* Disk status */
 static volatile DSTATUS Stat = STA_NOINIT;
 
@@ -111,6 +113,9 @@ DSTATUS USER_initialize (
 {
   /* USER CODE BEGIN INIT */
     Stat = STA_NOINIT;
+    if(hwif_init(&hw1)==0) {
+    	Stat = 0;
+    }
     return Stat;
   /* USER CODE END INIT */
 }
@@ -126,6 +131,11 @@ DSTATUS USER_status (
 {
   /* USER CODE BEGIN STATUS */
     Stat = STA_NOINIT;
+    if(hw1.initialized) {
+    	if(sd_read_status(&hw1)==0) {
+    		Stat=0;
+    	}
+    }
     return Stat;
   /* USER CODE END STATUS */
 }
@@ -146,6 +156,15 @@ DRESULT USER_read (
 )
 {
   /* USER CODE BEGIN READ */
+	BYTE *pRead = buff;
+	uint32_t address = sector*512;
+	for(int i=0;i<count;++i) {
+		if(sd_read(&hw1,address,buff)<0) {
+			return RES_ERROR;
+		}
+		pRead=pRead+512;
+		address+=512;
+	}
     return RES_OK;
   /* USER CODE END READ */
 }

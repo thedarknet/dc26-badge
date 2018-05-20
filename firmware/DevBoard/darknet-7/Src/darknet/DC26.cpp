@@ -15,6 +15,7 @@
 #include <spi.h>
 #include <i2c.h>
 #include "libstm32/app/display_message_state.h"
+#include <ff.h>
 
 using cmdc0de::ErrorType;
 using cmdc0de::DisplayST7735;
@@ -105,6 +106,12 @@ ErrorType DC26::onInit() {
 		++y;
 	}
 	Display.swap();
+
+	//disk_initialize(0);
+	FATFS myFS;
+	f_mount(&myFS,"0:",1);
+	DIR d;
+	FRESULT fr = f_opendir(&d,"");
 
 	return et;
 }

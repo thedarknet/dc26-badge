@@ -1,16 +1,10 @@
 #include "fat_sd_spi.h"
 
 
-static void spi_init(void)
-{
-	/* Configure spi using CubeMX!!! */
-	spi_set_speed(SD_SPEED_400KHZ);
-}
-
 static void spi_set_speed(enum sd_speed speed)
 {
+	/*
 	//CHECK YOUR APB1 FREQ!!!
-	SPI_InitTypeDef spi;
 	int prescaler = SPI_BAUDRATEPRESCALER_256;
 
 	if (speed == SD_SPEED_400KHZ)
@@ -20,7 +14,15 @@ static void spi_set_speed(enum sd_speed speed)
 
 	FAT_SD_SPI.Init.BaudRatePrescaler = prescaler;
 	HAL_SPI_Init(&FAT_SD_SPI);
+	*/
 }
+
+static void spi_init(void)
+{
+	/* Configure spi using CubeMX!!! */
+	spi_set_speed(SD_SPEED_400KHZ);
+}
+
 
 static uint8_t spi_txrx(uint8_t data)
 {
@@ -388,7 +390,7 @@ static int sd_init(hwif *hw)
 	return -2;
 }
 
-static int sd_read_status(hwif *hw)
+int sd_read_status(hwif *hw)
 {
 	uint16_t r2;
 

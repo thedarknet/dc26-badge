@@ -107,11 +107,13 @@ ErrorType DC26::onInit() {
 	}
 	Display.swap();
 
+#ifdef TEST_SD_CARD
 	//disk_initialize(0);
 	FATFS myFS;
 	f_mount(&myFS,"0:",1);
 	DIR d;
 	FRESULT fr = f_opendir(&d,"");
+#endif
 
 	return et;
 }

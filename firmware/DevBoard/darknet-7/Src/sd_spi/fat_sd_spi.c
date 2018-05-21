@@ -3,7 +3,6 @@
 
 static void spi_set_speed(enum sd_speed speed)
 {
-	/*
 	//CHECK YOUR APB1 FREQ!!!
 	int prescaler = SPI_BAUDRATEPRESCALER_256;
 
@@ -14,7 +13,6 @@ static void spi_set_speed(enum sd_speed speed)
 
 	FAT_SD_SPI.Init.BaudRatePrescaler = prescaler;
 	HAL_SPI_Init(&FAT_SD_SPI);
-	*/
 }
 
 static void spi_init(void)

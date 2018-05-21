@@ -43,7 +43,7 @@ https://community.st.com/thread/41968-how-to-change-the-program-start-address-to
 flash size = 512kbytes
 #0 : stm32f2x at 0x08000000, size 0x00080000, buswidth 0, chipwidth 0
         #  0: 0x00000000 (0x4000 16kB) not protected - program
-        #  1: 0x00004000 (0x4000 16kB) not protected - program
+        #  1: 0x00004000 (0x4000 16kB) not protected - data for settings
         #  2: 0x00008000 (0x4000 16kB) not protected - data for settings
         #  3: 0x0000c000 (0x4000 16kB) not protected - data for address book
         #  4: 0x00010000 (0x10000 64kB) not protected - program
@@ -55,8 +55,8 @@ flash size = 512kbytes
 MEMORY
 {
 RAM (xrw)              : ORIGIN = 0x20000000, LENGTH = 128K
-FLASH0 (rx)            : ORIGIN =  0x8000000, LENGTH = 32K
-DATA_ADDRESS_BOOK(xrw) : ORIGIN =  0x8008000, LENGTH = 32K
+FLASH0 (rx)            : ORIGIN =  0x8000000, LENGTH = 16K
+DATA_ADDRESS_BOOK(xrw) : ORIGIN =  0x8004000, LENGTH = 48K
 FLASH (rx)             : ORIGIN =  0x8010000, LENGTH = 320K
 DATA_RESOURCES(xrw)    : ORIGIN =  0x8060000, LENGTH = 128K
 }

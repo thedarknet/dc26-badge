@@ -45,7 +45,9 @@ cmdc0de::DrawBufferNoBuffer NoBuffer(&Display, &DrawBuffer[0],DISPLAY_OPT_WRITE_
 cmdc0de::DrawBuffer2D16BitColor16BitPerPixel1Buffer DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH),static_cast<uint8_t>(DISPLAY_HEIGHT),
 		&DrawBuffer[0],&Display);
 
-DC26::DC26() {
+DC26::DC26() : Apa106s(GPIO_APA106_DATA_Pin, GPIO_APA106_DATA_GPIO_Port, TIM1, DMA2_Stream0, DMA2_Stream2_IRQn)
+//,		MyContacts(SETTING_SECTOR, FIRST_CONTACT_SECTOR, NUM_CONTACT_SECTOR, MY_INFO_ADDRESS)
+{
 	// TODO Auto-generated constructor stub
 
 }

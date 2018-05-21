@@ -9,6 +9,7 @@
 #define DARKNET_DC26_H_
 
 #include "libstm32/app/app.h"
+#include "libstm32/leds/ws2812.h"
 
 class DC26 : public cmdc0de::App {
 public:
@@ -17,6 +18,9 @@ public:
 protected:
 	virtual cmdc0de::ErrorType onInit();
 	virtual cmdc0de::ErrorType onRun();
+private:
+	cmdc0de::WS2818 Apa106s;
+	//ContactStore MyContacts;
 };
 
 

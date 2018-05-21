@@ -38,11 +38,27 @@ _estack = 0x20020000;    /* end of RAM */
 _Min_Heap_Size = 0x200;      /* required amount of heap  */
 _Min_Stack_Size = 0x400; /* required amount of stack */
 
+/*
+https://community.st.com/thread/41968-how-to-change-the-program-start-address-to-the-second-section-in-an-stm32f765vgt
+flash size = 512kbytes
+#0 : stm32f2x at 0x08000000, size 0x00080000, buswidth 0, chipwidth 0
+        #  0: 0x00000000 (0x4000 16kB) not protected - program
+        #  1: 0x00004000 (0x4000 16kB) not protected - program
+        #  2: 0x00008000 (0x4000 16kB) not protected - data for settings
+        #  3: 0x0000c000 (0x4000 16kB) not protected - data for address book
+        #  4: 0x00010000 (0x10000 64kB) not protected - program
+        #  5: 0x00020000 (0x20000 128kB) not protected - program
+        #  6: 0x00040000 (0x20000 128kB) not protected - program
+        #  7: 0x00060000 (0x20000 128kB) not protected - data resources
+*/
 /* Specify the memory areas */
 MEMORY
 {
-RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 128K
-FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 512K
+RAM (xrw)              : ORIGIN = 0x20000000, LENGTH = 128K
+FLASH0 (rx)            : ORIGIN =  0x8000000, LENGTH = 32K
+DATA_ADDRESS_BOOK(xrw) : ORIGIN =  0x8008000, LENGTH = 32K
+FLASH (rx)             : ORIGIN =  0x8010000, LENGTH = 320K
+DATA_RESOURCES(xrw)    : ORIGIN =  0x8060000, LENGTH = 128K
 }
 
 /* Define output sections */
@@ -54,7 +70,7 @@ SECTIONS
     . = ALIGN(4);
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
-  } >FLASH
+  } >FLASH0
 
   /* The program code and other data goes into FLASH */
   .text :
@@ -109,6 +125,22 @@ SECTIONS
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
   } >FLASH
+  
+   /* app flash memory address book data */
+  .app_settings :
+  {
+    . = ALIGN(4);
+    *(.app_settings)
+    . = ALIGN(4);
+   } > DATA_ADDRESS_BOOK
+   
+    /* app flash RO resources data */
+  .app_resource :
+  {
+    . = ALIGN(4);
+    *(.app_resource)
+    . = ALIGN(4);
+   } > DATA_RESOURCES
 
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);

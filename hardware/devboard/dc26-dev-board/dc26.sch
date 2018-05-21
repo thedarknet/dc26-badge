@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.7.1">
+<eagle version="7.7.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
-<setting keepoldvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
@@ -32235,7 +32234,7 @@ Source: &lt;a href="https://www.arrow.com/en/products/ldl112d33r/stmicroelectron
 <part name="LED1" library="dc-26" deviceset="LED" device="1206" value="MF-LED-1206-GREEN"/>
 <part name="LINK1" library="dc-26" deviceset="STLINK-V2-CONNECTOR" device=""/>
 <part name="GND5" library="dc-26" deviceset="GND" device=""/>
-<part name="RESETTABLE-FUSE" library="dc-26" deviceset="PTC" device="SMD" value="NANOSMDH075F-02"/>
+<part name="F1" library="dc-26" deviceset="PTC" device="SMD" value="NANOSMDH075F-02"/>
 <part name="P1" library="dc-26" deviceset="SWITCH_SPDT" device="" value="SSSS811101"/>
 <part name="R2" library="dc-26" deviceset="RESISTOR" device="0805-RES" value="470"/>
 <part name="R3" library="dc-26" deviceset="RESISTOR" device="0805-RES" value="2k"/>
@@ -32437,7 +32436,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <instance part="LED1" gate="G$1" x="-7.62" y="73.66"/>
 <instance part="R2" gate="G$1" x="-7.62" y="81.28" rot="R90"/>
 <instance part="R3" gate="G$1" x="27.94" y="71.12" rot="R90"/>
-<instance part="RESETTABLE-FUSE" gate="G$1" x="127" y="96.52"/>
+<instance part="F1" gate="G$1" x="127" y="96.52"/>
 <instance part="P1" gate="G$1" x="157.48" y="50.8"/>
 <instance part="C3" gate="G$1" x="152.4" y="101.6"/>
 <instance part="GND6" gate="1" x="152.4" y="106.68" rot="R180"/>
@@ -32560,7 +32559,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <label x="50.8" y="83.82" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="RESETTABLE-FUSE" gate="G$1" pin="1"/>
+<pinref part="F1" gate="G$1" pin="1"/>
 <wire x1="111.76" y1="106.68" x2="111.76" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="111.76" y1="96.52" x2="121.92" y2="96.52" width="0.1524" layer="91"/>
 <label x="111.76" y="106.68" size="1.778" layer="95"/>
@@ -32659,7 +32658,7 @@ Ceramic + 1 μF Tantalum or Ceramic).</text>
 <wire x1="104.14" y1="76.2" x2="139.7" y2="76.2" width="0.1524" layer="91"/>
 <wire x1="139.7" y1="76.2" x2="139.7" y2="96.52" width="0.1524" layer="91"/>
 <pinref part="C3" gate="G$1" pin="2"/>
-<pinref part="RESETTABLE-FUSE" gate="G$1" pin="2"/>
+<pinref part="F1" gate="G$1" pin="2"/>
 <wire x1="152.4" y1="96.52" x2="144.78" y2="96.52" width="0.1524" layer="91"/>
 <junction x="152.4" y="96.52"/>
 <wire x1="144.78" y1="96.52" x2="139.7" y2="96.52" width="0.1524" layer="91"/>

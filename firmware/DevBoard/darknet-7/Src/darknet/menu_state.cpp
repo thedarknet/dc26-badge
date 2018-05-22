@@ -1,11 +1,13 @@
 
 #include "menu_state.h"
+#include "libstm32/display/display_device.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::StateBase;
 
-MenuState::MenuState() :
-		StateBase() //, MenuList("Main Menu", Items, 0, 0, 128, 160, 0, (sizeof(Items) / sizeof(Items[0])))
+MenuState::MenuState(cmdc0de::DisplayDevice *d) :
+		StateBase(), MenuList("Main Menu", Items, 0, 0, d->getWidth(), d->getHeight(), 0, (sizeof(Items) / sizeof(Items[0]))),
+				Display(d)
 {
 }
 
@@ -17,13 +19,14 @@ const char *HasMessage = "DCDN Net Msgs *";
 const char *NoHasMessage = "DCDN Net Msgs";
 
 ErrorType MenuState::onInit() {
-	/*
 	Items[0].id = 0;
-	if (rc.getContactStore().getSettings().isNameSet()) {
+	//if (getContactStore().getSettings().isNameSet()) {
 		Items[0].text = (const char *) "Settings";
-	} else {
-		Items[0].text = (const char *) "Settings *";
-	}
+	//} else {
+	//	Items[0].text = (const char *) "Settings *";
+	//}
+	/*
+
 	Items[1].id = 1;
 	Items[1].text = (const char *) "IR Pair";
 	Items[2].id = 2;

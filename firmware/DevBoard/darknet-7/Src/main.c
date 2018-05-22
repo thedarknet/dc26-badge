@@ -50,6 +50,7 @@
 #include "main.h"
 #include "stm32f4xx_hal.h"
 #include "dma.h"
+#include "fatfs.h"
 #include "i2c.h"
 #include "libjpeg.h"
 #include "spi.h"
@@ -116,6 +117,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM3_Init();
   MX_I2C3_Init();
+  MX_FATFS_Init();
 
   /* USER CODE BEGIN 2 */
   init();

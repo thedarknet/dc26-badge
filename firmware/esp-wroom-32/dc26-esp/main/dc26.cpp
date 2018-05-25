@@ -13,6 +13,7 @@
 #include "lib/net/HttpServer.h"
 #include "lib/FATFS_VFS.h"
 #include "mcu_to_mcu.h"
+#include "command_handler.h"
 
 static const int RX_BUF_SIZE = 1024;
 #define TXD_PIN (GPIO_NUM_4)
@@ -34,14 +35,6 @@ FATFS_VFS *FatFS = new FATFS_VFS("/spiflash", "storage");
 //    serial via flat buffers then send over uart to stm32
 void init() {
 	FatFS->mount();
-}
-
-//
-// wait on queue from uart 
-static void generalCmdTask(void *) {
-    while (1) {
-        vTaskDelay(20000 / portTICK_PERIOD_MS);
-    }
 }
 
 std::string ssid = "dc26";
@@ -76,6 +69,7 @@ public:
 
 ESP32_I2CMaster I2cDisplay(GPIO_NUM_19,GPIO_NUM_18,1000000, I2C_NUM_0, 1024, 1024);
 MCUToMCUTask ProcToProc("ProcToProc");
+CmdHandlerTask CmdTask("CmdTask");
 
 static char tag[] = "main";
 
@@ -92,6 +86,7 @@ void app_main()
 	init();
 	ProcToProc.init(TXD_PIN,RXD_PIN,RX_BUF_SIZE);
 	ProcToProc.start();
+	CmdTask.start();
 
 	System::logSystemInfo();
 	wifi_config_t wifi_config;
@@ -107,7 +102,7 @@ void app_main()
 	dhcps_lease_t l;
 	wifi.initDHCPSLeaseInfo(l);
 	wifi.wifi_start_access_point(wifi_config,ipInfo,l);
-	xTaskCreate(generalCmdTask, "generalCmdTask", 1024*2, NULL, configMAX_PRIORITIES, NULL);
+//	xTaskCreate(generalCmdTask, "generalCmdTask", 1024*2, NULL, configMAX_PRIORITIES, NULL);
    //xTaskCreate(tx_task, "uart_tx_task", 1024*2, NULL, configMAX_PRIORITIES-1, NULL);
 	vTaskDelete(NULL);
 }

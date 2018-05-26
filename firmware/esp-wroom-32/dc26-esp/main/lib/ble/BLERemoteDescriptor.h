@@ -15,7 +15,7 @@
 
 #include "BLERemoteCharacteristic.h"
 #include "BLEUUID.h"
-#include "FreeRTOS.h"
+#include "../FreeRTOS.h"
 
 class BLERemoteCharacteristic;
 /**

@@ -13,6 +13,8 @@
 #include "lib/net/HttpServer.h"
 #include "lib/FATFS_VFS.h"
 
+#include "dc26_ble_proto.h"
+
 static const int RX_BUF_SIZE = 1024;
 
 #define TXD_PIN (GPIO_NUM_4)
@@ -179,6 +181,7 @@ void app_main()
 	dhcps_lease_t l;
 	wifi.initDHCPSLeaseInfo(l);
 	wifi.wifi_start_access_point(wifi_config,ipInfo,l);
+	dc26_bt_init();
 	xTaskCreate(generalCmdTask, "generalCmdTask", 1024*2, NULL, configMAX_PRIORITIES, NULL);
    xTaskCreate(tx_task, "uart_tx_task", 1024*2, NULL, configMAX_PRIORITIES-1, NULL);
 	vTaskDelete(NULL);

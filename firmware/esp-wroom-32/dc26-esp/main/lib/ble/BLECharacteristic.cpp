@@ -18,7 +18,7 @@
 #include "BLEDevice.h"
 #include "BLEUtils.h"
 #include "BLE2902.h"
-#include "GeneralUtils.h"
+#include "../GeneralUtils.h"
 #ifdef ARDUINO_ARCH_ESP32
 #include "esp32-hal-log.h"
 #endif

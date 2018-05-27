@@ -20,7 +20,7 @@
 #include "BLEServer.h"
 #include "BLEService.h"
 #include "BLEUtils.h"
-#include "GeneralUtils.h"
+#include "../GeneralUtils.h"
 
 #ifdef ARDUINO_ARCH_ESP32
 #include "esp32-hal-log.h"

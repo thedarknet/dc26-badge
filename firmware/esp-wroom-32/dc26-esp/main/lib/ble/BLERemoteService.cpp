@@ -10,7 +10,7 @@
 #include <sstream>
 #include "BLERemoteService.h"
 #include "BLEUtils.h"
-#include "GeneralUtils.h"
+#include "../GeneralUtils.h"
 #include <esp_log.h>
 #include <esp_err.h>
 #ifdef ARDUINO_ARCH_ESP32

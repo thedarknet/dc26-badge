@@ -14,7 +14,7 @@
 #include "BLEClient.h"
 #include "BLEUtils.h"
 #include "BLEService.h"
-#include "GeneralUtils.h"
+#include "../GeneralUtils.h"
 #include <string>
 #include <sstream>
 #include <unordered_set>

@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "dc26_ble_proto.h"
-
 #include "lib/ble/BLEDevice.h"
 
 BLEServer *g_pServer;
@@ -10,7 +9,6 @@ bool g_b2b_advertising_enabled = false;
 
 std::string g_adv_name = "";
 std::string g_adv_manufacturer = "";
-
 
 static void startB2BAdvertising()
 {
@@ -96,9 +94,8 @@ static void btCmdTask(void *)
     }
 }
 
-void dc26_bt_init()
+void dc26_bt_init() 
 {
-    
     BLEDevice::init("DCDN BLE Server");
     g_pServer = BLEDevice::createServer();
     g_pAdvertising = g_pServer->getAdvertising();
@@ -107,5 +104,13 @@ void dc26_bt_init()
 
     // Create the comms task from STM->Main_App->BT
     xTaskCreate(btCmdTask, "bt_cmd_task", 1024*2, NULL, configMAX_PRIORITIES, NULL);
+    //BLEAdvertisementData adv_data;
+    //adv_data.setAppearance(0x26DC);
+    //adv_data.setFlags(0x6);
+    //adv_data.setName("GOURRY!!!!");
+    //adv_data.setManufacturerData("EGGPLANTS");
+    
+    //g_pAdvertising->setAdvertisementData(adv_data);
+    //g_pServer->startAdvertising();
 }
 

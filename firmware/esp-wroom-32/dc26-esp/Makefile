@@ -4,7 +4,8 @@
 #
 
 PROJECT_NAME := dc26esp
-CPPFLAGES += "-I $HOME/opt/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0"
+CPPFLAGS += "-I $HOME/opt/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0"
+CXXFLAGS += "-D FLATBUFFERS_TRACK_VERIFIER_BUFFER_SIZE"
 
 include $(IDF_PATH)/make/project.mk
 

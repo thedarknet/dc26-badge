@@ -24,7 +24,7 @@ static char tag[] = "Task";
  * @param [in] stackSize The size of the stack.
  * @return N/A.
  */
-Task::Task(std::string taskName, uint16_t stackSize, uint8_t priority) {
+Task::Task(const std::string &taskName, uint16_t stackSize, uint8_t priority) {
 	m_taskName  = taskName;
 	m_stackSize = stackSize;
 	m_priority  = priority;

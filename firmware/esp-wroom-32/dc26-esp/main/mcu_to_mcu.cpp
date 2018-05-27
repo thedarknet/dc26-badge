@@ -34,8 +34,7 @@ MCUToMCUTask::~MCUToMCUTask() {
 	uart_driver_delete(UART_NUM_1);
 }
 
-void MCUToMCUTask::txTask()
-{
+void MCUToMCUTask::txTask() {
 	ESP_LOGI(LOGTAG, "txTask");
 	esp_log_level_set(LOGTAG, ESP_LOG_INFO);
 	OutgoingMsg *msgToSend =0;
@@ -54,8 +53,7 @@ void MCUToMCUTask::txTask()
 	}
 }
 	
-void MCUToMCUTask::rxTask()
-{
+void MCUToMCUTask::rxTask() {
 	ESP_LOGI(LOGTAG, "txTask");
 	static std::vector<uint8_t> sUARTBuffer(getBufferSize());
 	esp_log_level_set(LOGTAG, ESP_LOG_INFO);

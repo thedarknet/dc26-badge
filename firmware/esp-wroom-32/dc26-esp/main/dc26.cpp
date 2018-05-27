@@ -15,6 +15,8 @@
 #include "mcu_to_mcu.h"
 #include "command_handler.h"
 
+#include "dc26_ble_proto.h"
+
 static const int RX_BUF_SIZE = 1024;
 #define TXD_PIN (GPIO_NUM_4)
 #define RXD_PIN (GPIO_NUM_5)
@@ -102,8 +104,7 @@ void app_main()
 	dhcps_lease_t l;
 	wifi.initDHCPSLeaseInfo(l);
 	wifi.wifi_start_access_point(wifi_config,ipInfo,l);
-//	xTaskCreate(generalCmdTask, "generalCmdTask", 1024*2, NULL, configMAX_PRIORITIES, NULL);
-   //xTaskCreate(tx_task, "uart_tx_task", 1024*2, NULL, configMAX_PRIORITIES-1, NULL);
+	dc26_bt_init();
 	vTaskDelete(NULL);
 }
 

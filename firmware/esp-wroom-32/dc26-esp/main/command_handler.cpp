@@ -19,8 +19,16 @@ CmdHandlerTask::~CmdHandlerTask() {
 }
 
 void CmdHandlerTask::run(void *data) {
+	darknet7::STMToESPRequest *msg;
 	while (1) {
-		vTaskDelay(20000 / portTICK_PERIOD_MS);
+		if(xQueueReceive(InCommingQueueHandle, &msg, ( TickType_t ) 20000)/portTICK_PERIOD_MS) {
+			switch(msg->MType()) {
+				case darknet7::MsgType_SETUP_AP:
+					break;
+				default:
+					break;
+			}
+		}
 	}
 }
 

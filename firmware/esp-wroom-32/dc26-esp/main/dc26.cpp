@@ -72,6 +72,7 @@ public:
 ESP32_I2CMaster I2cDisplay(GPIO_NUM_19,GPIO_NUM_18,1000000, I2C_NUM_0, 1024, 1024);
 MCUToMCUTask ProcToProc("ProcToProc");
 CmdHandlerTask CmdTask("CmdTask");
+BluetoothTask BTTask("BluetoothTask");
 
 static char tag[] = "main";
 
@@ -88,7 +89,10 @@ void app_main()
 	init();
 	ProcToProc.init(TXD_PIN,RXD_PIN,RX_BUF_SIZE);
 	ProcToProc.start();
+	CmdTask.init();
 	CmdTask.start();
+	BTTask.init();
+	BTTask.start();
 
 	System::logSystemInfo();
 	wifi_config_t wifi_config;
@@ -104,7 +108,6 @@ void app_main()
 	dhcps_lease_t l;
 	wifi.initDHCPSLeaseInfo(l);
 	wifi.wifi_start_access_point(wifi_config,ipInfo,l);
-	dc26_bt_init();
 	vTaskDelete(NULL);
 }
 

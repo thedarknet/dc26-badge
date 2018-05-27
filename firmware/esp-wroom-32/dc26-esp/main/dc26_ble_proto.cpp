@@ -3,114 +3,116 @@
 #include "dc26_ble_proto.h"
 #include "lib/ble/BLEDevice.h"
 
-BLEServer *g_pServer;
-BLEAdvertising *g_pAdvertising;
-bool g_b2b_advertising_enabled = false;
+const char *BluetoothTask::LOGTAG = "BluetoothTask";
 
-std::string g_adv_name = "";
-std::string g_adv_manufacturer = "";
-
-static void startB2BAdvertising()
+void BluetoothTask::startB2BAdvertising()
 {
-    if (!g_b2b_advertising_enabled)
-    {
-        g_pAdvertising->start();
-        printf("DC26 Badge-to-Badge advertising started\n");
-        g_b2b_advertising_enabled = true;
-    }
-    else
-    {
-        printf("DC26 Badge-to-Badget advertising already started");
-    }
+	if (!b2b_advertising_enabled)
+	{
+		ESP_LOGI(LOGTAG, "STARTING BT ADVERTISEMENT");
+		pAdvertising->start();
+		b2b_advertising_enabled = true;
+	}
+	else
+	{
+		ESP_LOGI(LOGTAG, "ADVERTISEMENT ALREADY RUNNING");
+	}
 }
 
-static void stopB2BAdvertising()
+void BluetoothTask::stopB2BAdvertising()
 {
-    if (g_b2b_advertising_enabled)
-    {
-        g_pAdvertising->stop();
-        printf("DC26 Badge-to-Badge advertising stopped\n");
-        g_b2b_advertising_enabled = false;
-    }
-    else
-    {
-        printf("DC26 Badge-to-Badget advertising already started");
-    }
+	if (b2b_advertising_enabled)
+	{
+		ESP_LOGI(LOGTAG, "STOPPING BT ADVERTISEMENT");
+		pAdvertising->stop();
+		b2b_advertising_enabled = false;
+	}
+	else
+	{
+		ESP_LOGI(LOGTAG, "ADVERTISEMENT ALREADY STOPPED");
+	}
 }
 
-static void setB2BAdvData(std::string new_name, std::string new_man_data)
+void BluetoothTask::setB2BAdvData(std::string new_name, std::string new_man_data)
 {
-    // TODO: Check length < 10 characters
-    g_adv_name = new_name;
-    g_adv_manufacturer = "DN" + new_man_data;
-    
-    // Stop advertising, re-set data, return advertising to original state
-    bool original_state = g_b2b_advertising_enabled;
-    if (original_state)
-    {
-        stopB2BAdvertising();
-    }
-    
-    // Setup data
-    BLEAdvertisementData adv_data;
-    adv_data.setAppearance(0x26DC);
-    adv_data.setFlags(0x6);
-    adv_data.setName(g_adv_name);
-    adv_data.setManufacturerData(g_adv_manufacturer);
-    g_pAdvertising->setAdvertisementData(adv_data);
+	// TODO: Check length < 10 characters
+	ESP_LOGI(LOGTAG, "SETTING ADVERTISMENT DATA");
+	adv_name = new_name;
+	adv_manufacturer = "DN" + new_man_data;
 
-    // Restart if we were already advertising
-    if (original_state)
-    {
-        startB2BAdvertising();
-    }
+	// Stop advertising, re-set data, return advertising to original state
+	bool original_state = b2b_advertising_enabled;
+	if (original_state)
+	{
+		stopB2BAdvertising();
+	}
+
+	// Setup data
+	BLEAdvertisementData adv_data;
+	adv_data.setAppearance(0x26DC);
+	adv_data.setFlags(0x6);
+	adv_data.setName(adv_name);
+	adv_data.setManufacturerData(adv_manufacturer);
+	//printf("ADV PAYLOAD: %s\n", adv_data.getPayload().c_str());
+
+	pAdvertising->setAdvertisementData(adv_data);
+
+	// Restart if we were already advertising
+	if (original_state)
+	{
+		startB2BAdvertising();
+	}
 }
 
-static void btCmdTask(void *)
+void BluetoothTask::run(void * data)
 {
-    BTCmd cmd = BT_CMD_START_B2B;
-    while (1)
-    {
-        vTaskDelay(20000 / portTICK_PERIOD_MS);
-        // TODO: Check queue for command
-        switch(cmd)
-        {
-            case BT_CMD_START_B2B:
-                startB2BAdvertising();
-                cmd = BT_CMD_SET_B2B_ADV_DATA;
-                break;
-            case BT_CMD_STOP_B2B:
-                stopB2BAdvertising();
-                cmd = BT_CMD_UNK;
-                break;
-            case BT_CMD_SET_B2B_ADV_DATA:
-                setB2BAdvData("GOURRY!!!!", "INFECT!");
-                cmd = BT_CMD_UNK;
-                break;
-            default:
-                printf("EGGPLANT: waiting for an updated name now: %d\n", cmd);
-                break;
-        }
-    }
+	// TODO: Get commands from Queue
+	ESP_LOGI(LOGTAG, "RUNNING");
+	BTCmd cmd = BT_CMD_START_B2B;
+	while (1)
+	{
+		vTaskDelay(20000 / portTICK_PERIOD_MS);
+		// TODO: Check queue for command
+		switch(cmd)
+		{
+			case BT_CMD_START_B2B:
+				startB2BAdvertising();
+				cmd = BT_CMD_SET_B2B_ADV_DATA;
+				break;
+			case BT_CMD_STOP_B2B:
+				ESP_LOGI(LOGTAG, "");
+				stopB2BAdvertising();
+				cmd = BT_CMD_UNK;
+				break;
+			case BT_CMD_SET_B2B_ADV_DATA:
+				setB2BAdvData("GOURRY!!!", "INFECT");
+				cmd = BT_CMD_UNK;
+				break;
+			default:
+				ESP_LOGI(LOGTAG, "INFINITE LOOP");
+				break;
+		}
+	}
 }
 
-void dc26_bt_init() 
+bool BluetoothTask::init()
 {
-    BLEDevice::init("DCDN BLE Server");
-    g_pServer = BLEDevice::createServer();
-    g_pAdvertising = g_pServer->getAdvertising();
-    
-    setB2BAdvData("DN 12345", "EGGPLANT");
+	ESP_LOGI(LOGTAG, "INIT");
+	pDevice = new BLEDevice();
+	pDevice->init("DCDN BLE Device");
+	pServer = pDevice->createServer();
+	pAdvertising = pServer->getAdvertising();
 
-    // Create the comms task from STM->Main_App->BT
-    xTaskCreate(btCmdTask, "bt_cmd_task", 1024*2, NULL, configMAX_PRIORITIES, NULL);
-    //BLEAdvertisementData adv_data;
-    //adv_data.setAppearance(0x26DC);
-    //adv_data.setFlags(0x6);
-    //adv_data.setName("GOURRY!!!!");
-    //adv_data.setManufacturerData("EGGPLANTS");
-    
-    //g_pAdvertising->setAdvertisementData(adv_data);
-    //g_pServer->startAdvertising();
+	this->setB2BAdvData("DN 1", "EGGPLNT");
+	return true;
 }
 
+BluetoothTask::BluetoothTask(const std::string &tName, uint16_t stackSize, uint8_t p)
+	: Task(tName, stackSize, p), InQueue(), InQueueHandle(nullptr) {
+	//TODO: , ESPToBTBuffer() {
+	ESP_LOGI(LOGTAG, "CREATE\n");
+}
+
+BluetoothTask::~BluetoothTask() {
+	// TODO
+}

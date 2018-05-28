@@ -5,6 +5,11 @@
 
 const char *BluetoothTask::LOGTAG = "BluetoothTask";
 
+void MyScanCallbacks::onResult(BLEAdvertisedDevice advertisedDevice) 
+{
+	printf("Advertised Device: %s \n", advertisedDevice.toString().c_str());
+}
+
 void BluetoothTask::startB2BAdvertising()
 {
 	if (!b2b_advertising_enabled)
@@ -31,6 +36,27 @@ void BluetoothTask::stopB2BAdvertising()
 	{
 		ESP_LOGI(LOGTAG, "ADVERTISEMENT ALREADY STOPPED");
 	}
+}
+
+
+void BluetoothTask::scan(bool active)
+{
+	ESP_LOGI(LOGTAG, "STARTING SCAN");
+	if (scan_started)
+	{
+		ESP_LOGI(LOGTAG, "SCAN ALREADY IN PROGRESS. ABORTED.");
+	}
+	scan_started = true;
+
+	pScan = pDevice->getScan();
+	pScan->setAdvertisedDeviceCallbacks(pScanCallbacks);
+	pScan->setActiveScan(active);
+	BLEScanResults foundDevices = pScan->start(scan_time);
+	printf("Devices found: %d\n", foundDevices.getCount());
+
+	scan_started = false;
+	ESP_LOGI(LOGTAG, "SCAN COMPLETE");
+	return;
 }
 
 void BluetoothTask::setB2BAdvData(std::string new_name, std::string new_man_data)
@@ -86,6 +112,14 @@ void BluetoothTask::run(void * data)
 				break;
 			case BT_CMD_SET_B2B_ADV_DATA:
 				setB2BAdvData("GOURRY!!!", "INFECT");
+				cmd = BT_CMD_PASSIVE_SCAN;
+				break;
+			case BT_CMD_PASSIVE_SCAN:
+				scan(false);
+				cmd = BT_CMD_ACTIVE_SCAN;
+				break;
+			case BT_CMD_ACTIVE_SCAN:
+				scan(true);
 				cmd = BT_CMD_UNK;
 				break;
 			default:
@@ -102,7 +136,7 @@ bool BluetoothTask::init()
 	pDevice->init("DCDN BLE Device");
 	pServer = pDevice->createServer();
 	pAdvertising = pServer->getAdvertising();
-
+	pScanCallbacks = new MyScanCallbacks();
 	this->setB2BAdvData("DN 1", "EGGPLNT");
 	return true;
 }

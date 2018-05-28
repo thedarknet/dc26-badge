@@ -1,13 +1,14 @@
 
 #include "menu_state.h"
-#include "libstm32/display/display_device.h"
+#include "../libstm32/display/display_device.h"
+#include "../darknet7.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::StateBase;
 
-MenuState::MenuState(cmdc0de::DisplayDevice *d) :
-		StateBase(), MenuList("Main Menu", Items, 0, 0, d->getWidth(), d->getHeight(), 0, (sizeof(Items) / sizeof(Items[0]))),
-				Display(d)
+MenuState::MenuState() :
+		cmdc0de::StateBase(), MenuList("Main Menu", Items, 0, 0, DarkNet7::get().getDisplay().getWidth(), DarkNet7::get().getDisplay().getHeight()
+				, 0, (sizeof(Items) / sizeof(Items[0])))
 {
 }
 
@@ -15,16 +16,16 @@ MenuState::~MenuState() {
 
 }
 
-const char *HasMessage = "DCDN Net Msgs *";
-const char *NoHasMessage = "DCDN Net Msgs";
+const char *HasMessage = "DarkNet Msgs *";
+const char *NoHasMessage = "DarkNet Msgs";
 
 ErrorType MenuState::onInit() {
 	Items[0].id = 0;
-	//if (getContactStore().getSettings().isNameSet()) {
+	if (DarkNet7::get().getContacts().getSettings().isNameSet()) {
 		Items[0].text = (const char *) "Settings";
-	//} else {
-	//	Items[0].text = (const char *) "Settings *";
-	//}
+	} else {
+		Items[0].text = (const char *) "Settings *";
+	}
 	/*
 
 	Items[1].id = 1;

@@ -5,7 +5,7 @@
  *      Author: dcomes
  */
 
-#include "DC26.h"
+#include "darknet7.h"
 #include "libstm32/display/display_device.h"
 #include "libstm32/display/gui.h"
 #include "libstm32/display/fonts.h"
@@ -38,15 +38,8 @@ static const uint32_t DISPLAY_HEIGHT = 160;
 #endif
 
 static const uint32_t DISPLAY_OPT_WRITE_ROWS = DISPLAY_HEIGHT;
-DisplayST7735 Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT);
-uint16_t DrawBuffer[DISPLAY_WIDTH * DISPLAY_OPT_WRITE_ROWS]; //120 wide, 10 pixels high, 2 bytes per pixel (uint16_t)
-
-
-cmdc0de::DrawBufferNoBuffer NoBuffer(&Display, &DrawBuffer[0],DISPLAY_OPT_WRITE_ROWS);
-
-cmdc0de::DrawBuffer2D16BitColor16BitPerPixel1Buffer DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH),static_cast<uint8_t>(DISPLAY_HEIGHT),
-		&DrawBuffer[0],&Display);
-
+static uint16_t DrawBuffer[DISPLAY_WIDTH * DISPLAY_OPT_WRITE_ROWS]; //120 wide, 10 pixels high, 2 bytes per pixel (uint16_t)
+//cmdc0de::DrawBufferNoBuffer NoBuffer(&Display, &DrawBuffer[0],DISPLAY_OPT_WRITE_ROWS);
 
 static const uint8_t MyAddressInfoSector = 3;
 static const uint32_t MyAddressInfoOffSet = 0;
@@ -54,22 +47,48 @@ static const uint8_t SettingSector = 1;
 static const uint32_t SettingOffset = 0;
 static const uint8_t StartContactSector = 2;
 static const uint8_t EndContactSector = 3;
-//						my Info, start setting address, start Contact address, end contact address
-ContactStore MyContacts( MyAddressInfoSector, MyAddressInfoOffSet, SettingSector, SettingOffset, StartContactSector, EndContactSector);
+
+DarkNet7 *DarkNet7::mSelf = 0;
+
+DarkNet7 &DarkNet7::get() {
+	if(0==mSelf) {
+		mSelf = new DarkNet7();
+	}
+	return *mSelf;
+}
+
+cmdc0de::DisplayST7735 &DarkNet7::getDisplay() {
+	return Display;
+}
+
+const cmdc0de::DisplayST7735 &DarkNet7::getDisplay() const {
+	return Display;
+}
+
+ContactStore &DarkNet7::getContacts() {
+	return MyContacts;
+}
+
+const ContactStore &DarkNet7::getContacts() const {
+	return MyContacts;
+}
 
 
-DC26::DC26() : Apa106s(GPIO_APA106_DATA_Pin, GPIO_APA106_DATA_GPIO_Port, TIM1, DMA2_Stream0, DMA2_Stream2_IRQn)
-//,		MyContacts(SETTING_SECTOR, FIRST_CONTACT_SECTOR, NUM_CONTACT_SECTOR, MY_INFO_ADDRESS)
-{
-	// TODO Auto-generated constructor stub
+DarkNet7::DarkNet7() : Apa106s(GPIO_APA106_DATA_Pin, GPIO_APA106_DATA_GPIO_Port, TIM1, DMA2_Stream0, DMA2_Stream2_IRQn)
+			//		my Info, start setting address, start Contact address, end contact address
+	, MyContacts( MyAddressInfoSector, MyAddressInfoOffSet, SettingSector, SettingOffset, StartContactSector, EndContactSector)
+	, Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT)
+	, DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH),static_cast<uint8_t>(DISPLAY_HEIGHT),&DrawBuffer[0],&Display)
+	, DMS() {
+
 
 }
 
-DC26::~DC26() {
+DarkNet7::~DarkNet7() {
 	// TODO Auto-generated destructor stub
 }
 
-ErrorType DC26::onInit() {
+ErrorType DarkNet7::onInit() {
 	ErrorType et;
 
 	GUIListItemData items[4];
@@ -137,7 +156,7 @@ static const char *RFAILED = "Receive Failed";
 static const char *TFAILED = "Transmit Failed";
 static const uint16_t ESP_ADDRESS = 1;
 
-ErrorType DC26::onRun() {
+ErrorType DarkNet7::onRun() {
 	if (HAL_GPIO_ReadPin(MID_BUTTON1_GPIO_Port, MID_BUTTON1_Pin)
 			== GPIO_PIN_RESET) {
 		static const char *dis = "mid";
@@ -244,9 +263,9 @@ ErrorType DC26::onRun() {
 }
 
 
-cmdc0de::DisplayMessageState DMS;
 
-cmdc0de::DisplayMessageState *StateCollection::getDisplayMessageState(cmdc0de::StateBase *bm, const char *message, uint16_t timeToDisplay) {
+
+cmdc0de::DisplayMessageState *DarkNet7::getDisplayMessageState(cmdc0de::StateBase *bm, const char *message, uint16_t timeToDisplay) {
 	DMS.setMessage(message);
 	DMS.setNextState(bm);
 	DMS.setTimeInState(timeToDisplay);
@@ -254,7 +273,7 @@ cmdc0de::DisplayMessageState *StateCollection::getDisplayMessageState(cmdc0de::S
 	return &DMS;
 }
 
-MenuState *StateCollection::getDisplayMenuState() {
+MenuState *DarkNet7::getDisplayMenuState() {
 	return 0;
 }
 

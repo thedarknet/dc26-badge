@@ -13,13 +13,16 @@ enum BTCmd
 	BT_CMD_SET_B2B_ADV_DATA,
 	BT_CMD_PASSIVE_SCAN,
 	BT_CMD_ACTIVE_SCAN,
+	BT_CMD_PAIR,
 	BT_CMD_UNK,
 };
 
 class MyScanCallbacks : public BLEAdvertisedDeviceCallbacks {
 public:
-	void onResult(BLEAdvertisedDevice advertisedDevice);
+	BLEAddress *pServerAddress;
+	bool server_found = false;
 public:
+	void onResult(BLEAdvertisedDevice advertisedDevice);
 public:
 protected:
 };
@@ -33,6 +36,9 @@ public:
 
 	BLEDevice *pDevice;
 	BLEServer *pServer;
+	BLEClient *pClient;
+	BLEService *pService;
+	BLECharacteristic *pPairingCharacteristic;
 	BLEScan *pScan;
 	BLEAdvertising *pAdvertising;
 	MyScanCallbacks *pScanCallbacks;
@@ -48,6 +54,11 @@ public:
 	bool scan_started = false;
 	bool cancel_scan = false;
 
+	// Client Connecting Data
+	bool server_found;
+	BLEAddress *pServerAddress;
+	BLERemoteCharacteristic *pRemoteCharacteristic;
+
 public:
 	BluetoothTask(const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);
 	bool init();
@@ -59,6 +70,9 @@ public:
 
 	// Scanning for advertising device
 	void scan(bool active);
+
+	// Simple pairing demo
+	void pair();
 
 	// Serial badge-to-??? comms
 public:

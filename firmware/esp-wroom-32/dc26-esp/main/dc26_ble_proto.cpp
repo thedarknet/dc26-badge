@@ -3,11 +3,33 @@
 #include "dc26_ble_proto.h"
 #include "lib/ble/BLEDevice.h"
 
+
+#define PAIR_SERVICE_UUID	"64633236-6463-646e-3230-313870616972"
+#define PAIRING_CHAR_UUID	"beb5483e-36e1-4688-b7f5-ea07361b26a8"
+
+static BLEUUID pairServiceUUID(PAIR_SERVICE_UUID);
+static BLEUUID pairingCharUUID(PAIRING_CHAR_UUID);
+
 const char *BluetoothTask::LOGTAG = "BluetoothTask";
 
-void MyScanCallbacks::onResult(BLEAdvertisedDevice advertisedDevice) 
+void MyScanCallbacks::onResult(BLEAdvertisedDevice advertisedDevice)
 {
-	printf("Advertised Device: %s \n", advertisedDevice.toString().c_str());
+	//printf("Advertised Device: %s \n", advertisedDevice.toString().c_str());
+	if (advertisedDevice.haveAppearance() &&
+		advertisedDevice.getAppearance() == 0x26DC)
+	{
+		// TODO: Report this back to the STM32
+		printf("Found DC26 Device: %s \n", advertisedDevice.toString().c_str());
+		//if (advertisedDevice.haveServiceUUID() &&
+		//	advertisedDevice.getServiceUUID().equals(pairServiceUUID))
+		//{
+			// Found the device we want, stop scan, save data, setup pairing
+			//printf("Found UUID for DC26 Device\n");
+			advertisedDevice.getScan()->stop();
+			server_found = true;
+			pServerAddress = new BLEAddress(advertisedDevice.getAddress());
+		//}
+	}
 }
 
 void BluetoothTask::startB2BAdvertising()
@@ -54,9 +76,52 @@ void BluetoothTask::scan(bool active)
 	BLEScanResults foundDevices = pScan->start(scan_time);
 	printf("Devices found: %d\n", foundDevices.getCount());
 
+	if (pScanCallbacks->server_found)
+	{
+		server_found = pScanCallbacks->server_found;
+		pServerAddress = pScanCallbacks->pServerAddress;
+	}
+
 	scan_started = false;
 	ESP_LOGI(LOGTAG, "SCAN COMPLETE");
 	return;
+}
+
+void BluetoothTask::pair()
+{
+	ESP_LOGI(LOGTAG, "STARTING PAIRING\n");
+
+	// Connect to the remote BLE Server.
+	pClient->connect(*pServerAddress);
+	printf("Connected to server\n");
+
+	// Obtain a reference to the service we are after in the remote BLE server.
+	BLERemoteService* pRemoteService = pClient->getService(pairServiceUUID);
+	if (pRemoteService == nullptr)
+	{
+		printf("Failed to find our service UUID: %s\n",
+				pairServiceUUID.toString().c_str());
+		return;
+	}
+	printf("Found our service\n");
+
+
+	// Obtain a reference to the characteristic in the service of the remote BLE server.
+	pRemoteCharacteristic = pRemoteService->getCharacteristic(pairingCharUUID);
+	if (pRemoteCharacteristic == nullptr)
+	{
+		printf("Failed to find our characteristic UUID: %s\n",
+				pairingCharUUID.toString().c_str());
+		return;
+	}
+	printf("Found our characteristic\n");
+
+	// Read the value of the characteristic.
+	std::string value = pRemoteCharacteristic->readValue();
+	printf("The characteristic value was: %s\n", value.c_str());
+
+	// Disconnect
+	pClient->disconnect();
 }
 
 void BluetoothTask::setB2BAdvData(std::string new_name, std::string new_man_data)
@@ -94,10 +159,10 @@ void BluetoothTask::run(void * data)
 {
 	// TODO: Get commands from Queue
 	ESP_LOGI(LOGTAG, "RUNNING");
-	BTCmd cmd = BT_CMD_START_B2B;
+	BTCmd cmd = BT_CMD_ACTIVE_SCAN;
 	while (1)
 	{
-		vTaskDelay(20000 / portTICK_PERIOD_MS);
+		vTaskDelay(10000 / portTICK_PERIOD_MS);
 		// TODO: Check queue for command
 		switch(cmd)
 		{
@@ -112,7 +177,7 @@ void BluetoothTask::run(void * data)
 				break;
 			case BT_CMD_SET_B2B_ADV_DATA:
 				setB2BAdvData("GOURRY!!!", "INFECT");
-				cmd = BT_CMD_PASSIVE_SCAN;
+				cmd = BT_CMD_ACTIVE_SCAN;
 				break;
 			case BT_CMD_PASSIVE_SCAN:
 				scan(false);
@@ -120,6 +185,11 @@ void BluetoothTask::run(void * data)
 				break;
 			case BT_CMD_ACTIVE_SCAN:
 				scan(true);
+				if (server_found)
+					cmd = BT_CMD_PAIR;
+				break;
+			case BT_CMD_PAIR:
+				pair();
 				cmd = BT_CMD_UNK;
 				break;
 			default:
@@ -134,10 +204,29 @@ bool BluetoothTask::init()
 	ESP_LOGI(LOGTAG, "INIT");
 	pDevice = new BLEDevice();
 	pDevice->init("DCDN BLE Device");
+
+	// Create out Bluetooth Server
 	pServer = pDevice->createServer();
+
+	// Create our DCDN Pairing Service
+	pService = pServer->createService(PAIR_SERVICE_UUID);
+	pPairingCharacteristic = pService->createCharacteristic(
+										 PAIRING_CHAR_UUID,
+										 BLECharacteristic::PROPERTY_READ);
+	pPairingCharacteristic->setValue("Cryptographic Hash Goes Here");
+	pService->start();
+
+	// Create out Client for reaching out for pairing
+	pClient = pDevice->createClient();
+
+	// Setup advertising object
 	pAdvertising = pServer->getAdvertising();
+	setB2BAdvData("DN 1", "EGGPLNT");
+	startB2BAdvertising();
+
+	// Setup scanning callbacks
 	pScanCallbacks = new MyScanCallbacks();
-	this->setB2BAdvData("DN 1", "EGGPLNT");
+
 	return true;
 }
 

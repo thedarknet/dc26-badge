@@ -44,8 +44,8 @@ flash size = 512kbytes
 #0 : stm32f2x at 0x08000000, size 0x00080000, buswidth 0, chipwidth 0
         #  0: 0x00000000 (0x4000 16kB) not protected - program
         #  1: 0x00004000 (0x4000 16kB) not protected - data for settings
-        #  2: 0x00008000 (0x4000 16kB) not protected - data for settings
-        #  3: 0x0000c000 (0x4000 16kB) not protected - data for address book
+        #  2: 0x00008000 (0x4000 16kB) not protected - data for address
+        #  3: 0x0000c000 (0x4000 16kB) not protected - data 
         #  4: 0x00010000 (0x10000 64kB) not protected - program
         #  5: 0x00020000 (0x20000 128kB) not protected - program
         #  6: 0x00040000 (0x20000 128kB) not protected - program

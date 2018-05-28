@@ -15,7 +15,7 @@
 #include "BLECharacteristic.h"
 #include "BLEServer.h"
 #include "BLEUUID.h"
-#include "FreeRTOS.h"
+#include "../FreeRTOS.h"
 
 class BLEServer;
 

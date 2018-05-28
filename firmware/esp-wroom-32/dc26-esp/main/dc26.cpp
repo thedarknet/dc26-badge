@@ -12,28 +12,20 @@
 #include "esp_to_stm_generated.h"
 #include "lib/net/HttpServer.h"
 #include "lib/FATFS_VFS.h"
+#include "mcu_to_mcu.h"
+#include "command_handler.h"
+
+#include "dc26_ble_proto.h"
 
 static const int RX_BUF_SIZE = 1024;
-
 #define TXD_PIN (GPIO_NUM_4)
 #define RXD_PIN (GPIO_NUM_5)
 
 extern "C" {
 		void app_main(void);
-		static void rx_task(void *);
 		static void generalCmdTask(void *);
 }
 
-static const int STM_TO_ESP_MSG_QUEUE_SIZE = 10;
-static const int STM_TO_ESP_MSG_ITEM_SIZE = sizeof(darknet7::STMToESPRequest*);
-static StaticQueue_t STMToESPQueue;
-static QueueHandle_t STMToESPQueueHandle = nullptr;
-static uint8_t STMToESPBuffer[STM_TO_ESP_MSG_QUEUE_SIZE*STM_TO_ESP_MSG_ITEM_SIZE];
-static const int ESP_TO_STM_MSG_QUEUE_SIZE = 10;
-static const int ESP_TO_STM_MSG_ITEM_SIZE = sizeof(darknet7::ESPToSTM*);
-static uint8_t ESPToSTMBuffer[ESP_TO_STM_MSG_QUEUE_SIZE*ESP_TO_STM_MSG_ITEM_SIZE];
-static StaticQueue_t ESPToSTMQueue;
-static QueueHandle_t ESPToSTMQueueHandle = nullptr;
 static HttpServer Port80WebServer;
 FATFS_VFS *FatFS = new FATFS_VFS("/spiflash", "storage");
 
@@ -44,64 +36,7 @@ FATFS_VFS *FatFS = new FATFS_VFS("/spiflash", "storage");
 //    to out going queue as a flat buffer class, then out going task will
 //    serial via flat buffers then send over uart to stm32
 void init() {
-	//create queues
-	STMToESPQueueHandle = xQueueCreateStatic(STM_TO_ESP_MSG_QUEUE_SIZE, STM_TO_ESP_MSG_ITEM_SIZE, STMToESPBuffer, &STMToESPQueue );
-	ESPToSTMQueueHandle = xQueueCreateStatic(ESP_TO_STM_MSG_QUEUE_SIZE, ESP_TO_STM_MSG_ITEM_SIZE, ESPToSTMBuffer, &ESPToSTMQueue );
-
 	FatFS->mount();
-    const uart_config_t uart_config = {
-        .baud_rate = 115200,
-        .data_bits = UART_DATA_8_BITS,
-        .parity = UART_PARITY_DISABLE,
-        .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
-    };
-    uart_param_config(UART_NUM_1, &uart_config);
-    uart_set_pin(UART_NUM_1, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
-    // We won't use a buffer for sending data.
-    uart_driver_install(UART_NUM_1, RX_BUF_SIZE * 2, 0, 0, NULL, 0);
-}
-
-int sendData(const char* logName, const char* data)
-{
-    const int len = strlen(data);
-    const int txBytes = uart_write_bytes(UART_NUM_1, data, len);
-    ESP_LOGI(logName, "Wrote %d bytes", txBytes);
-    return txBytes;
-}
-
-static void tx_task()
-{
-    static const char *TX_TASK_TAG = "TX_TASK";
-    esp_log_level_set(TX_TASK_TAG, ESP_LOG_INFO);
-    while (1) {
-        sendData(TX_TASK_TAG, "Hello world");
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
-    }
-}
-//
-// wait on queue from uart 
-static void generalCmdTask(void *) {
-    while (1) {
-        vTaskDelay(20000 / portTICK_PERIOD_MS);
-    }
-}
-
-static void rx_task(void *)
-{
-    static const char *RX_TASK_TAG = "RX_TASK";
-    esp_log_level_set(RX_TASK_TAG, ESP_LOG_INFO);
-    uint8_t* data = (uint8_t*) malloc(RX_BUF_SIZE+1);
-    while (1) {
-        const int rxBytes = uart_read_bytes(UART_NUM_1, data, RX_BUF_SIZE, 1000 / portTICK_RATE_MS);
-        if (rxBytes > 0) {
-            data[rxBytes] = 0;
-            ESP_LOGI(RX_TASK_TAG, "Read %d bytes: '%s'", rxBytes, data);
-            ESP_LOG_BUFFER_HEXDUMP(RX_TASK_TAG, data, rxBytes, ESP_LOG_INFO);
-    			uart_write_bytes(UART_NUM_1, (const char *)data, rxBytes);
-        }
-    }
-    free(data);
 }
 
 std::string ssid = "dc26";
@@ -135,6 +70,9 @@ public:
 
 
 ESP32_I2CMaster I2cDisplay(GPIO_NUM_19,GPIO_NUM_18,1000000, I2C_NUM_0, 1024, 1024);
+MCUToMCUTask ProcToProc("ProcToProc");
+CmdHandlerTask CmdTask("CmdTask");
+
 static char tag[] = "main";
 
 void app_main()
@@ -148,7 +86,10 @@ void app_main()
 		ESP_LOGI(tag,"display init UN-successful");
 	}
 	init();
-	xTaskCreate(rx_task, "uart_rx_task", 1024*2, NULL, configMAX_PRIORITIES, NULL);
+	ProcToProc.init(TXD_PIN,RXD_PIN,RX_BUF_SIZE);
+	ProcToProc.start();
+	CmdTask.start();
+
 	System::logSystemInfo();
 	wifi_config_t wifi_config;
 	bool isHidden = false;
@@ -163,9 +104,8 @@ void app_main()
 	dhcps_lease_t l;
 	wifi.initDHCPSLeaseInfo(l);
 	wifi.wifi_start_access_point(wifi_config,ipInfo,l);
-	xTaskCreate(generalCmdTask, "generalCmdTask", 1024*2, NULL, configMAX_PRIORITIES, NULL);
+	dc26_bt_init();
 	vTaskDelete(NULL);
-//    xTaskCreate(tx_task, "uart_tx_task", 1024*2, NULL, configMAX_PRIORITIES-1, NULL);
 }
 
 #endif

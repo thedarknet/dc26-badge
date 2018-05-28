@@ -10,7 +10,7 @@
 #include "BLEClient.h"
 #include "BLEUtils.h"
 #include "BLEUUID.h"
-#include "GeneralUtils.h"
+#include "../GeneralUtils.h"
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/event_groups.h>

@@ -13,7 +13,7 @@
 #include "BLEUUID.h"
 #include "BLECharacteristic.h"
 #include <esp_gatts_api.h>
-#include "FreeRTOS.h"
+#include "../FreeRTOS.h"
 
 class BLEService;
 class BLECharacteristic;

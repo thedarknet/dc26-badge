@@ -1,36 +1,12 @@
 #include <stdio.h>
 #include <string.h>
-#include "dc26_ble_proto.h"
-#include "lib/ble/BLEDevice.h"
+#include "dc26_ble.h"
+#include "dc26_ble_pairing.h"
+#include "dc26_ble_scanning.h"
+#include "../lib/ble/BLEDevice.h"
 
-
-#define PAIR_SERVICE_UUID	"64633236-6463-646e-3230-313870616972"
-#define PAIRING_CHAR_UUID	"beb5483e-36e1-4688-b7f5-ea07361b26a8"
-
-static BLEUUID pairServiceUUID(PAIR_SERVICE_UUID);
-static BLEUUID pairingCharUUID(PAIRING_CHAR_UUID);
 
 const char *BluetoothTask::LOGTAG = "BluetoothTask";
-
-void MyScanCallbacks::onResult(BLEAdvertisedDevice advertisedDevice)
-{
-	//printf("Advertised Device: %s \n", advertisedDevice.toString().c_str());
-	if (advertisedDevice.haveAppearance() &&
-		advertisedDevice.getAppearance() == 0x26DC)
-	{
-		// TODO: Report this back to the STM32
-		printf("Found DC26 Device: %s \n", advertisedDevice.toString().c_str());
-		//if (advertisedDevice.haveServiceUUID() &&
-		//	advertisedDevice.getServiceUUID().equals(pairServiceUUID))
-		//{
-			// Found the device we want, stop scan, save data, setup pairing
-			//printf("Found UUID for DC26 Device\n");
-			advertisedDevice.getScan()->stop();
-			server_found = true;
-			pServerAddress = new BLEAddress(advertisedDevice.getAddress());
-		//}
-	}
-}
 
 void BluetoothTask::startB2BAdvertising()
 {
@@ -67,14 +43,13 @@ void BluetoothTask::scan(bool active)
 	if (scan_started)
 	{
 		ESP_LOGI(LOGTAG, "SCAN ALREADY IN PROGRESS. ABORTED.");
+		return;
 	}
 	scan_started = true;
 
-	pScan = pDevice->getScan();
-	pScan->setAdvertisedDeviceCallbacks(pScanCallbacks);
 	pScan->setActiveScan(active);
-	BLEScanResults foundDevices = pScan->start(scan_time);
-	printf("Devices found: %d\n", foundDevices.getCount());
+	//pScan->start(scan_time);
+	pScan->start(10);
 
 	if (pScanCallbacks->server_found)
 	{
@@ -92,36 +67,15 @@ void BluetoothTask::pair()
 	ESP_LOGI(LOGTAG, "STARTING PAIRING\n");
 
 	// Connect to the remote BLE Server.
-	pClient->connect(*pServerAddress);
+	pPairingClient->connect(*pServerAddress);
 	printf("Connected to server\n");
-
-	// Obtain a reference to the service we are after in the remote BLE server.
-	BLERemoteService* pRemoteService = pClient->getService(pairServiceUUID);
-	if (pRemoteService == nullptr)
-	{
-		printf("Failed to find our service UUID: %s\n",
-				pairServiceUUID.toString().c_str());
-		return;
-	}
-	printf("Found our service\n");
-
-
-	// Obtain a reference to the characteristic in the service of the remote BLE server.
-	pRemoteCharacteristic = pRemoteService->getCharacteristic(pairingCharUUID);
-	if (pRemoteCharacteristic == nullptr)
-	{
-		printf("Failed to find our characteristic UUID: %s\n",
-				pairingCharUUID.toString().c_str());
-		return;
-	}
-	printf("Found our characteristic\n");
-
-	// Read the value of the characteristic.
-	std::string value = pRemoteCharacteristic->readValue();
-	printf("The characteristic value was: %s\n", value.c_str());
-
+	pPairingClientCallbacks->afterConnected(pPairingClient);
 	// Disconnect
-	pClient->disconnect();
+}
+
+void BluetoothTask::unpair()
+{
+	pPairingClient->disconnect();
 }
 
 void BluetoothTask::setB2BAdvData(std::string new_name, std::string new_man_data)
@@ -209,23 +163,43 @@ bool BluetoothTask::init()
 	pServer = pDevice->createServer();
 
 	// Create our DCDN Pairing Service
-	pService = pServer->createService(PAIR_SERVICE_UUID);
+	pService = pServer->createService(pairServiceUUID);
+	// setup callbacks
+	pPairingServerCallbacks = new MyServerCallbacks();
+	pPairingServerCallbacks->btTask = this;
+	pServer->setCallbacks(pPairingServerCallbacks);
+	// setup characteristic and initial value
 	pPairingCharacteristic = pService->createCharacteristic(
-										 PAIRING_CHAR_UUID,
-										 BLECharacteristic::PROPERTY_READ);
-	pPairingCharacteristic->setValue("Cryptographic Hash Goes Here");
+										pairingCharUUID,
+										BLECharacteristic::PROPERTY_READ |
+										BLECharacteristic::PROPERTY_WRITE |
+										BLECharacteristic::PROPERTY_INDICATE |
+										BLECharacteristic::PROPERTY_NOTIFY);
+	pPairingCharacteristic->addDescriptor(new BLEDescriptor(pairingDescUUID));
+	pPairingCharacteristic->getDescriptorByUUID(pairingDescUUID)->setValue("Desc");
+	pPairingCharacteristic->setValue("PAIRING START");
 	pService->start();
 
-	// Create out Client for reaching out for pairing
-	pClient = pDevice->createClient();
+	// Create our Client for reaching out for pairing
+	pPairingClient = pDevice->createClient();
+	pPairingClientCallbacks = new MyClientCallbacks();
+	pPairingClientCallbacks->btTask = this;
+	pPairingClient->setClientCallbacks(pPairingClientCallbacks);
+
+	// Save reference to the client and server callbacks inside each other
+	pPairingClientCallbacks->pServerCallbacks = pPairingServerCallbacks;
+	pPairingServerCallbacks->pClientCallbacks = pPairingClientCallbacks;
 
 	// Setup advertising object
 	pAdvertising = pServer->getAdvertising();
-	setB2BAdvData("DN 1", "EGGPLNT");
+	pAdvertising->addServiceUUID(pairServiceUUID);
+	setB2BAdvData(adv_name, adv_manufacturer);
 	startB2BAdvertising();
 
-	// Setup scanning callbacks
+	// Setup scanning object and callbacks
+	pScan = pDevice->getScan();
 	pScanCallbacks = new MyScanCallbacks();
+	pScan->setAdvertisedDeviceCallbacks(pScanCallbacks);
 
 	return true;
 }

@@ -15,7 +15,7 @@
 #include "mcu_to_mcu.h"
 #include "command_handler.h"
 
-#include "dc26_ble_proto.h"
+#include "dc26_ble/dc26_ble.h"
 
 static const int RX_BUF_SIZE = 1024;
 #define TXD_PIN (GPIO_NUM_4)

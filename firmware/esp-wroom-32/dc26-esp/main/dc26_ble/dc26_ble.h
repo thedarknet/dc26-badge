@@ -3,8 +3,10 @@
 
 #include "esp_system.h"
 #include "esp_log.h"
-#include "lib/Task.h"
-#include "lib/ble/BLEDevice.h"
+#include "../lib/Task.h"
+#include "../lib/ble/BLEDevice.h"
+#include "dc26_ble_pairing.h"
+#include "dc26_ble_scanning.h"
 
 enum BTCmd
 {
@@ -17,17 +19,6 @@ enum BTCmd
 	BT_CMD_UNK,
 };
 
-class MyScanCallbacks : public BLEAdvertisedDeviceCallbacks {
-public:
-	BLEAddress *pServerAddress;
-	bool server_found = false;
-public:
-	void onResult(BLEAdvertisedDevice advertisedDevice);
-public:
-protected:
-};
-
-
 class BluetoothTask : public Task {
 public:
 	static const int ESP_TO_BT_MSG_QUEUE_SIZE = 10;
@@ -36,18 +27,20 @@ public:
 
 	BLEDevice *pDevice;
 	BLEServer *pServer;
-	BLEClient *pClient;
+	BLEClient *pPairingClient;
 	BLEService *pService;
 	BLECharacteristic *pPairingCharacteristic;
 	BLEScan *pScan;
 	BLEAdvertising *pAdvertising;
 	MyScanCallbacks *pScanCallbacks;
+	MyServerCallbacks *pPairingServerCallbacks;
+	MyClientCallbacks *pPairingClientCallbacks;
 	BLEAdvertisementData adv_data;
 
 	// Advertisement data
 	bool b2b_advertising_enabled = false;
-	std::string adv_name = "DN 12345";
-	std::string adv_manufacturer = "DNEGGPLANT";
+	std::string adv_name = "DN1";
+	std::string adv_manufacturer = "DN2";
 
 	// Scanning related data
 	uint32_t scan_time = 30;
@@ -73,6 +66,7 @@ public:
 
 	// Simple pairing demo
 	void pair();
+	void unpair();
 
 	// Serial badge-to-??? comms
 public:

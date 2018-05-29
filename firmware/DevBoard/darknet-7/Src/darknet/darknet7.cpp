@@ -17,6 +17,9 @@
 #include "libstm32/app/display_message_state.h"
 #include <ff.h>
 #include "KeyStore.h"
+#include "menus/MessageState.h"
+#include "menus/SendMsgState.h"
+#include "menus/menu_state.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::DisplayST7735;
@@ -50,8 +53,48 @@ static const uint8_t EndContactSector = 3;
 
 DarkNet7 *DarkNet7::mSelf = 0;
 
+DarkNet7::ButtonInfo::ButtonInfo() :
+		BState(0) {
+}
+
+bool DarkNet7::ButtonInfo::isButtonDown(const BUTTON &b) {
+	return (ButtonState & b) == b;
+}
+
+bool DarkNet7::ButtonInfo::wasButtonDown(const BUTTON &b) {
+	return (LastButtonState & b) == b;
+}
+
+bool DarkNet7::ButtonInfo::isAnyDown(const uint16_t &b) {
+	return (LastButtonState & b) != 0;
+}
+
+void DarkNet7::ButtonInfo::processButtons() {
+	ButtonState = LastButtonState;
+	ButtonState = 0;
+	if (HAL_GPIO_ReadPin(MID_BUTTON1_GPIO_Port, MID_BUTTON1_Pin)
+			== GPIO_PIN_RESET) {
+		ButtonState|=BUTTON_MID;
+	} else if (HAL_GPIO_ReadPin(BUTTON_RIGHT_GPIO_Port, BUTTON_RIGHT_Pin)
+			== GPIO_PIN_RESET) {
+		ButtonState|=BUTTON_RIGHT;
+	} else if (HAL_GPIO_ReadPin(BUTTON_LEFT_GPIO_Port, BUTTON_LEFT_Pin)
+			== GPIO_PIN_RESET) {
+		ButtonState|=BUTTON_LEFT;
+	} else if (HAL_GPIO_ReadPin(BUTTON_UP_GPIO_Port, BUTTON_UP_Pin)
+			== GPIO_PIN_RESET) {
+		ButtonState|=BUTTON_UP;
+	} else if (HAL_GPIO_ReadPin(BUTTON_DOWN_GPIO_Port, BUTTON_DOWN_Pin)
+			== GPIO_PIN_RESET) {
+		ButtonState|=BUTTON_DOWN;
+	} else if (HAL_GPIO_ReadPin(BUTTON_FIRE1_GPIO_Port, BUTTON_FIRE1_Pin)
+			== GPIO_PIN_RESET) {
+		ButtonState|=BUTTON_FIRE1;
+	}
+}
+
 DarkNet7 &DarkNet7::get() {
-	if(0==mSelf) {
+	if (0 == mSelf) {
 		mSelf = new DarkNet7();
 	}
 	return *mSelf;
@@ -73,16 +116,36 @@ const ContactStore &DarkNet7::getContacts() const {
 	return MyContacts;
 }
 
-
-DarkNet7::DarkNet7() : Apa106s(GPIO_APA106_DATA_Pin, GPIO_APA106_DATA_GPIO_Port, TIM1, DMA2_Stream0, DMA2_Stream2_IRQn)
-			//		my Info, start setting address, start Contact address, end contact address
-	, MyContacts( MyAddressInfoSector, MyAddressInfoOffSet, SettingSector, SettingOffset, StartContactSector, EndContactSector)
-	, Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT)
-	, DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH),static_cast<uint8_t>(DISPLAY_HEIGHT),&DrawBuffer[0],&Display)
-	, DMS() {
-
-
+cmdc0de::GUI &DarkNet7::getGUI() {
+	return MyGUI;
 }
+
+const cmdc0de::GUI &DarkNet7::getGUI() const {
+	return MyGUI;
+}
+
+DarkNet7::ButtonInfo &DarkNet7::getButtonInfo() {
+	return MyButtons;
+}
+
+const DarkNet7::ButtonInfo& DarkNet7::getButtonInfo() const {
+	return MyButtons;
+}
+
+AppEventBusType &DarkNet7::getEventBus() {
+	return AppEventBus;
+}
+
+DarkNet7::DarkNet7() :
+		Apa106s(GPIO_APA106_DATA_Pin, GPIO_APA106_DATA_GPIO_Port, TIM1, DMA2_Stream0, DMA2_Stream2_IRQn)
+				//		my Info, start setting address, start Contact address, end contact address
+				, MyContacts(MyAddressInfoSector, MyAddressInfoOffSet, SettingSector, SettingOffset, StartContactSector,
+				EndContactSector)
+				, Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT)
+		, DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH),static_cast<uint8_t>(DISPLAY_HEIGHT),&DrawBuffer[0],&Display)
+		, DMS(), MyGUI(&Display), MyButtons() {
+
+		}
 
 DarkNet7::~DarkNet7() {
 	// TODO Auto-generated destructor stub
@@ -93,10 +156,9 @@ ErrorType DarkNet7::onInit() {
 
 	GUIListItemData items[4];
 	GUIListData DrawList((const char *) "Self Check", items, uint8_t(0),
-			uint8_t(0), uint8_t(DISPLAY_WIDTH), uint8_t(DISPLAY_HEIGHT/2), uint8_t(0), uint8_t(0));
+			uint8_t(0), uint8_t(DISPLAY_WIDTH), uint8_t(DISPLAY_HEIGHT / 2), uint8_t(0), uint8_t(0));
 	//DO SELF CHECK
 	if ((et = Display.init(DisplayST7735::FORMAT_16_BIT, &Font_6x10, &DisplayBuffer)).ok()) {
-			//DisplayST7735::MADCTL_MY, &Font_6x10, &DisplayBuffer)).ok()) {
 		HAL_Delay(1000);
 		items[0].set(0, "OLED_INIT");
 		DrawList.ItemsCount++;
@@ -110,7 +172,7 @@ ErrorType DarkNet7::onInit() {
 	Display.swap();
 	Display.fillScreen(cmdc0de::RGBColor::BLACK);
 	Display.swap();
-	Display.fillRec(30,10,80,40,cmdc0de::RGBColor(0,255,0));
+	Display.fillRec(30, 10, 80, 40, cmdc0de::RGBColor(0, 255, 0));
 	Display.swap();
 #if DEBUG_WHY_CANT_CHANGE_ROTATION
 	//Display.setRotation(cmdc0de::DisplayDevice::LANDSCAPE_TOP_LEFT,true);
@@ -122,16 +184,16 @@ ErrorType DarkNet7::onInit() {
 	Display.swap();
 #endif
 
-	uint16_t r = 0, g= 0, b = 0;
+	uint16_t r = 0, g = 0, b = 0;
 	uint16_t y = 0;
-	while(y<Display.getHeight()) {
-		for(uint32_t i=0;i<Display.getWidth();i++) {
-			Display.drawPixel(i,y,cmdc0de::RGBColor(r,g,b));
-			if(r==0xFF && g==0xFF && b==0xFF) {
-				r=g=b=0;
-			} else if (r==0xFF && g==0xFF) {
+	while (y < Display.getHeight()) {
+		for (uint32_t i = 0; i < Display.getWidth(); i++) {
+			Display.drawPixel(i, y, cmdc0de::RGBColor(r, g, b));
+			if (r == 0xFF && g == 0xFF && b == 0xFF) {
+				r = g = b = 0;
+			} else if (r == 0xFF && g == 0xFF) {
 				++b;
-			} else if (r==0xFF) {
+			} else if (r == 0xFF) {
 				++g;
 			} else {
 				++r;
@@ -157,38 +219,33 @@ static const char *TFAILED = "Transmit Failed";
 static const uint16_t ESP_ADDRESS = 1;
 
 ErrorType DarkNet7::onRun() {
-	if (HAL_GPIO_ReadPin(MID_BUTTON1_GPIO_Port, MID_BUTTON1_Pin)
-			== GPIO_PIN_RESET) {
+	MyButtons.processButtons();
+	if (MyButtons.isButtonDown(ButtonInfo::BUTTON_MID)) {
 		static const char *dis = "mid";
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);
 		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
 
-	} else if (HAL_GPIO_ReadPin(BUTTON_RIGHT_GPIO_Port, BUTTON_RIGHT_Pin)
-			== GPIO_PIN_RESET) {
+	} else if (MyButtons.isButtonDown(ButtonInfo::BUTTON_RIGHT)) {
 		static const char *dis = "right";
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);
 		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
 
-	} else if (HAL_GPIO_ReadPin(BUTTON_LEFT_GPIO_Port, BUTTON_LEFT_Pin)
-			== GPIO_PIN_RESET) {
+	} else if (MyButtons.isButtonDown(ButtonInfo::BUTTON_LEFT)) {
 		static const char *dis = "left";
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);
 		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
 
-	} else if (HAL_GPIO_ReadPin(BUTTON_UP_GPIO_Port, BUTTON_UP_Pin)
-			== GPIO_PIN_RESET) {
+	} else if (MyButtons.isButtonDown(ButtonInfo::BUTTON_UP)) {
 		static const char *dis = "up";
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);
 		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
 
-	} else if (HAL_GPIO_ReadPin(BUTTON_DOWN_GPIO_Port, BUTTON_DOWN_Pin)
-			== GPIO_PIN_RESET) {
+	} else if (MyButtons.isButtonDown(ButtonInfo::BUTTON_DOWN)) {
 		static const char *dis = "down";
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);
 		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
 
-	} else if (HAL_GPIO_ReadPin(BUTTON_FIRE1_GPIO_Port, BUTTON_FIRE1_Pin)
-			== GPIO_PIN_RESET) {
+	} else if (MyButtons.isButtonDown(ButtonInfo::BUTTON_FIRE1)) {
 		static const char *dis = "fire";
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);
 		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
@@ -262,10 +319,8 @@ ErrorType DarkNet7::onRun() {
 	return ErrorType();
 }
 
-
-
-
-cmdc0de::DisplayMessageState *DarkNet7::getDisplayMessageState(cmdc0de::StateBase *bm, const char *message, uint16_t timeToDisplay) {
+cmdc0de::DisplayMessageState *DarkNet7::getDisplayMessageState(cmdc0de::StateBase *bm, const char *message,
+		uint16_t timeToDisplay) {
 	DMS.setMessage(message);
 	DMS.setNextState(bm);
 	DMS.setTimeInState(timeToDisplay);
@@ -273,7 +328,19 @@ cmdc0de::DisplayMessageState *DarkNet7::getDisplayMessageState(cmdc0de::StateBas
 	return &DMS;
 }
 
+static MenuState MyMenu;
+static MessageState MyMsgState;
+static SendMsgState MySendMsgState;
+
 MenuState *DarkNet7::getDisplayMenuState() {
-	return 0;
+	return &MyMenu;
+}
+
+MessageState *DarkNet7::getMessageState() {
+	return &MyMsgState;
+}
+
+SendMsgState *DarkNet7::getSendMsgState() {
+	return &MySendMsgState;
 }
 

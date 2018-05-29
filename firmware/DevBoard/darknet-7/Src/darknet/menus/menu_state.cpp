@@ -1,13 +1,15 @@
-
 #include "menu_state.h"
 #include "../libstm32/display/display_device.h"
 #include "../darknet7.h"
+#include "MessageState.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::StateBase;
+using cmdc0de::RGBColor;
 
 MenuState::MenuState() :
-		cmdc0de::StateBase(), MenuList("Main Menu", Items, 0, 0, DarkNet7::get().getDisplay().getWidth(), DarkNet7::get().getDisplay().getHeight()
+		Darknet7BaseState(), MenuList("Main Menu", Items, 0, 0, DarkNet7::get().getDisplay().getWidth(),
+				DarkNet7::get().getDisplay().getHeight()
 				, 0, (sizeof(Items) / sizeof(Items[0])))
 {
 }
@@ -26,14 +28,12 @@ ErrorType MenuState::onInit() {
 	} else {
 		Items[0].text = (const char *) "Settings *";
 	}
-	/*
-
 	Items[1].id = 1;
-	Items[1].text = (const char *) "IR Pair";
+	Items[1].text = (const char *) "Badge Pair";
 	Items[2].id = 2;
 	Items[2].text = (const char *) "Address Book";
 	Items[3].id = 3;
-	if (((MessageState *) StateFactory::getMessageState())->hasNewMessage()) {
+	if (DarkNet7::get().getMessageState()->hasNewMsg()) {
 		Items[3].text = HasMessage;
 	} else {
 		Items[3].text = NoHasMessage;
@@ -45,95 +45,73 @@ ErrorType MenuState::onInit() {
 	Items[6].id = 6;
 	Items[6].text = (const char *) "Badge Info";
 	Items[7].id = 7;
-	Items[7].text = (const char *) "Radio Info";
+	Items[7].text = (const char *) "MCU Info";
 	Items[8].id = 8;
-	Items[8].text = (const char *) "KeyBoard Test";
+	Items[8].text = (const char *) "Tamagotchi";
 	Items[9].id = 9;
-	Items[9].text = (const char *) "Quest Dialing";
-	Items[10].id = 10;
-	Items[10].text = (const char *) "Gateway";
-	rc.getDisplay().fillScreen(RGBColor::BLACK);
-	rc.getGUI().drawList(&this->MenuList);
-	*/
+	Items[9].text = (const char *) "Communications Settings";
+	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+	DarkNet7::get().getGUI().drawList(&this->MenuList);
 	return ErrorType();
 }
 
 cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 	StateBase *nextState = this;
-	/*
-	StateBase *nextState = this;
-	uint8_t key = rc.getKB().getLastKeyReleased();
-
-	switch (key) {
-		case QKeyboard::UP: {
-			if (MenuList.selectedItem == 0) {
-				MenuList.selectedItem = sizeof(Items) / sizeof(Items[0]) - 1;
-			} else {
-				MenuList.selectedItem--;
-			}
-			break;
+	if (DarkNet7::get().getButtonInfo().isButtonDown(DarkNet7::ButtonInfo::BUTTON_UP)) {
+		if (MenuList.selectedItem == 0) {
+			MenuList.selectedItem = sizeof(Items) / sizeof(Items[0]) - 1;
+		} else {
+			MenuList.selectedItem--;
 		}
-		case QKeyboard::DOWN: {
-			if (MenuList.selectedItem == (sizeof(Items) / sizeof(Items[0]) - 1)) {
-				MenuList.selectedItem = 0;
-			} else {
-				MenuList.selectedItem++;
-			}
-			break;
-		}
-		case QKeyboard::BACK: {
+	} else if (DarkNet7::get().getButtonInfo().isButtonDown(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
+		if (MenuList.selectedItem == (sizeof(Items) / sizeof(Items[0]) - 1)) {
 			MenuList.selectedItem = 0;
+		} else {
+			MenuList.selectedItem++;
 		}
-			break;
-		case QKeyboard::ENTER: {
-			switch (MenuList.selectedItem) {
-				case 0:
-					nextState = StateFactory::getSettingState();
-					break;
-				case 1:
-					if (rc.getContactStore().getSettings().getAgentName()[0] != '\0') {
-						nextState = StateFactory::getIRPairingState();
-					} else {
-						nextState = StateFactory::getDisplayMessageState(StateFactory::getMenuState(),
-								(const char *) "You must set your agent name first", 3000);
-					}
-					break;
-				case 2:
-					nextState = StateFactory::getAddressBookState();
-					break;
-				case 3:
-					nextState = StateFactory::getMessageState();
-					break;
-				case 4:
-					nextState = StateFactory::get3DState();
-					break;
-				case 5:
-					nextState = StateFactory::getGameOfLifeState();
-					break;
-				case 6:
-					nextState = StateFactory::getBadgeInfoState();
-					break;
-				case 7:
-					nextState = StateFactory::getRadioInfoState();
-					break;
-				case 8:
-					nextState = StateFactory::getKeyBoardTest();
-					break;
-				case 9:
-					rc.getKB().setDialerMode(true);
-					nextState = StateFactory::getKeyBoardTest();
-					break;
-				case 10:
-					nextState = StateFactory::getGateway();
-					break;
-			}
+	} else if (DarkNet7::get().getButtonInfo().isButtonDown(DarkNet7::ButtonInfo::BUTTON_LEFT)) {
+		MenuList.selectedItem = 0;
+	} else if (DarkNet7::get().getButtonInfo().isButtonDown(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+		switch (MenuList.selectedItem) {
+			case 0:
+				nextState = DarkNet7::get().getSettingState();
+				break;
+			case 1:
+				if (DarkNet7::get().getContacts().getSettings().getAgentName()[0] != '\0') {
+					nextState = DarkNet7::get().getPairingState();
+				} else {
+					nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),
+							(const char *) "You must set your agent name first", 3000);
+				}
+				break;
+			case 2:
+				nextState = DarkNet7::get().getAddressBookState();
+				break;
+			case 3:
+				nextState = DarkNet7::get().get3DState();
+				break;
+			case 5:
+				nextState = DarkNet7::get().getGameOfLifeState();
+				break;
+			case 6:
+				nextState = DarkNet7::get().getBadgeInfoState();
+				break;
+			case 7:
+				nextState = DarkNet7::get().getMCUInfo();
+				break;
+			case 8:
+				nextState = DarkNet7::get().getTamagotchiState();
+				break;
+			case 9:
+				nextState = DarkNet7::get().getCommunicationsState();
+				break;
+
 		}
-			break;
 	}
-	if (rc.getKB().wasKeyReleased() && key != 9) {
-		rc.getGUI().drawList(&this->MenuList);
-	}
-	*/
+	//if (rc.getKB().wasKeyReleased() && key != 9) {
+		DarkNet7::get().getGUI().drawList(&this->MenuList);
+	//}
+
 	return ReturnStateContext(nextState);
 }
 

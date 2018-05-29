@@ -7,7 +7,7 @@
 using cmdc0de::ErrorType;
 using cmdc0de::RGBColor;
 
-GameOfLife::GameOfLife() : cmdc0de::StateBase(),
+GameOfLife::GameOfLife() : Darknet7BaseState(),
 		Generations(0), CurrentGeneration(0), Neighborhood(0), InternalState(GameOfLife::GAME), DisplayMessageUntil(0) {
 }
 

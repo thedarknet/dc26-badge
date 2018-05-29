@@ -1,12 +1,9 @@
 #ifndef GAME_OF_LIFE_H
 #define GAME_OF_LIFE_H
 
-#include "../libstm32/app/state_base.h"
-#include "../messaging/stm_to_esp_generated.h"
-#include "../libstm32/display/gui.h"
+#include "darknet7_base_state.h"
 
-
-class GameOfLife: public cmdc0de::StateBase {
+class GameOfLife: public Darknet7BaseState {
 public:
 	GameOfLife();
 	virtual ~GameOfLife();

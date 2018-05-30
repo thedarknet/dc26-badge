@@ -12,19 +12,27 @@ namespace darknet7 {
 
 struct SetupAP;
 
+struct StopAP;
+
+struct DisplayMessage;
+
 struct STMToESPRequest;
 
 enum STMToESPAny {
   STMToESPAny_NONE = 0,
   STMToESPAny_SetupAP = 1,
+  STMToESPAny_StopAP = 2,
+  STMToESPAny_DisplayMessage = 3,
   STMToESPAny_MIN = STMToESPAny_NONE,
-  STMToESPAny_MAX = STMToESPAny_SetupAP
+  STMToESPAny_MAX = STMToESPAny_DisplayMessage
 };
 
-inline const STMToESPAny (&EnumValuesSTMToESPAny())[2] {
+inline const STMToESPAny (&EnumValuesSTMToESPAny())[4] {
   static const STMToESPAny values[] = {
     STMToESPAny_NONE,
-    STMToESPAny_SetupAP
+    STMToESPAny_SetupAP,
+    STMToESPAny_StopAP,
+    STMToESPAny_DisplayMessage
   };
   return values;
 }
@@ -33,6 +41,8 @@ inline const char * const *EnumNamesSTMToESPAny() {
   static const char * const names[] = {
     "NONE",
     "SetupAP",
+    "StopAP",
+    "DisplayMessage",
     nullptr
   };
   return names;
@@ -49,6 +59,14 @@ template<typename T> struct STMToESPAnyTraits {
 
 template<> struct STMToESPAnyTraits<SetupAP> {
   static const STMToESPAny enum_value = STMToESPAny_SetupAP;
+};
+
+template<> struct STMToESPAnyTraits<StopAP> {
+  static const STMToESPAny enum_value = STMToESPAny_StopAP;
+};
+
+template<> struct STMToESPAnyTraits<DisplayMessage> {
+  static const STMToESPAny enum_value = STMToESPAny_DisplayMessage;
 };
 
 bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, STMToESPAny type);
@@ -128,6 +146,95 @@ inline flatbuffers::Offset<SetupAP> CreateSetupAPDirect(
       mode);
 }
 
+struct StopAP FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct StopAPBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit StopAPBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  StopAPBuilder &operator=(const StopAPBuilder &);
+  flatbuffers::Offset<StopAP> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<StopAP>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<StopAP> CreateStopAP(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  StopAPBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+struct DisplayMessage FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_MSG = 4,
+    VT_DISPLAYTIME = 6
+  };
+  const flatbuffers::String *msg() const {
+    return GetPointer<const flatbuffers::String *>(VT_MSG);
+  }
+  int32_t displayTime() const {
+    return GetField<int32_t>(VT_DISPLAYTIME, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_MSG) &&
+           verifier.Verify(msg()) &&
+           VerifyField<int32_t>(verifier, VT_DISPLAYTIME) &&
+           verifier.EndTable();
+  }
+};
+
+struct DisplayMessageBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_msg(flatbuffers::Offset<flatbuffers::String> msg) {
+    fbb_.AddOffset(DisplayMessage::VT_MSG, msg);
+  }
+  void add_displayTime(int32_t displayTime) {
+    fbb_.AddElement<int32_t>(DisplayMessage::VT_DISPLAYTIME, displayTime, 0);
+  }
+  explicit DisplayMessageBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  DisplayMessageBuilder &operator=(const DisplayMessageBuilder &);
+  flatbuffers::Offset<DisplayMessage> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<DisplayMessage>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<DisplayMessage> CreateDisplayMessage(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> msg = 0,
+    int32_t displayTime = 0) {
+  DisplayMessageBuilder builder_(_fbb);
+  builder_.add_displayTime(displayTime);
+  builder_.add_msg(msg);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<DisplayMessage> CreateDisplayMessageDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *msg = nullptr,
+    int32_t displayTime = 0) {
+  return darknet7::CreateDisplayMessage(
+      _fbb,
+      msg ? _fbb.CreateString(msg) : 0,
+      displayTime);
+}
+
 struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_MTYPE = 4,
@@ -147,6 +254,12 @@ struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const SetupAP *Msg_as_SetupAP() const {
     return Msg_type() == STMToESPAny_SetupAP ? static_cast<const SetupAP *>(Msg()) : nullptr;
   }
+  const StopAP *Msg_as_StopAP() const {
+    return Msg_type() == STMToESPAny_StopAP ? static_cast<const StopAP *>(Msg()) : nullptr;
+  }
+  const DisplayMessage *Msg_as_DisplayMessage() const {
+    return Msg_type() == STMToESPAny_DisplayMessage ? static_cast<const DisplayMessage *>(Msg()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int8_t>(verifier, VT_MTYPE) &&
@@ -159,6 +272,14 @@ struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 
 template<> inline const SetupAP *STMToESPRequest::Msg_as<SetupAP>() const {
   return Msg_as_SetupAP();
+}
+
+template<> inline const StopAP *STMToESPRequest::Msg_as<StopAP>() const {
+  return Msg_as_StopAP();
+}
+
+template<> inline const DisplayMessage *STMToESPRequest::Msg_as<DisplayMessage>() const {
+  return Msg_as_DisplayMessage();
 }
 
 struct STMToESPRequestBuilder {
@@ -204,6 +325,14 @@ inline bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, 
     }
     case STMToESPAny_SetupAP: {
       auto ptr = reinterpret_cast<const SetupAP *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case STMToESPAny_StopAP: {
+      auto ptr = reinterpret_cast<const StopAP *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case STMToESPAny_DisplayMessage: {
+      auto ptr = reinterpret_cast<const DisplayMessage *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return false;

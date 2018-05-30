@@ -112,6 +112,10 @@ void WIFI::wifi_start_access_point(wifi_config_t &wifi_config, tcpip_adapter_ip_
 	}
 }
 
+void WIFI::stopWiFi() {
+	esp_wifi_stop();
+}
+
 #if 0
 extern "C" {
 	void app_main();

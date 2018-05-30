@@ -24,6 +24,7 @@ public:
 	void initDHCPSLeaseInfo(dhcps_lease_t &l);
 	void initDHCPSLeaseInfo(dhcps_lease_t &l, const std::string &start_ip, const std::string &end_ip);
 	void wifi_start_access_point(wifi_config_t &wifi_config, tcpip_adapter_ip_info_t &ipInfo, dhcps_lease_t &lease);
+	void stopWiFi();
 	void setWifiEventHandler(WiFiEventHandler *wifiEventHandler);
 	const WiFiEventHandler *getWifiEventHandler() const {return mpWifiEventHandler;}
 	WiFiEventHandler *getWifiEventHandler() {return mpWifiEventHandler;}

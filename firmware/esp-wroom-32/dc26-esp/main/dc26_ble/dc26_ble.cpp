@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "dc26_ble.h"
-#include "dc26_ble_pairing.h"
+#include "dc26_ble_pairing_server.h"
+#include "dc26_ble_pairing_client.h"
 #include "dc26_ble_scanning.h"
 #include "../lib/ble/BLEDevice.h"
 
@@ -69,8 +70,6 @@ void BluetoothTask::pair()
 	// Connect to the remote BLE Server.
 	pPairingClient->connect(*pServerAddress);
 	printf("Connected to server\n");
-	pPairingClientCallbacks->afterConnected(pPairingClient);
-	// Disconnect
 }
 
 void BluetoothTask::unpair()
@@ -109,14 +108,21 @@ void BluetoothTask::setB2BAdvData(std::string new_name, std::string new_man_data
 	}
 }
 
+bool isClient = false;
 void BluetoothTask::run(void * data)
 {
 	// TODO: Get commands from Queue
 	ESP_LOGI(LOGTAG, "RUNNING");
-	BTCmd cmd = BT_CMD_ACTIVE_SCAN;
+	BTCmd cmd;
+	if (isClient)
+		cmd = BT_CMD_PASSIVE_SCAN;
+	else
+	{
+		cmd = BT_CMD_UNK;
+	}
 	while (1)
 	{
-		vTaskDelay(10000 / portTICK_PERIOD_MS);
+		vTaskDelay(5000 / portTICK_PERIOD_MS);
 		// TODO: Check queue for command
 		switch(cmd)
 		{
@@ -135,7 +141,8 @@ void BluetoothTask::run(void * data)
 				break;
 			case BT_CMD_PASSIVE_SCAN:
 				scan(false);
-				cmd = BT_CMD_ACTIVE_SCAN;
+				if (server_found)
+					cmd = BT_CMD_PAIR;
 				break;
 			case BT_CMD_ACTIVE_SCAN:
 				scan(true);
@@ -153,52 +160,57 @@ void BluetoothTask::run(void * data)
 	}
 }
 
+BLEDevice Device;
+BLEAdvertising Advertising;
+UartWriteCharCallbacks UartWriteCallbacks;
+UartServerCallbacks iUartServerCallbacks;
+UartClientCallbacks iUartClientCallbacks;
+MyScanCallbacks ScanCallbacks;
+
 bool BluetoothTask::init()
 {
 	ESP_LOGI(LOGTAG, "INIT");
-	pDevice = new BLEDevice();
+	//pDevice = new BLEDevice();
+	pDevice = &Device;
 	pDevice->init("DCDN BLE Device");
 
-	// Create out Bluetooth Server
-	pServer = pDevice->createServer();
 
-	// Create our DCDN Pairing Service
-	pService = pServer->createService(pairServiceUUID);
-	// setup callbacks
-	pPairingServerCallbacks = new MyServerCallbacks();
-	pPairingServerCallbacks->btTask = this;
-	pServer->setCallbacks(pPairingServerCallbacks);
-	// setup characteristic and initial value
-	pPairingCharacteristic = pService->createCharacteristic(
-										pairingCharUUID,
-										BLECharacteristic::PROPERTY_READ |
-										BLECharacteristic::PROPERTY_WRITE |
-										BLECharacteristic::PROPERTY_INDICATE |
-										BLECharacteristic::PROPERTY_NOTIFY);
-	pPairingCharacteristic->addDescriptor(new BLEDescriptor(pairingDescUUID));
-	pPairingCharacteristic->getDescriptorByUUID(pairingDescUUID)->setValue("Desc");
-	pPairingCharacteristic->setValue("PAIRING START");
-	pService->start();
+	if (!isClient)
+	{
+		// Create out Bluetooth Server
+		pServer = pDevice->createServer();
 
-	// Create our Client for reaching out for pairing
+		// Create the UART Service
+		pService = pServer->createService(uartServiceUUID);
+		// setup characteristic for the server to send info
+		pUartReadCharacteristic = pService->createCharacteristic(
+											uartReadUUID,
+											BLECharacteristic::PROPERTY_NOTIFY);
+		iUartServerCallbacks.pCharacteristic = pUartReadCharacteristic;
+		pServer->setCallbacks(&iUartServerCallbacks);
+		
+		// setup characteristic for the client to send info
+		pUartWriteCharacteristic = pService->createCharacteristic(
+											uartWriteUUID,
+											BLECharacteristic::PROPERTY_WRITE);
+		pUartWriteCharacteristic->setCallbacks(&UartWriteCallbacks);
+		pService->start();
+
+		// Setup advertising object
+		pAdvertising = pServer->getAdvertising();
+		pAdvertising->addServiceUUID(uartServiceUUID);
+		setB2BAdvData(adv_name, adv_manufacturer);
+		startB2BAdvertising();
+	}
+	
+	// setup pairing client
 	pPairingClient = pDevice->createClient();
-	pPairingClientCallbacks = new MyClientCallbacks();
-	pPairingClientCallbacks->btTask = this;
-	pPairingClient->setClientCallbacks(pPairingClientCallbacks);
-
-	// Save reference to the client and server callbacks inside each other
-	pPairingClientCallbacks->pServerCallbacks = pPairingServerCallbacks;
-	pPairingServerCallbacks->pClientCallbacks = pPairingClientCallbacks;
-
-	// Setup advertising object
-	pAdvertising = pServer->getAdvertising();
-	pAdvertising->addServiceUUID(pairServiceUUID);
-	setB2BAdvData(adv_name, adv_manufacturer);
-	startB2BAdvertising();
+	pPairingClient->setClientCallbacks(&iUartClientCallbacks);
 
 	// Setup scanning object and callbacks
 	pScan = pDevice->getScan();
-	pScanCallbacks = new MyScanCallbacks();
+	//pScanCallbacks = new MyScanCallbacks();
+	pScanCallbacks = &ScanCallbacks;
 	pScan->setAdvertisedDeviceCallbacks(pScanCallbacks);
 
 	return true;

@@ -2,7 +2,6 @@
 #include <string.h>
 #include "dc26_ble.h"
 #include "dc26_ble_scanning.h"
-#include "dc26_ble_pairing.h"
 #include "../lib/ble/BLEDevice.h"
 
 

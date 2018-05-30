@@ -5,7 +5,8 @@
 #include "esp_log.h"
 #include "../lib/Task.h"
 #include "../lib/ble/BLEDevice.h"
-#include "dc26_ble_pairing.h"
+#include "dc26_ble_pairing_server.h"
+#include "dc26_ble_pairing_client.h"
 #include "dc26_ble_scanning.h"
 
 enum BTCmd
@@ -29,12 +30,11 @@ public:
 	BLEServer *pServer;
 	BLEClient *pPairingClient;
 	BLEService *pService;
-	BLECharacteristic *pPairingCharacteristic;
 	BLEScan *pScan;
 	BLEAdvertising *pAdvertising;
 	MyScanCallbacks *pScanCallbacks;
-	MyServerCallbacks *pPairingServerCallbacks;
-	MyClientCallbacks *pPairingClientCallbacks;
+	BLECharacteristic *pUartWriteCharacteristic;
+	BLECharacteristic *pUartReadCharacteristic;
 	BLEAdvertisementData adv_data;
 
 	// Advertisement data

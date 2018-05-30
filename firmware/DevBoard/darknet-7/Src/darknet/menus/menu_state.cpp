@@ -2,6 +2,15 @@
 #include "../libstm32/display/display_device.h"
 #include "../darknet7.h"
 #include "MessageState.h"
+#include "setting_state.h"
+#include "pairing_state.h"
+#include "AddressState.h"
+#include "GameOfLife.h"
+#include "menu3d.h"
+#include "communications_settings.h"
+#include "badge_info_state.h"
+#include "mcu_info.h"
+#include "tamagotchi.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::StateBase;
@@ -97,13 +106,13 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 				nextState = DarkNet7::get().getBadgeInfoState();
 				break;
 			case 7:
-				nextState = DarkNet7::get().getMCUInfo();
+				nextState = DarkNet7::get().getMCUInfoState();
 				break;
 			case 8:
 				nextState = DarkNet7::get().getTamagotchiState();
 				break;
 			case 9:
-				nextState = DarkNet7::get().getCommunicationsState();
+				nextState = DarkNet7::get().getCommunicationSettingState();
 				break;
 
 		}

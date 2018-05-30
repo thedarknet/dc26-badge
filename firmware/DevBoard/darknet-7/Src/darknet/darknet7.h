@@ -21,6 +21,13 @@ class MessageState;
 class SendMsgState;
 class SettingState;
 class PairingState;
+class AddressState;
+class Menu3D;
+class GameOfLife;
+class CommunicationSettingState;
+class BadgeInfoState;
+class MCUInfoState;
+class Tamagotchi;
 
 class DarkNet7: public cmdc0de::App {
 public:
@@ -61,6 +68,13 @@ public:
 	SendMsgState *getSendMsgState();
 	SettingState *getSettingState();
 	PairingState *getPairingState();
+	AddressState *getAddressBookState();
+	Menu3D *get3DState();
+	GameOfLife *getGameOfLifeState();
+	CommunicationSettingState *getCommunicationSettingState();
+	BadgeInfoState * getBadgeInfoState();
+	MCUInfoState *getMCUInfoState();
+	Tamagotchi *getTamagotchiState();
 public:
 	cmdc0de::DisplayST7735 &getDisplay();
 	const cmdc0de::DisplayST7735 &getDisplay() const;

@@ -4,13 +4,14 @@
 #include <app/app.h>
 #include <app/state_base.h>
 #include "darknet7_base_state.h"
+#include "3d/renderer.h"
+#include "3d/vec_math.h"
 
 namespace cmdc0de {
 	class DisplayDevice;
 	class RGBColor;
 }
 
-class Model;
 
 class Menu3D : public Darknet7BaseState {
 public:

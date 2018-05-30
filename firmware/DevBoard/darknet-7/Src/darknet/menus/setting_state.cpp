@@ -40,7 +40,7 @@ ErrorType SettingState::onInit() {
 	return ErrorType();
 }
 
-StateBase::ReturnStateContext SettingState::onRun(RunContext &rc) {
+StateBase::ReturnStateContext SettingState::onRun() {
 	//uint8_t key = rc.getKB().getLastKeyReleased();
 	StateBase *nextState = this;
 	/*

@@ -16,7 +16,7 @@
 class Darknet7BaseState: public cmdc0de::StateBase {
 public:
 	Darknet7BaseState() {}
-	virtual ~Darknet7BaseState() =0;
+	virtual ~Darknet7BaseState() {}
 };
 
 

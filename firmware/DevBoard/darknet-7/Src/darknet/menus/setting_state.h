@@ -9,6 +9,7 @@
 #define DARKNET_MENUS_SETTING_STATE_H_
 
 #include "darknet7_base_state.h"
+#include "../KeyStore.h"
 
 class SettingState: public Darknet7BaseState {
 public:

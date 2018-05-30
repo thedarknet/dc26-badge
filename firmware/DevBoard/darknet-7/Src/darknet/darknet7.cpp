@@ -20,6 +20,15 @@
 #include "menus/MessageState.h"
 #include "menus/SendMsgState.h"
 #include "menus/menu_state.h"
+#include "menus/setting_state.h"
+#include "menus/pairing_state.h"
+#include "menus/AddressState.h"
+#include "menus/menu3d.h"
+#include "menus/GameOfLife.h"
+#include "menus/badge_info_state.h"
+#include "menus/mcu_info.h"
+#include "menus/tamagotchi.h"
+#include "menus/communications_settings.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::DisplayST7735;
@@ -132,7 +141,8 @@ const DarkNet7::ButtonInfo& DarkNet7::getButtonInfo() const {
 	return MyButtons;
 }
 
-AppEventBusType &DarkNet7::getEventBus() {
+
+DarkNet7::AppEventBusType &DarkNet7::getEventBus() {
 	return AppEventBus;
 }
 
@@ -331,6 +341,15 @@ cmdc0de::DisplayMessageState *DarkNet7::getDisplayMessageState(cmdc0de::StateBas
 static MenuState MyMenu;
 static MessageState MyMsgState;
 static SendMsgState MySendMsgState;
+static SettingState MySettingState;
+static PairingState MyPairingState;
+static AddressState MyAddressState;
+static Menu3D MyMenu3D;
+static GameOfLife MyGameOfLife;
+static CommunicationSettingState MyCommunicationSettings;
+static BadgeInfoState MyBadgeInfoState;
+static MCUInfoState MyMCUInfoState;
+static Tamagotchi MyTamagotchi;
 
 MenuState *DarkNet7::getDisplayMenuState() {
 	return &MyMenu;
@@ -344,3 +363,38 @@ SendMsgState *DarkNet7::getSendMsgState() {
 	return &MySendMsgState;
 }
 
+SettingState *DarkNet7::getSettingState() {
+	return &MySettingState;
+}
+
+PairingState *DarkNet7::getPairingState() {
+	return &MyPairingState;
+}
+
+AddressState *DarkNet7::getAddressBookState() {
+	return &MyAddressState;
+}
+
+Menu3D *DarkNet7::get3DState() {
+	return &MyMenu3D;
+}
+
+GameOfLife *DarkNet7::getGameOfLifeState() {
+	return &MyGameOfLife;
+}
+
+CommunicationSettingState *DarkNet7::getCommunicationSettingState() {
+	return &MyCommunicationSettings;
+}
+
+BadgeInfoState * DarkNet7::getBadgeInfoState() {
+	return &MyBadgeInfoState;
+}
+
+MCUInfoState *DarkNet7::getMCUInfoState() {
+	return &MyMCUInfoState;
+}
+
+Tamagotchi *DarkNet7::getTamagotchiState() {
+	return &MyTamagotchi;
+}

@@ -70,7 +70,7 @@ void BluetoothTask::pair()
 
 	// Connect to the remote BLE Server.
 	pPairingClient->connect(*pServerAddress);
-	printf("Connected to server\n");
+	ESP_LOGI(LOGTAG, "Connected to server\n");
 }
 
 void BluetoothTask::unpair()
@@ -112,7 +112,8 @@ void BluetoothTask::setB2BAdvData(std::string new_name, std::string new_man_data
 static void clientRxCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, 
 							uint8_t* pData, size_t length, bool isNotify)
 {   
-	printf("Client Notified of: %s\n", pBLERemoteCharacteristic->readValue().c_str());
+	std::string dstr((const char*)pData, length); 
+	ESP_LOGI("Client Notified of", "%s", dstr.c_str()); 
 }
 
 
@@ -168,33 +169,30 @@ void BluetoothTask::run(void * data)
 			case BT_CMD_PAIR:
 				pair();
 				iUartClientCallbacks.afterConnect();
-				iUartClientCallbacks.pRxChar->registerForNotify(clientRxCallback);
+				iUartClientCallbacks.pRxChar->registerForNotify(&clientRxCallback);
 				cmd = BT_CMD_UNK;
 				break;
 			default:
 				if (isClient)
 				{
 					iUartClientCallbacks.pTxChar->writeValue("doodlebug");
-					ESP_LOGI(LOGTAG, "Client read: %c", 
-							iUartClientCallbacks.pRxChar->readUInt8());
 				}
 				else
 				{
 					if (iUartServerCallbacks.isConnected)
 					{
-						printf("sending %c\n", a);
-						pUartTxCharacteristic->setValue(&a, 1);
+						pUartTxCharacteristic->setValue("dinglebutt");
 						pUartTxCharacteristic->notify();
 						a++;
 					}
 				}
-				ESP_LOGI(LOGTAG, "INFINITE LOOP");
 				break;
 		}
 	}
 }
 
-
+BLE2902 i2902;
+BLE2902 j2902;
 bool BluetoothTask::init()
 {
 	ESP_LOGI(LOGTAG, "INIT");
@@ -215,7 +213,7 @@ bool BluetoothTask::init()
 											uartRxUUID,
 											BLECharacteristic::PROPERTY_WRITE);
 		pUartRxCharacteristic->setCallbacks(&UartRxCallbacks);
-		pUartRxCharacteristic->addDescriptor(new BLE2902());
+		pUartRxCharacteristic->addDescriptor(&i2902);
 		
 		// setup characteristic for the client to send info
 		pUartTxCharacteristic = pService->createCharacteristic(
@@ -224,7 +222,8 @@ bool BluetoothTask::init()
 											BLECharacteristic::PROPERTY_READ |
 											BLECharacteristic::PROPERTY_INDICATE |
 											BLECharacteristic::PROPERTY_NOTIFY);
-		pUartTxCharacteristic->addDescriptor(new BLE2902());
+		j2902.setNotifications(true);
+		pUartTxCharacteristic->addDescriptor(&j2902);
 		
 		// set the callbacks and start the service
 		iUartServerCallbacks.isConnected = false;

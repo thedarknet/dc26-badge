@@ -33,8 +33,8 @@ public:
 	BLEScan *pScan;
 	BLEAdvertising *pAdvertising;
 	MyScanCallbacks *pScanCallbacks;
-	BLECharacteristic *pUartWriteCharacteristic;
-	BLECharacteristic *pUartReadCharacteristic;
+	BLECharacteristic *pUartTxCharacteristic;
+	BLECharacteristic *pUartRxCharacteristic;
 	BLEAdvertisementData adv_data;
 
 	// Advertisement data

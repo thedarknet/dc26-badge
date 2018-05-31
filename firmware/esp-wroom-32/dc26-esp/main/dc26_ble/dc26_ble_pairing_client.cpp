@@ -8,97 +8,53 @@
 const char *PAIR_CLIENT_TAG = "BTPairingClient";
 
 
-static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
-							uint8_t* pData, size_t length, bool isNotify)
-{
-	printf("Notified of value: %s\n", pBLERemoteCharacteristic->readValue().c_str());
-}
-
 void UartClientCallbacks::onConnect(BLEClient* client)
 {
-	ESP_LOGI(PAIR_CLIENT_TAG, "CLIENT CONNECTED");
-	pClientTask = new UartClientTask("BtUartClient");
-	pClientTask->init();
-	pClientTask->start(client);
+	ESP_LOGI(PAIR_CLIENT_TAG, "connected to server");
+	pClient = client;
 }
 
-void UartClientCallbacks::onDisconnect(BLEClient* client)
+void UartClientCallbacks::afterConnect()
 {
-	ESP_LOGI(PAIR_CLIENT_TAG, "CLIENT DISCONNECTED");
-	pClientTask->stop();
-	delete pClientTask;
-}
-
-
-bool UartClientTask::init()
-{
-	// TODO
-	return true;
-}
-
-void UartClientTask::run(void *data)
-{
-	BLEClient *pClient;
-	BLERemoteService* pRemoteService;
-	BLERemoteCharacteristic *pRemoteCharacteristic;
-	BLERemoteCharacteristic *pRemoteCharacteristic2;
+	ESP_LOGI(PAIR_CLIENT_TAG, "connected to server");
 	
-	printf("task!\n");
-	pClient = (BLEClient *)data;
-
     // Obtain a reference to the service we are after in the remote BLE server.
-	delay(500 / portTICK_PERIOD_MS);
+	ESP_LOGI(PAIR_CLIENT_TAG, "sleep 500");
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
+	ESP_LOGI(PAIR_CLIENT_TAG, "get client");
     pRemoteService = pClient->getService(uartServiceUUID);
+	ESP_LOGI(PAIR_CLIENT_TAG, "client got");
     if (pRemoteService == nullptr) {
 		printf("service finding error\n");
 		return;
     }
+	ESP_LOGI(PAIR_CLIENT_TAG, "got service");
 
-    // Obtain a reference to the characteristic in the service of the remote BLE server.
-	delay(500 / portTICK_PERIOD_MS);
-    pRemoteCharacteristic = pRemoteService->getCharacteristic(uartWriteUUID);
-    if (pRemoteCharacteristic == nullptr) {
+	// get the characteristic for the CLIENT to RECEIVE (TX)
+	vTaskDelay(1800 / portTICK_PERIOD_MS);
+    pRxChar = pRemoteService->getCharacteristic(uartTxUUID);
+    if (pRxChar == nullptr) {
 		printf("first char finding error\n");
 		return;
     }
 	
-	// Obtain reference to characteristic we can receive from 
-	delay(500 / portTICK_PERIOD_MS);
-    pRemoteCharacteristic2 = pRemoteService->getCharacteristic(uartReadUUID);
-    if (pRemoteCharacteristic2 == nullptr) {
+	ESP_LOGI(PAIR_CLIENT_TAG, "got characteristic one");
+	
+	// get the characteristic for the CLIENT to SEND (RX)
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
+    pTxChar = pRemoteService->getCharacteristic(uartRxUUID);
+    if (pTxChar == nullptr) {
 		printf("second char finding error\n");
 		return;
     }
+	ESP_LOGI(PAIR_CLIENT_TAG, "got characteristic two");
 	
-	delay(500 / portTICK_PERIOD_MS);
-	// register to receive notifications	
-	pRemoteCharacteristic2->registerForNotify(notifyCallback);
-	
-	while (1)
-	{
-		// Send a message
-		delay(10000);
-		printf("sending doodlebug\n");
-		pRemoteCharacteristic->writeValue("doodlebug");
-	}
-	// TODO
-	// data is the target address to connect to 
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-	// connect to the address
-
-	// timeouts
-
-	// wait for STM32 message with crypto message 1
-	// write to uartWriteUUID in loop until fully sent
+	ESP_LOGI(PAIR_CLIENT_TAG, "setup complete");
 }
 
-UartClientTask::UartClientTask(const std::string &tName, uint16_t stackSize, uint8_t p)
-	: Task(tName,stackSize,p) // TODO: Queue Stuff
+void UartClientCallbacks::onDisconnect(BLEClient* client)
 {
-	// TODO
-}
-
-UartClientTask::~UartClientTask()
-{
-	// TODO
+	ESP_LOGI(PAIR_CLIENT_TAG, "disconnected");
 }

@@ -4,6 +4,7 @@
 #include "dc26_ble_pairing_server.h"
 #include "dc26_ble_pairing_client.h"
 #include "dc26_ble_scanning.h"
+#include "../lib/ble/BLE2902.h"
 #include "../lib/ble/BLEDevice.h"
 
 
@@ -108,12 +109,27 @@ void BluetoothTask::setB2BAdvData(std::string new_name, std::string new_man_data
 	}
 }
 
-bool isClient = false;
+static void clientRxCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, 
+							uint8_t* pData, size_t length, bool isNotify)
+{   
+	printf("Client Notified of: %s\n", pBLERemoteCharacteristic->readValue().c_str());
+}
+
+
+BLEDevice Device;
+BLEAdvertising Advertising;
+UartRxCharCallbacks UartRxCallbacks;
+UartServerCallbacks iUartServerCallbacks;
+UartClientCallbacks iUartClientCallbacks;
+MyScanCallbacks ScanCallbacks;
+
+bool isClient = true;
 void BluetoothTask::run(void * data)
 {
 	// TODO: Get commands from Queue
 	ESP_LOGI(LOGTAG, "RUNNING");
 	BTCmd cmd;
+	uint8_t a = 0x41;
 	if (isClient)
 		cmd = BT_CMD_PASSIVE_SCAN;
 	else
@@ -151,21 +167,33 @@ void BluetoothTask::run(void * data)
 				break;
 			case BT_CMD_PAIR:
 				pair();
+				iUartClientCallbacks.afterConnect();
+				iUartClientCallbacks.pRxChar->registerForNotify(clientRxCallback);
 				cmd = BT_CMD_UNK;
 				break;
 			default:
+				if (isClient)
+				{
+					iUartClientCallbacks.pTxChar->writeValue("doodlebug");
+					ESP_LOGI(LOGTAG, "Client read: %c", 
+							iUartClientCallbacks.pRxChar->readUInt8());
+				}
+				else
+				{
+					if (iUartServerCallbacks.isConnected)
+					{
+						printf("sending %c\n", a);
+						pUartTxCharacteristic->setValue(&a, 1);
+						pUartTxCharacteristic->notify();
+						a++;
+					}
+				}
 				ESP_LOGI(LOGTAG, "INFINITE LOOP");
 				break;
 		}
 	}
 }
 
-BLEDevice Device;
-BLEAdvertising Advertising;
-UartWriteCharCallbacks UartWriteCallbacks;
-UartServerCallbacks iUartServerCallbacks;
-UartClientCallbacks iUartClientCallbacks;
-MyScanCallbacks ScanCallbacks;
 
 bool BluetoothTask::init()
 {
@@ -183,17 +211,24 @@ bool BluetoothTask::init()
 		// Create the UART Service
 		pService = pServer->createService(uartServiceUUID);
 		// setup characteristic for the server to send info
-		pUartReadCharacteristic = pService->createCharacteristic(
-											uartReadUUID,
-											BLECharacteristic::PROPERTY_NOTIFY);
-		iUartServerCallbacks.pCharacteristic = pUartReadCharacteristic;
-		pServer->setCallbacks(&iUartServerCallbacks);
+		pUartRxCharacteristic = pService->createCharacteristic(
+											uartRxUUID,
+											BLECharacteristic::PROPERTY_WRITE);
+		pUartRxCharacteristic->setCallbacks(&UartRxCallbacks);
+		pUartRxCharacteristic->addDescriptor(new BLE2902());
 		
 		// setup characteristic for the client to send info
-		pUartWriteCharacteristic = pService->createCharacteristic(
-											uartWriteUUID,
-											BLECharacteristic::PROPERTY_WRITE);
-		pUartWriteCharacteristic->setCallbacks(&UartWriteCallbacks);
+		pUartTxCharacteristic = pService->createCharacteristic(
+											uartTxUUID,
+											BLECharacteristic::PROPERTY_WRITE |
+											BLECharacteristic::PROPERTY_READ |
+											BLECharacteristic::PROPERTY_INDICATE |
+											BLECharacteristic::PROPERTY_NOTIFY);
+		pUartTxCharacteristic->addDescriptor(new BLE2902());
+		
+		// set the callbacks and start the service
+		iUartServerCallbacks.isConnected = false;
+		pServer->setCallbacks(&iUartServerCallbacks);
 		pService->start();
 
 		// Setup advertising object
@@ -202,10 +237,12 @@ bool BluetoothTask::init()
 		setB2BAdvData(adv_name, adv_manufacturer);
 		startB2BAdvertising();
 	}
-	
-	// setup pairing client
-	pPairingClient = pDevice->createClient();
-	pPairingClient->setClientCallbacks(&iUartClientCallbacks);
+	else
+	{	
+		// setup pairing client
+		pPairingClient = pDevice->createClient();
+		pPairingClient->setClientCallbacks(&iUartClientCallbacks);
+	}
 
 	// Setup scanning object and callbacks
 	pScan = pDevice->getScan();

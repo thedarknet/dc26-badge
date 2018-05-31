@@ -8,27 +8,15 @@
 #include "../lib/Task.h"
 #include "../lib/ble/BLEDevice.h"
 
-
-
-class UartClientTask : public Task {
-public:
-	// TODO: Message Queue
-public:
-	UartClientTask(const std::string &tName, uint16_t stackSize=10000, uint8_t p=3);
-	bool init();
-public:
-	virtual void run(void *data);
-	virtual ~UartClientTask();
-protected:
-	// TODO: Message Queue
-};
-
-
 class UartClientCallbacks : public BLEClientCallbacks {
 public:
-	UartClientTask *pClientTask;
+	BLEClient *pClient;
+	BLERemoteService *pRemoteService;
+	BLERemoteCharacteristic *pTxChar;
+	BLERemoteCharacteristic *pRxChar;
 public:
 	void onConnect(BLEClient* client);
+	void afterConnect();
 	void onDisconnect(BLEClient* client);
 protected:
 };

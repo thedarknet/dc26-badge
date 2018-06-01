@@ -22,8 +22,8 @@ void CmdHandlerTask::run(void *data) {
 	darknet7::STMToESPRequest *msg;
 	while (1) {
 		if(xQueueReceive(InCommingQueueHandle, &msg, ( TickType_t ) 20000)/portTICK_PERIOD_MS) {
-			switch(msg->MType()) {
-				case darknet7::MsgType_SETUP_AP:
+			switch(msg->Msg_type()) {
+				case darknet7::STMToESPAny_SetupAP:
 					break;
 				default:
 					break;

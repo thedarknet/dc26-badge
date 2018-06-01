@@ -70,8 +70,8 @@ public:
 
 
 ESP32_I2CMaster I2cDisplay(GPIO_NUM_19,GPIO_NUM_18,1000000, I2C_NUM_0, 1024, 1024);
-MCUToMCUTask ProcToProc("ProcToProc");
 CmdHandlerTask CmdTask("CmdTask");
+MCUToMCUTask ProcToProc(&CmdTask, "ProcToProc");
 
 static char tag[] = "main";
 

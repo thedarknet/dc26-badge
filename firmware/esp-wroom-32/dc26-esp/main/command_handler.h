@@ -18,6 +18,7 @@ public:
 public:
 	CmdHandlerTask(const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);
 	bool init();
+	QueueHandle_t getQueueHandle() {return InCommingQueueHandle;}
 public:
 	virtual void run(void *data);
 	virtual ~CmdHandlerTask();

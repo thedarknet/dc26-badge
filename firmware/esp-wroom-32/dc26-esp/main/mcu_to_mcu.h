@@ -15,6 +15,8 @@ namespace darknet7 {
 	class STMToESPRequest;
 }
 
+class CmdHandlerTask;
+
 class MCUToMCUTask : public Task {
 public:
 	static const int STM_TO_ESP_MSG_QUEUE_SIZE = 10;
@@ -23,7 +25,7 @@ public:
 	static const int ESP_TO_STM_MSG_ITEM_SIZE = sizeof(OutgoingMsg);
 	static const char *LOGTAG;
 public:
-	MCUToMCUTask(const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);
+	MCUToMCUTask(CmdHandlerTask *pch, const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);
 	void txTask();
 	void rxTask();
 	bool init(gpio_num_t tx, gpio_num_t rx, uint16_t rxBufSize);
@@ -39,6 +41,7 @@ protected:
 	StaticQueue_t ESPToSTMQueue;
 	QueueHandle_t ESPToSTMQueueHandle = nullptr;
 	uint16_t BufSize;
+	CmdHandlerTask *CmdHandler;
 };
 
 #endif

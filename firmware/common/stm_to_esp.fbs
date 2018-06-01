@@ -20,6 +20,7 @@ table DisplayMessage {
 }
 
 table STMToESPRequest {
+	msgInstanceID:uint32;
 	MType:MsgType;
 	Msg:STMToESPAny;
 }

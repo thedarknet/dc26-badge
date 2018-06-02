@@ -12,6 +12,7 @@ table GenericResponse {
 }
 
 table ESPToSTM {
+	msgInstanceID:uint32;
 	MType:MsgType;
 	Msg:ESPToSTMAny;
 }

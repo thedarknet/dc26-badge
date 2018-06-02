@@ -2,7 +2,7 @@ include "common.fbs";
 
 namespace darknet7;
 
-union STMToESPAny { SetupAP }
+union STMToESPAny { SetupAP, StopAP, DisplayMessage }
 
 table SetupAP {
 	ssid:string;
@@ -10,7 +10,17 @@ table SetupAP {
 	mode:WifiMode;
 }
 
+table StopAP {
+	
+}
+
+table DisplayMessage {
+	msg:string;
+	displayTime:int;
+}
+
 table STMToESPRequest {
+	msgInstanceID:uint32;
 	MType:MsgType;
 	Msg:STMToESPAny;
 }

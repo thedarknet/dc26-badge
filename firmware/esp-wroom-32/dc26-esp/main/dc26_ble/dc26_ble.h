@@ -3,6 +3,8 @@
 
 #include "esp_system.h"
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/queue.h"
 #include "../lib/Task.h"
 #include "../lib/ble/BLEDevice.h"
 #include "dc26_ble_pairing_server.h"
@@ -17,13 +19,12 @@ enum BTCmd
 	BT_CMD_PASSIVE_SCAN,
 	BT_CMD_ACTIVE_SCAN,
 	BT_CMD_PAIR,
+	BT_CMD_ECHO,
 	BT_CMD_UNK,
 };
 
 class BluetoothTask : public Task {
 public:
-	static const int ESP_TO_BT_MSG_QUEUE_SIZE = 10;
-	//static const int ESP_TO_BT_MSG_ITEM_SIZE = sizeof(darknet7::ESPToBTRequest*);
 	static const char *LOGTAG;
 
 	BLEDevice *pDevice;
@@ -52,6 +53,13 @@ public:
 	BLEAddress *pServerAddress;
 	BLERemoteCharacteristic *pRemoteCharacteristic;
 
+	// Callback message queue
+	static const int CBACK_MSG_QUEUE_SIZE = 10;
+	static const int CBACK_MSG_ITEM_SIZE = sizeof(void *); // TODO: Msg Size?
+	StaticQueue_t CallbackQueue;
+	QueueHandle_t CallbackQueueHandle = nullptr;
+	uint8_t CallbackBuffer[CBACK_MSG_QUEUE_SIZE * CBACK_MSG_ITEM_SIZE];
+
 public:
 	BluetoothTask(const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);
 	bool init();
@@ -70,12 +78,10 @@ public:
 
 	// Serial badge-to-??? comms
 public:
+	void dispatchCmd(BTCmd *cmd);
 	virtual void run(void *data);
 	virtual ~BluetoothTask();
 protected:
-	StaticQueue_t InQueue;
-	QueueHandle_t InQueueHandle = nullptr;
-	//uint6_t ESPToBTBuffer[ESP_TO_BT_MSG_QUEUE_SIZE*ESP_TO_BT_MSG_ITEM_SIZE]
 };
 
 

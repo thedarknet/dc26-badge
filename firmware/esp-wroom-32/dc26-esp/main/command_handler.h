@@ -23,9 +23,8 @@ public:
 	virtual void run(void *data);
 	virtual ~CmdHandlerTask();
 protected:
-	StaticQueue_t InCommingQueue;
 	QueueHandle_t InCommingQueueHandle = nullptr;
-	uint8_t STMToESPBuffer[STM_TO_ESP_MSG_QUEUE_SIZE*STM_TO_ESP_MSG_ITEM_SIZE];
+private:
 };
 
 #endif

@@ -40,6 +40,7 @@ void MCUToMCUTask::txTask() {
 	esp_log_level_set(LOGTAG, ESP_LOG_INFO);
 	OutgoingMsg *msgToSend =0;
 	while (1) {
+			  /*
 		if(xQueueReceive(ESPToSTMQueueHandle, &msgToSend, ( TickType_t ) 1000)) {
 			uint32_t bytesSent = 0;
 			while(bytesSent < msgToSend->Size) {
@@ -49,6 +50,7 @@ void MCUToMCUTask::txTask() {
 				vTaskDelay(portTICK_PERIOD_MS*10);
 			}
 		}
+		*/
 		//sendData(TX_TASK_TAG, "Hello world");
 		vTaskDelay(2000 / portTICK_PERIOD_MS);
 	}

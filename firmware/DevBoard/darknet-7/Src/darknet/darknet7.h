@@ -44,12 +44,16 @@ public:
 			, BUTTON_DOWN = 0x08
 			, BUTTON_MID = 0x10
 			, BUTTON_FIRE1 = 0x20
+			, ANY_KEY = BUTTON_LEFT|BUTTON_RIGHT|BUTTON_UP|BUTTON_DOWN|BUTTON_MID|BUTTON_FIRE1
 		};
 	public:
 		ButtonInfo();
-		bool isButtonDown(const BUTTON &b);
-		bool wasButtonDown(const BUTTON &b);
-		bool isAnyDown(const uint16_t &b);
+		bool areTheseButtonsDown(const int32_t &b);
+		bool isAnyOfTheseButtonDown(const int32_t &b);
+		bool isAnyButtonDown();
+		bool wereTheseButtonsReleased(const int32_t &b);
+		bool wereAnyOfTheseButtonsReleased(const int32_t &b);
+		bool wasAnyButtonReleased();
 	protected:
 		void processButtons();
 		friend class DarkNet7;

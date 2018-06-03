@@ -66,17 +66,32 @@ DarkNet7::ButtonInfo::ButtonInfo() :
 		BState(0) {
 }
 
-bool DarkNet7::ButtonInfo::isButtonDown(const BUTTON &b) {
+bool DarkNet7::ButtonInfo::areTheseButtonsDown(const int32_t &b) {
 	return (ButtonState & b) == b;
 }
 
-bool DarkNet7::ButtonInfo::wasButtonDown(const BUTTON &b) {
-	return (LastButtonState & b) == b;
+bool DarkNet7::ButtonInfo::isAnyOfTheseButtonDown(const int32_t &b) {
+	return (ButtonState&b)!=0;
 }
 
-bool DarkNet7::ButtonInfo::isAnyDown(const uint16_t &b) {
-	return (LastButtonState & b) != 0;
+bool DarkNet7::ButtonInfo::isAnyButtonDown() {
+	return ButtonState!=0;
 }
+
+bool DarkNet7::ButtonInfo::wereTheseButtonsReleased(const int32_t &b) {
+	//last state must match these buttons and current state must have none of these buttons
+	return (LastButtonState & b) == b && (ButtonState&b)==0;
+}
+
+bool DarkNet7::ButtonInfo::wereAnyOfTheseButtonsReleased(const int32_t &b) {
+	//last state must have at least 1 of the buttons and at least 1 of the buttons must not be down now
+	return (LastButtonState & b) != 0 && !isAnyOfTheseButtonDown(b);
+}
+
+bool DarkNet7::ButtonInfo::wasAnyButtonReleased() {
+	return ButtonState!=LastButtonState && LastButtonState!=0;
+}
+
 
 void DarkNet7::ButtonInfo::processButtons() {
 	ButtonState = LastButtonState;
@@ -232,32 +247,32 @@ static const uint16_t ESP_ADDRESS = 1;
 
 ErrorType DarkNet7::onRun() {
 	MyButtons.processButtons();
-	if (MyButtons.isButtonDown(ButtonInfo::BUTTON_MID)) {
+	if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_MID)) {
 		static const char *dis = "mid";
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);
 		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
 
-	} else if (MyButtons.isButtonDown(ButtonInfo::BUTTON_RIGHT)) {
+	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_RIGHT)) {
 		static const char *dis = "right";
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);
 		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
 
-	} else if (MyButtons.isButtonDown(ButtonInfo::BUTTON_LEFT)) {
+	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_LEFT)) {
 		static const char *dis = "left";
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);
 		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
 
-	} else if (MyButtons.isButtonDown(ButtonInfo::BUTTON_UP)) {
+	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_UP)) {
 		static const char *dis = "up";
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);
 		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
 
-	} else if (MyButtons.isButtonDown(ButtonInfo::BUTTON_DOWN)) {
+	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_DOWN)) {
 		static const char *dis = "down";
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);
 		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
 
-	} else if (MyButtons.isButtonDown(ButtonInfo::BUTTON_FIRE1)) {
+	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_FIRE1)) {
 		static const char *dis = "fire";
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);
 		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);

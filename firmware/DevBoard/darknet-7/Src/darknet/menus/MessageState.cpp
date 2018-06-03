@@ -66,21 +66,21 @@ cmdc0de::StateBase::ReturnStateContext MessageState::onRun() {
 
 	if (InternalState == MESSAGE_LIST) {
 		NewMessage = false;
-		if(DarkNet7::get().getButtonInfo().isButtonDown(DarkNet7::ButtonInfo::BUTTON_UP)) {
+		if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_UP)) {
 			if (MsgList.selectedItem == 0) {
 				MsgList.selectedItem = sizeof(Items) / sizeof(Items[0]) - 1;
 			} else {
 				MsgList.selectedItem--;
 			}
-		} else if (DarkNet7::get().getButtonInfo().isButtonDown(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
+		} else if (DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
 			if (MsgList.selectedItem == (sizeof(Items) / sizeof(Items[0]) - 1)) {
 				MsgList.selectedItem = 0;
 			} else {
 				MsgList.selectedItem++;
 			}
-		} else if (DarkNet7::get().getButtonInfo().isButtonDown(DarkNet7::ButtonInfo::BUTTON_LEFT)) {
+		} else if (DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_LEFT)) {
 			nextState = DarkNet7::get().getDisplayMenuState();
-		} else if (DarkNet7::get().getButtonInfo().isButtonDown(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+		} else if (DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
 			if (Items[MsgList.selectedItem].id != 0) {
 				MsgDisplayBuffer[0] = '\0';
 				for (uint16_t i = 0; i < (sizeof(RMsgs) / sizeof(RMsgs[0])); i++) {
@@ -104,7 +104,7 @@ cmdc0de::StateBase::ReturnStateContext MessageState::onRun() {
 		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
 		DarkNet7::get().getDisplay().drawString(0, 10, &FromBuffer[0]);
 		DarkNet7::get().getDisplay().drawString(0, 20, &MsgDisplayBuffer[0]);
-		if(DarkNet7::get().getButtonInfo().isAnyDown(DarkNet7::ButtonInfo::BUTTON_LEFT|DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+		if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_LEFT|DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
 			onInit();
 			InternalState = MESSAGE_LIST;
 		}

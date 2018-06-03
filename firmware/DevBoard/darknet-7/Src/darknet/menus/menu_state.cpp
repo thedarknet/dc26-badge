@@ -66,21 +66,21 @@ ErrorType MenuState::onInit() {
 
 cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 	StateBase *nextState = this;
-	if (DarkNet7::get().getButtonInfo().isButtonDown(DarkNet7::ButtonInfo::BUTTON_UP)) {
+	if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_UP)) {
 		if (MenuList.selectedItem == 0) {
 			MenuList.selectedItem = sizeof(Items) / sizeof(Items[0]) - 1;
 		} else {
 			MenuList.selectedItem--;
 		}
-	} else if (DarkNet7::get().getButtonInfo().isButtonDown(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
+	} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
 		if (MenuList.selectedItem == (sizeof(Items) / sizeof(Items[0]) - 1)) {
 			MenuList.selectedItem = 0;
 		} else {
 			MenuList.selectedItem++;
 		}
-	} else if (DarkNet7::get().getButtonInfo().isButtonDown(DarkNet7::ButtonInfo::BUTTON_LEFT)) {
+	} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_LEFT)) {
 		MenuList.selectedItem = 0;
-	} else if (DarkNet7::get().getButtonInfo().isButtonDown(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+	} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
 		switch (MenuList.selectedItem) {
 			case 0:
 				nextState = DarkNet7::get().getSettingState();
@@ -117,11 +117,11 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 
 		}
 	}
-	//if (rc.getKB().wasKeyReleased() && key != 9) {
+	if (DarkNet7::get().getButtonInfo().wasAnyButtonReleased()) {
 		DarkNet7::get().getGUI().drawList(&this->MenuList);
-	//}
+	}
 
-	return ReturnStateContext(nextState);
+	return StateBase::ReturnStateContext(nextState);
 }
 
 ErrorType MenuState::onShutdown() {

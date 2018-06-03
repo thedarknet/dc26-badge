@@ -212,6 +212,8 @@ ErrorType DarkNet7::onInit() {
 		++y;
 	}
 	Display.swap();
+	HAL_Delay(500);
+	setCurrentState(getDisplayMenuState());
 
 #ifdef TEST_SD_CARD
 	//disk_initialize(0);

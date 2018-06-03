@@ -215,12 +215,17 @@ void BluetoothTask::run(void * data)
 		vTaskDelay(5000 / portTICK_PERIOD_MS);
 		dispatchCmd(&cmd);
 		// TODO: Check CallbackQueue(Handle) for message to echo
-		if (xQueueReceive(CallbackQueueHandle, &msg, 
-							(TickType_t) 500)/portTICK_PERIOD_MS)
+		if (isClient)
 		{
-			ESP_LOGI(LOGTAG, "Queue got: %s\n", msg);
-			free(msg);
-			//cmd = BT_CMD_ECHO;
+			ESP_LOGI(LOGTAG, "Queue has %d waiting",
+						uxQueueMessagesWaiting(CallbackQueueHandle));
+			if (xQueueReceive(CallbackQueueHandle, &msg,
+							(TickType_t) 500)/portTICK_PERIOD_MS)
+			{
+				ESP_LOGI(LOGTAG, "Queue got: %s\n", msg);
+				free(msg);
+				//cmd = BT_CMD_ECHO;
+			}
 		}
 	}
 }

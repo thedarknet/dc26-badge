@@ -3,18 +3,19 @@
 
 #include <app/app.h>
 #include <app/state_base.h>
-#include "renderer.h"
+#include "darknet7_base_state.h"
+#include "3d/renderer.h"
+#include "3d/vec_math.h"
 
 namespace cmdc0de {
 	class DisplayDevice;
 	class RGBColor;
 }
 
-class Model;
 
-class Menu3D : public cmdc0de::StateBase {
+class Menu3D : public Darknet7BaseState {
 public:
-	Menu3D(cmdc0de::DisplayDevice * const dd);
+	Menu3D();
 	virtual ~Menu3D();
 public:
 protected:
@@ -24,7 +25,6 @@ protected:
 	void initMenu3d();
 	void update();
 	void render();
-	cmdc0de::DisplayDevice &getDisplay() {return *DD;}
 	void line(int x0, int y0, int x1, int y1, cmdc0de::RGBColor& color);
 private:
 	Model model;
@@ -34,7 +34,6 @@ private:
 	static const Vec3f up;
 	uint8_t CanvasWidth;
 	uint8_t CanvasHeight;
-	cmdc0de::DisplayDevice *const DD;
 };
 
 #endif

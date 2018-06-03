@@ -45,7 +45,6 @@ void Model::set(const VertexStruct *v, uint16_t nv, const uint16_t *i,
 	Format = format;
 }
 
-#ifdef NORMALS
 const Vec3f &Model::normal(uint16_t face, uint8_t nVert) const {
 	if (Format == VERTS)
 	return Verts[Indexes[(face * 3) + nVert]].normal;
@@ -55,7 +54,6 @@ const Vec3f &Model::normal(uint16_t face, uint8_t nVert) const {
 	}
 	return Verts[Indexes[(face + 2) + nVert]].normal;
 }
-#endif
 
 const Vec3f &Model::vert(uint16_t face, uint8_t nVert) const {
 	if (Format == VERTS)

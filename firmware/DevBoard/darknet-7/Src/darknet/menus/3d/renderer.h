@@ -11,6 +11,7 @@ extern Matrix Projection;
 struct VertexStruct {
 	Vec3f pos;
 	cmdc0de::RGBColor color;
+	Vec3f normal;
 	//VertexStruct(const Vec3f &p, const RGBColor &r) : pos(p), color(r) {}
 };
 

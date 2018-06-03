@@ -6,15 +6,13 @@
  */
 
 #include "init.h"
-#include "DC26.h"
-
-DC26 App;
+#include "darknet7.h"
 
 void init() {
-	App.init();
+	DarkNet7::get().init();
 }
 
 void runOnce() {
-	App.run();
+	DarkNet7::get().run();
 }
 

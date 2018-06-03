@@ -112,12 +112,14 @@ int main(void)
   MX_SPI2_Init();
   MX_SPI3_Init();
   MX_USART1_UART_Init();
-  MX_LIBJPEG_Init();
+#ifdef USE_USB
   MX_USB_DEVICE_Init();
+#endif
   MX_USART2_UART_Init();
   MX_TIM3_Init();
   MX_I2C3_Init();
   MX_FATFS_Init();
+  MX_LIBJPEG_Init();
 
   /* USER CODE BEGIN 2 */
   init();

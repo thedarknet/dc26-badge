@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.7.1">
+<eagle version="9.0.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -23509,30 +23509,8 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <wire x1="41.9714" y1="11.1786" x2="41.9714" y2="11.1553125" width="0.1524" layer="16"/>
 <wire x1="41.9714" y1="11.1553125" x2="43.4767125" y2="9.65" width="0.1524" layer="16"/>
 <wire x1="43.4767125" y1="9.65" x2="45.17" y2="9.65" width="0.1524" layer="16"/>
-<wire x1="125.2" y1="38.46" x2="126.673815625" y2="36.986184375" width="0.1524" layer="16"/>
-<wire x1="126.673815625" y1="36.986184375" x2="126.673815625" y2="22.326184375" width="0.1524" layer="16"/>
-<wire x1="126.673815625" y1="22.326184375" x2="120.8316" y2="16.48396875" width="0.1524" layer="16"/>
-<wire x1="120.8316" y1="16.48396875" x2="104.33396875" y2="16.48396875" width="0.1524" layer="16"/>
-<wire x1="104.33396875" y1="16.48396875" x2="99.85" y2="12" width="0.1524" layer="16"/>
-<wire x1="99.85" y1="12" x2="99.85" y2="8.55" width="0.1524" layer="16"/>
-<wire x1="99.85" y1="8.55" x2="98.740625" y2="7.440625" width="0.1524" layer="16"/>
-<wire x1="51.5776625" y1="7.440625" x2="50.0396875" y2="9.0786" width="0.1524" layer="16"/>
-<wire x1="98.740625" y1="7.440625" x2="51.5776625" y2="7.440625" width="0.1524" layer="16"/>
-<wire x1="46.11085625" y1="8.50914375" x2="45.17" y2="9.65" width="0.1524" layer="16"/>
-<wire x1="50.0396875" y1="9.0786" x2="48.3003125" y2="9.0786" width="0.1524" layer="16"/>
-<wire x1="47.73085625" y1="8.50914375" x2="46.11085625" y2="8.50914375" width="0.1524" layer="16"/>
-<wire x1="48.3003125" y1="9.0786" x2="47.73085625" y2="8.50914375" width="0.1524" layer="16"/>
-<wire x1="4.7" y1="39.53" x2="3.326184375" y2="38.156184375" width="0.1524" layer="1"/>
-<wire x1="3.326184375" y1="38.156184375" x2="3.326184375" y2="22.326184375" width="0.1524" layer="1"/>
-<wire x1="3.326184375" y1="22.326184375" x2="8.96876875" y2="16.6836" width="0.1524" layer="1"/>
-<wire x1="8.96876875" y1="16.6836" x2="10.62855" y2="16.6836" width="0.1524" layer="1"/>
-<wire x1="10.62855" y1="16.6836" x2="12" y2="15.31215" width="0.1524" layer="1"/>
-<wire x1="12" y1="15.31215" x2="12" y2="7.3" width="0.1524" layer="1"/>
-<wire x1="12" y1="7.3" x2="12.3" y2="7" width="0.1524" layer="1"/>
-<wire x1="12.3" y1="7" x2="12.94763125" y2="7" width="0.1524" layer="1"/>
-<wire x1="27.550625" y1="7.240625" x2="31.55" y2="11.24" width="0.1524" layer="1"/>
-<wire x1="12.94763125" y1="7" x2="13.18825625" y2="7.240625" width="0.1524" layer="1"/>
-<wire x1="13.18825625" y1="7.240625" x2="27.550625" y2="7.240625" width="0.1524" layer="1"/>
+<wire x1="45.17" y1="9.65" x2="125.2" y2="38.46" width="0" layer="19" extent="16-16"/>
+<wire x1="4.7" y1="39.53" x2="28.61" y2="8.82" width="0" layer="19" extent="16-16"/>
 </signal>
 <signal name="ESP-RX" airwireshidden="yes">
 <contactref element="ESP32PH" pad="RX"/>
@@ -26115,6 +26093,10 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <wire x1="88.337996875" y1="50.695196875" x2="95.7072" y2="58.0644" width="0.1524" layer="1"/>
 </signal>
 </signals>
+<errors>
+<approved hash="21,19,30ea3216cc173014"/>
+<approved hash="21,19,d4f5d4f5d6f7d7f6"/>
+</errors>
 </board>
 </drawing>
 <compatibility>

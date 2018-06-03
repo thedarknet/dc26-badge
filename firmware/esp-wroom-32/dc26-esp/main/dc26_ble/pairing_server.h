@@ -3,7 +3,7 @@
 
 #include "esp_system.h"
 #include "esp_log.h"
-#include "dc26_ble.h"
+#include "ble.h"
 #include "../lib/Task.h"
 #include "../lib/ble/BLEDevice.h"
 
@@ -16,6 +16,8 @@ static BLEUUID uartTxUUID(PAIRING_TX_UUID);
 static BLEUUID uartRxUUID(PAIRING_RX_UUID);
 
 class UartRxCharCallbacks : public BLECharacteristicCallbacks {
+public:
+	QueueHandle_t CallbackQueueHandle = nullptr;
 public:
 	void onWrite(BLECharacteristic *pCharacteristic);
 protected:

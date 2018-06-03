@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include "dc26_ble.h"
-#include "dc26_ble_scanning.h"
+#include "ble.h"
+#include "scanning.h"
 #include "../lib/ble/BLEDevice.h"
 
 

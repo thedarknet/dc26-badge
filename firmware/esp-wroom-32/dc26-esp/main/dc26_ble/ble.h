@@ -7,9 +7,9 @@
 #include "freertos/queue.h"
 #include "../lib/Task.h"
 #include "../lib/ble/BLEDevice.h"
-#include "dc26_ble_pairing_server.h"
-#include "dc26_ble_pairing_client.h"
-#include "dc26_ble_scanning.h"
+#include "pairing_server.h"
+#include "pairing_client.h"
+#include "scanning.h"
 
 enum BTCmd
 {

@@ -3,7 +3,7 @@
 
 #include "esp_system.h"
 #include "esp_log.h"
-#include "dc26_ble.h"
+#include "ble.h"
 #include "../lib/Task.h"
 #include "../lib/ble/BLEDevice.h"
 

@@ -2,10 +2,10 @@
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
-#include "dc26_ble.h"
-#include "dc26_ble_pairing_server.h"
-#include "dc26_ble_pairing_client.h"
-#include "dc26_ble_scanning.h"
+#include "ble.h"
+#include "pairing_server.h"
+#include "pairing_client.h"
+#include "scanning.h"
 #include "../lib/ble/BLE2902.h"
 #include "../lib/ble/BLEDevice.h"
 
@@ -123,18 +123,9 @@ static void clientRxCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 	memcpy(qbuf, pData, length);
 	qbuf[length] = '\x00';
 
-	// FIXME: I almost certainly can't just pass this pointer, it likely gets
-	// free'd the moment this function completes.
-	ESP_LOGI("RXCallback", "Queue Put");
-	if (xQueueSendFromISR(pBTTask->CallbackQueueHandle, &qbuf, NULL))
-	{
-		ESP_LOGI("RXCallback", "done");
-	}
-	else
-	{
-		ESP_LOGI("RXCallback", "fail");
-	}
-	//TODO: pBTTask->CallabackQueue.put(data)
+	// FIXME: I almost certainly can't just pass the pointer to the RemoteChar
+	// it likely gets free'd the moment this function completes.
+	xQueueSendFromISR(pBTTask->CallbackQueueHandle, &qbuf, NULL);
 }
 
 
@@ -145,7 +136,10 @@ UartServerCallbacks iUartServerCallbacks;
 UartClientCallbacks iUartClientCallbacks;
 MyScanCallbacks ScanCallbacks;
 
-bool isClient = true;
+bool isClient = false;
+bool firstSend = true;
+
+#define CbackQTimeout ((TickType_t) 500/portTICK_PERIOD_MS)
 
 void BluetoothTask::dispatchCmd(BTCmd *cmd)
 {
@@ -181,28 +175,51 @@ void BluetoothTask::dispatchCmd(BTCmd *cmd)
 		*cmd = BT_CMD_UNK;
 		break;
 	default:
-		if (isClient)
+		char * msg = nullptr;
+		if (isClient && firstSend)
 		{
 			iUartClientCallbacks.pTxChar->writeValue("doodlebug");
+			firstSend = false;
+		}
+		else if (isClient)
+		{
+			if(xQueueReceive(CallbackQueueHandle, &msg, CbackQTimeout) ==
+				pdTRUE)
+			{
+				ESP_LOGI(LOGTAG, "RX Queue read: %s", msg);
+				if (iUartClientCallbacks.connected)
+				{
+					iUartClientCallbacks.pTxChar->writeValue(msg);
+				}
+				free(msg);
+			}
 		}
 		else
 		{
 			if (iUartServerCallbacks.isConnected)
 			{
-				pUartTxCharacteristic->setValue("dinglebutt");
-				pUartTxCharacteristic->notify();
+				if(xQueueReceive(CallbackQueueHandle, &msg, CbackQTimeout) ==
+					pdTRUE)
+				{
+					ESP_LOGI(LOGTAG, "RX Queue read: %s", msg);
+					pUartTxCharacteristic->setValue(msg);
+					pUartTxCharacteristic->notify();
+					free(msg);
+				}
+			}
+			else
+			{
+
 			}
 		}
 		break;
 	}
 }
 
-
 void BluetoothTask::run(void * data)
 {
 	// TODO: Get commands from Queue
 	ESP_LOGI(LOGTAG, "RUNNING");
-	char *msg;
 	BTCmd cmd;
 	if (isClient)
 		cmd = BT_CMD_PASSIVE_SCAN;
@@ -214,19 +231,6 @@ void BluetoothTask::run(void * data)
 	{
 		vTaskDelay(5000 / portTICK_PERIOD_MS);
 		dispatchCmd(&cmd);
-		// TODO: Check CallbackQueue(Handle) for message to echo
-		if (isClient)
-		{
-			ESP_LOGI(LOGTAG, "Queue has %d waiting",
-						uxQueueMessagesWaiting(CallbackQueueHandle));
-			if (xQueueReceive(CallbackQueueHandle, &msg,
-							(TickType_t) 500)/portTICK_PERIOD_MS)
-			{
-				ESP_LOGI(LOGTAG, "Queue got: %s\n", msg);
-				free(msg);
-				//cmd = BT_CMD_ECHO;
-			}
-		}
 	}
 }
 
@@ -257,6 +261,7 @@ bool BluetoothTask::init()
 		// Create the UART Service
 		pService = pServer->createService(uartServiceUUID);
 		// setup characteristic for the server to send info
+		UartRxCallbacks.CallbackQueueHandle = CallbackQueueHandle;
 		pUartRxCharacteristic = pService->createCharacteristic(
 											uartRxUUID,
 											BLECharacteristic::PROPERTY_WRITE);

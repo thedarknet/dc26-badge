@@ -2,12 +2,18 @@
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
+
+// Main BLE library files
+#include "../lib/ble/BLE2902.h"
+#include "../lib/ble/BLEDevice.h"
+
+//DC26 BLE Files
 #include "ble.h"
 #include "pairing_server.h"
 #include "pairing_client.h"
 #include "scanning.h"
-#include "../lib/ble/BLE2902.h"
-#include "../lib/ble/BLEDevice.h"
+#include "./security.h"
+
 
 const char *BluetoothTask::LOGTAG = "BluetoothTask";
 
@@ -136,7 +142,7 @@ UartServerCallbacks iUartServerCallbacks;
 UartClientCallbacks iUartClientCallbacks;
 MyScanCallbacks ScanCallbacks;
 
-bool isClient = false;
+bool isClient = true;
 bool firstSend = true;
 
 #define CbackQTimeout ((TickType_t) 500/portTICK_PERIOD_MS)
@@ -236,6 +242,8 @@ void BluetoothTask::run(void * data)
 
 BLE2902 i2902;
 BLE2902 j2902;
+MySecurity *pMySecurity;
+BLESecurity *pSecurity;
 bool BluetoothTask::init()
 {
 	ESP_LOGI(LOGTAG, "INIT");
@@ -252,6 +260,16 @@ bool BluetoothTask::init()
 	
 	pDevice = &Device;
 	pDevice->init("DCDN BLE Device");
+	
+	pDevice->setEncryptionLevel(ESP_BLE_SEC_ENCRYPT);
+	pMySecurity = new MySecurity();
+	pDevice->setSecurityCallbacks(pMySecurity);
+
+	pSecurity = new BLESecurity();
+	pSecurity->setKeySize();
+	pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_ONLY);
+	pSecurity->setCapability(ESP_IO_CAP_IO);
+	pSecurity->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
 
 	if (!isClient)
 	{

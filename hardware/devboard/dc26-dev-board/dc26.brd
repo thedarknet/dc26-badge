@@ -22143,7 +22143,7 @@ Note, that not all DRC settings must be set by the manufacturer. Several can be 
 <element name="OLED1" library="dc-26" package="DISPLAY-OLED-128X32" value="DISPLAY-OLED-128X32" x="65.98" y="21.58" smashed="yes">
 <attribute name="NAME" x="59.23" y="21.6" size="0.8128" layer="25" font="vector" align="bottom-center"/>
 </element>
-<element name="P1" library="dc-26" package="SPDT_SSAJ120100" value="SSSS811101" x="46.17" y="8.2" smashed="yes" rot="MR0"/>
+<element name="P1" library="dc-26" package="SPDT_SSAJ120100" value="SPDT_SSAJ120100" x="46.17" y="8.2" smashed="yes" rot="MR0"/>
 <element name="R1" library="dc-26" package="0805" value="10K" x="9" y="51" smashed="yes" rot="MR90">
 <attribute name="NAME" x="9.8255" y="50.238" size="0.6096" layer="26" font="vector" rot="MR90"/>
 </element>

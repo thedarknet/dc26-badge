@@ -142,7 +142,7 @@ UartServerCallbacks iUartServerCallbacks;
 UartClientCallbacks iUartClientCallbacks;
 MyScanCallbacks ScanCallbacks;
 
-bool isClient = true;
+bool isClient = false;
 bool firstSend = true;
 
 #define CbackQTimeout ((TickType_t) 500/portTICK_PERIOD_MS)
@@ -263,13 +263,24 @@ bool BluetoothTask::init()
 	
 	pDevice->setEncryptionLevel(ESP_BLE_SEC_ENCRYPT);
 	pMySecurity = new MySecurity();
+	pMySecurity->pBTTask = this;
 	pDevice->setSecurityCallbacks(pMySecurity);
 
 	pSecurity = new BLESecurity();
-	pSecurity->setKeySize();
+	//pSecurity->setKeySize();
 	pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_ONLY);
-	pSecurity->setCapability(ESP_IO_CAP_IO);
-	pSecurity->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
+
+	// FIXME: will need to swap this back and forth when engaging as a client
+	if (isClient)
+	{
+		pSecurity->setCapability(ESP_IO_CAP_IO);
+		pSecurity->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
+	}
+	else
+	{
+		pSecurity->setCapability(ESP_IO_CAP_OUT);
+		pSecurity->setInitEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
+	}
 
 	if (!isClient)
 	{
@@ -298,6 +309,7 @@ bool BluetoothTask::init()
 		
 		// set the callbacks and start the service
 		iUartServerCallbacks.isConnected = false;
+		iUartServerCallbacks.pBTTask = this;
 		pServer->setCallbacks(&iUartServerCallbacks);
 		pService->start();
 
@@ -311,6 +323,7 @@ bool BluetoothTask::init()
 	{	
 		// setup pairing client
 		pPairingClient = pDevice->createClient();
+		iUartClientCallbacks.pBTTask = this;
 		pPairingClient->setClientCallbacks(&iUartClientCallbacks);
 	}
 

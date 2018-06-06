@@ -10,6 +10,7 @@
 
 class UartClientCallbacks : public BLEClientCallbacks {
 public:
+	BluetoothTask *pBTTask;
 	BLEClient *pClient;
 	BLERemoteService *pRemoteService;
 	BLERemoteCharacteristic *pTxChar;

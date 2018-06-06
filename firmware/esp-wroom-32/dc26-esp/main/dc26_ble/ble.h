@@ -53,6 +53,10 @@ public:
 	BLEAddress *pServerAddress;
 	BLERemoteCharacteristic *pRemoteCharacteristic;
 
+	// Client/Server Behavior differentiating data
+	bool isActingClient = false;
+	bool isActingServer = false;
+
 	// Callback message queue
 	static const int CBACK_MSG_QUEUE_SIZE = 10;
 	static const int CBACK_MSG_ITEM_SIZE = sizeof(void *); // TODO: Msg Size?

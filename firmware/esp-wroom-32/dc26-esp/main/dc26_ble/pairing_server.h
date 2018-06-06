@@ -15,6 +15,8 @@ static BLEUUID uartServiceUUID(PAIR_SERVICE_UUID);
 static BLEUUID uartTxUUID(PAIRING_TX_UUID);
 static BLEUUID uartRxUUID(PAIRING_RX_UUID);
 
+class BluetoothTask;
+
 class UartRxCharCallbacks : public BLECharacteristicCallbacks {
 public:
 	QueueHandle_t CallbackQueueHandle = nullptr;
@@ -25,6 +27,7 @@ protected:
 
 class UartServerCallbacks : public BLEServerCallbacks {
 public:
+	BluetoothTask *pBTTask = nullptr;
 	bool isConnected;
 public:
 	void onConnect(BLEServer* server);

@@ -11,6 +11,7 @@ const char *PAIR_CLIENT_TAG = "BTPairingClient";
 void UartClientCallbacks::onConnect(BLEClient* client)
 {
 	ESP_LOGI(PAIR_CLIENT_TAG, "connected to server");
+	pBTTask->isActingClient = true;
 	connected = true;
 	pClient = client;
 }
@@ -49,5 +50,6 @@ void UartClientCallbacks::afterConnect()
 void UartClientCallbacks::onDisconnect(BLEClient* client)
 {
 	ESP_LOGI(PAIR_CLIENT_TAG, "disconnected");
+	pBTTask->isActingClient = false;
 	connected = false;
 }

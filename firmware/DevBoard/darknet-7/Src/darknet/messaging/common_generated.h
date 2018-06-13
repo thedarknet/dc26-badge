@@ -8,38 +8,6 @@
 
 namespace darknet7 {
 
-enum MsgType {
-  MsgType_RESERVED = 0,
-  MsgType_SETUP_AP = 1,
-  MsgType_GENERIC_RESPONSE = 2,
-  MsgType_MIN = MsgType_RESERVED,
-  MsgType_MAX = MsgType_GENERIC_RESPONSE
-};
-
-inline const MsgType (&EnumValuesMsgType())[3] {
-  static const MsgType values[] = {
-    MsgType_RESERVED,
-    MsgType_SETUP_AP,
-    MsgType_GENERIC_RESPONSE
-  };
-  return values;
-}
-
-inline const char * const *EnumNamesMsgType() {
-  static const char * const names[] = {
-    "RESERVED",
-    "SETUP_AP",
-    "GENERIC_RESPONSE",
-    nullptr
-  };
-  return names;
-}
-
-inline const char *EnumNameMsgType(MsgType e) {
-  const size_t index = static_cast<int>(e);
-  return EnumNamesMsgType()[index];
-}
-
 enum WifiMode {
   WifiMode_OPEN = 0,
   WifiMode_WPA2 = 1,

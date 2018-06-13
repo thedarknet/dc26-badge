@@ -29,6 +29,7 @@
 #include "menus/mcu_info.h"
 #include "menus/tamagotchi.h"
 #include "menus/communications_settings.h"
+#include "messaging/stm_to_esp_generated.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::DisplayST7735;
@@ -236,6 +237,19 @@ ErrorType DarkNet7::onInit() {
 	f_mount(&myFS,"0:",1);
 	DIR d;
 	FRESULT fr = f_opendir(&d,"");
+#endif
+
+#if 0
+	 flatbuffers::FlatBufferBuilder fb;
+	 auto setup = darknet7::CreateSetupAPDirect(fb,"test","test");
+	 darknet7::CreateSTMToESPRequest(fb,1U,darknet7::STMToESPAny_SetupAP,setup.Union());
+	 uint8_t *p = fb.GetBufferPointer();
+	 flatbuffers::uoffset_t size = fb.GetSize();
+	 flatbuffers::Verifier v(p,size,0);
+	 darknet7::STMToESPRequest *s = (darknet7::STMToESPRequest*)p;
+	 if(s->Verify(v)) {
+		 const darknet7::SetupAP *setup = s->Msg_as<darknet7::SetupAP>();
+	 }
 #endif
 
 	return et;

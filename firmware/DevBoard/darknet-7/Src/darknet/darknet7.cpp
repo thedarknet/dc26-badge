@@ -11,6 +11,7 @@
 #include "libstm32/display/fonts.h"
 #include <main.h>
 #include "libstm32/config.h"
+#include "libstm32/logger.h"
 #include <usart.h>
 #include <spi.h>
 #include <i2c.h>
@@ -64,7 +65,7 @@ static const uint8_t EndContactSector = 3;
 DarkNet7 *DarkNet7::mSelf = 0;
 
 DarkNet7::ButtonInfo::ButtonInfo() :
-		BState(0) {
+		ButtonState(0),LastButtonState(0) {
 }
 
 bool DarkNet7::ButtonInfo::areTheseButtonsDown(const int32_t &b) {
@@ -95,7 +96,7 @@ bool DarkNet7::ButtonInfo::wasAnyButtonReleased() {
 
 
 void DarkNet7::ButtonInfo::processButtons() {
-	ButtonState = LastButtonState;
+	LastButtonState = ButtonState;
 	ButtonState = 0;
 	if (HAL_GPIO_ReadPin(MID_BUTTON1_GPIO_Port, MID_BUTTON1_Pin)
 			== GPIO_PIN_RESET) {
@@ -231,18 +232,26 @@ ErrorType DarkNet7::onInit() {
 	HAL_Delay(500);
 	setCurrentState(getDisplayMenuState());
 
+#define TEST_SD_CARD
 #ifdef TEST_SD_CARD
 	//disk_initialize(0);
 	FATFS myFS;
 	f_mount(&myFS,"0:",1);
 	DIR d;
-	FRESULT fr = f_opendir(&d,"");
+	if(FR_OK==f_opendir(&d,"/")) {
+		FILINFO fno;
+		if(FR_OK==::f_findfirst(&d,&fno,"/",0)) {
+			DBGMSG("%s",&fno.fname[0]);
+		}
+	}
 #endif
 
-#if 0
+#if 1
 	 flatbuffers::FlatBufferBuilder fb;
 	 auto setup = darknet7::CreateSetupAPDirect(fb,"test","test");
-	 darknet7::CreateSTMToESPRequest(fb,1U,darknet7::STMToESPAny_SetupAP,setup.Union());
+	 flatbuffers::Offset<darknet7::STMToESPRequest> of = darknet7::CreateSTMToESPRequest(fb,1U,darknet7::STMToESPAny_SetupAP,setup.Union());
+
+	 fb.Finish(setup,(const char *)"test");
 	 uint8_t *p = fb.GetBufferPointer();
 	 flatbuffers::uoffset_t size = fb.GetSize();
 	 flatbuffers::Verifier v(p,size,0);
@@ -261,6 +270,7 @@ static const uint16_t ESP_ADDRESS = 1;
 
 ErrorType DarkNet7::onRun() {
 	MyButtons.processButtons();
+	/*
 	if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_MID)) {
 		static const char *dis = "mid";
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);
@@ -292,6 +302,7 @@ ErrorType DarkNet7::onRun() {
 		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
 
 	}
+	*/
 	if (HAL_GPIO_ReadPin(MID_BUTTON1_GPIO_Port, MID_BUTTON1_Pin)
 			== GPIO_PIN_RESET) {
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);

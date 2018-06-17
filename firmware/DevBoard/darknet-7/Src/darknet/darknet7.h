@@ -58,11 +58,8 @@ public:
 		void processButtons();
 		friend class DarkNet7;
 	private:
-		union {
-			uint32_t ButtonState :8;
-			uint32_t LastButtonState :8;
-			uint32_t BState;
-		};
+		uint8_t ButtonState;
+		uint8_t LastButtonState;
 	};
 public:
 	cmdc0de::DisplayMessageState *getDisplayMessageState(cmdc0de::StateBase *bm, const char *message,

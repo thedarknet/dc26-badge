@@ -1,6 +1,9 @@
+#ifndef MY_SECURITY
+#define MY_SECURITY
+
+#include "ble.h"
 #include "../lib/ble/BLESecurity.h"
 #include "../lib/ble/BLEDevice.h"
-#include "ble.h"
 
 class MySecurity : public BLESecurityCallbacks 
 {
@@ -13,3 +16,5 @@ public:
 	virtual bool onSecurityRequest();
 	virtual void onAuthenticationComplete(esp_ble_auth_cmpl_t cmpl);
 };
+
+#endif // MY_SECURITY

@@ -44,8 +44,7 @@ bool MySecurity::onConfirmPIN(uint32_t pass_key)
 	bool retval = false;
 	if (pBTTask->isActingClient)
 	{
-		ESP_LOGI(CLTSECTAG, "The passkey YES/NO number:%d", pass_key);
-		vTaskDelay(5000);
+		ESP_LOGI(CLTSECTAG, "onConfirmPin: %d", pass_key);
 		retval = true;
 	}
 	else
@@ -62,7 +61,7 @@ bool MySecurity::onSecurityRequest()
 	bool retval = false;
 	if (pBTTask->isActingClient)
 	{
-		ESP_LOGI(CLTSECTAG, "Security Request");
+		ESP_LOGI(CLTSECTAG, "On Security Request");
 		retval = true;
 	}
 	else

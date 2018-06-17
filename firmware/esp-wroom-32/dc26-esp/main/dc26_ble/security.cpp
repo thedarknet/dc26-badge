@@ -51,6 +51,7 @@ bool MySecurity::onConfirmPIN(uint32_t pass_key)
 	else
 	{
 		ESP_LOGI(SVRSECTAG, "onConfirmPin %d", pass_key);
+		retval = true;
 		// TODO: retval
 	}
 	return retval;

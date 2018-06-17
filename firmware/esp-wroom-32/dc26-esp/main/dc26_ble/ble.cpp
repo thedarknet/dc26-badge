@@ -267,69 +267,55 @@ bool BluetoothTask::init()
 	pDevice->setSecurityCallbacks(pMySecurity);
 
 	pSecurity = new BLESecurity();
-	//pSecurity->setKeySize();
-	pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_ONLY);
 
-	// FIXME: will need to swap this back and forth when engaging as a client
-	if (isClient)
-	{
-		pSecurity->setCapability(ESP_IO_CAP_IO);
-		pSecurity->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
-	}
-	else
-	{
-		pSecurity->setCapability(ESP_IO_CAP_OUT);
-		pSecurity->setInitEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
-	}
+	pSecurity->setKeySize();
+	pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_BOND);
+	pSecurity->setCapability(ESP_IO_CAP_IO);
+	pSecurity->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
+	pSecurity->setInitEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
 
-	if (!isClient)
-	{
-		// Create out Bluetooth Server
-		pServer = pDevice->createServer();
+	// Create out Bluetooth Server
+	pServer = pDevice->createServer();
 
-		// Create the UART Service
-		pService = pServer->createService(uartServiceUUID);
-		// setup characteristic for the server to send info
-		UartRxCallbacks.CallbackQueueHandle = CallbackQueueHandle;
-		pUartRxCharacteristic = pService->createCharacteristic(
-											uartRxUUID,
-											BLECharacteristic::PROPERTY_WRITE);
-		pUartRxCharacteristic->setCallbacks(&UartRxCallbacks);
-		pUartRxCharacteristic->addDescriptor(&i2902);
-		
-		// setup characteristic for the client to send info
-		pUartTxCharacteristic = pService->createCharacteristic(
-											uartTxUUID,
-											BLECharacteristic::PROPERTY_WRITE |
-											BLECharacteristic::PROPERTY_READ |
-											BLECharacteristic::PROPERTY_INDICATE |
-											BLECharacteristic::PROPERTY_NOTIFY);
-		j2902.setNotifications(true);
-		pUartTxCharacteristic->addDescriptor(&j2902);
-		
-		// set the callbacks and start the service
-		iUartServerCallbacks.isConnected = false;
-		iUartServerCallbacks.pBTTask = this;
-		pServer->setCallbacks(&iUartServerCallbacks);
-		pService->start();
+	// Create the UART Service
+	pService = pServer->createService(uartServiceUUID);
+	// setup characteristic for the server to send info
+	UartRxCallbacks.CallbackQueueHandle = CallbackQueueHandle;
+	pUartRxCharacteristic = pService->createCharacteristic(
+										uartRxUUID,
+										BLECharacteristic::PROPERTY_WRITE);
+	pUartRxCharacteristic->setCallbacks(&UartRxCallbacks);
+	pUartRxCharacteristic->addDescriptor(&i2902);
 
-		// Setup advertising object
-		pAdvertising = pServer->getAdvertising();
-		pAdvertising->addServiceUUID(uartServiceUUID);
-		setB2BAdvData(adv_name, adv_manufacturer);
-		startB2BAdvertising();
-	}
-	else
-	{	
-		// setup pairing client
-		pPairingClient = pDevice->createClient();
-		iUartClientCallbacks.pBTTask = this;
-		pPairingClient->setClientCallbacks(&iUartClientCallbacks);
-	}
+	// setup characteristic for the client to send info
+	pUartTxCharacteristic = pService->createCharacteristic(
+										uartTxUUID,
+										BLECharacteristic::PROPERTY_WRITE |
+										BLECharacteristic::PROPERTY_READ |
+										BLECharacteristic::PROPERTY_INDICATE |
+										BLECharacteristic::PROPERTY_NOTIFY);
+	j2902.setNotifications(true);
+	pUartTxCharacteristic->addDescriptor(&j2902);
+
+	// set the callbacks and start the service
+	iUartServerCallbacks.isConnected = false;
+	iUartServerCallbacks.pBTTask = this;
+	pServer->setCallbacks(&iUartServerCallbacks);
+	pService->start();
+
+	// Setup advertising object
+	pAdvertising = pServer->getAdvertising();
+	pAdvertising->addServiceUUID(uartServiceUUID);
+	setB2BAdvData(adv_name, adv_manufacturer);
+	startB2BAdvertising();
+
+	// setup pairing client
+	pPairingClient = pDevice->createClient();
+	iUartClientCallbacks.pBTTask = this;
+	pPairingClient->setClientCallbacks(&iUartClientCallbacks);
 
 	// Setup scanning object and callbacks
 	pScan = pDevice->getScan();
-	//pScanCallbacks = new MyScanCallbacks();
 	pScanCallbacks = &ScanCallbacks;
 	pScan->setAdvertisedDeviceCallbacks(pScanCallbacks);
 

@@ -11,40 +11,37 @@ const char *PAIR_CLIENT_TAG = "BTPairingClient";
 void UartClientCallbacks::onConnect(BLEClient* client)
 {
 	ESP_LOGI(PAIR_CLIENT_TAG, "connected to server");
-	pBTTask->isActingClient = true;
 	connected = true;
 	pClient = client;
 }
 
 void UartClientCallbacks::afterConnect()
 {
-	ESP_LOGI(PAIR_CLIENT_TAG, "connected to server");
-	
-    // Obtain a reference to the service we are after in the remote BLE server.
+	// Obtain a reference to the service we are after in the remote BLE server.
 	vTaskDelay(150 / portTICK_PERIOD_MS);
-    pRemoteService = pClient->getService(uartServiceUUID);
-    if (pRemoteService == nullptr) {
-		printf("service finding error\n");
+	pRemoteService = pClient->getService(uartServiceUUID);
+	if (pRemoteService == nullptr) {
+		ESP_LOGE(PAIR_CLIENT_TAG, "service finding error");
 		return;
-    }
+	}
 
 	// get the characteristic for the CLIENT to RECEIVE (TX)
 	vTaskDelay(150 / portTICK_PERIOD_MS);
-    pRxChar = pRemoteService->getCharacteristic(uartTxUUID);
-    if (pRxChar == nullptr) {
-		printf("first char finding error\n");
+	pRxChar = pRemoteService->getCharacteristic(uartTxUUID);
+	if (pRxChar == nullptr) {
+		ESP_LOGE(PAIR_CLIENT_TAG, "first char finding error");
 		return;
-    }
+	}
 	
 	// get the characteristic for the CLIENT to SEND (RX)
 	vTaskDelay(150 / portTICK_PERIOD_MS);
-    pTxChar = pRemoteService->getCharacteristic(uartRxUUID);
-    if (pTxChar == nullptr) {
-		printf("second char finding error\n");
+	pTxChar = pRemoteService->getCharacteristic(uartRxUUID);
+	if (pTxChar == nullptr) {
+		ESP_LOGE(PAIR_CLIENT_TAG, "second char finding error");
 		return;
-    }
+	}
 	
-	vTaskDelay(150 / portTICK_PERIOD_MS);
+	ESP_LOGI(PAIR_CLIENT_TAG, "Setup Complete");
 }
 
 void UartClientCallbacks::onDisconnect(BLEClient* client)

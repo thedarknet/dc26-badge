@@ -3,6 +3,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 
+// FIXME: remove this when we ship, it's just for building/testing ease
+#include "swaphack.h"
+
 // Main BLE library files
 #include "../lib/ble/BLE2902.h"
 #include "../lib/ble/BLEDevice.h"
@@ -14,12 +17,27 @@
 #include "scanning.h"
 #include "./security.h"
 
+#ifdef IS_CLIENT
+bool isClient = true;
+bool firstSend = true;
+#else
+bool isClient = false;
+bool firstSend = false;
+#endif // IS_CLIENT
+
 
 const char *BluetoothTask::LOGTAG = "BluetoothTask";
 
 // We need a global reference so that we can access the callback message queue
 // from a static function
 BluetoothTask *pBTTask;
+
+//BLEDevice Device;
+UartRxCharCallbacks UartRxCallbacks;
+UartServerCallbacks iUartServerCallbacks;
+UartClientCallbacks iUartClientCallbacks;
+BLE2902 i2902;
+BLE2902 j2902;
 
 void BluetoothTask::startB2BAdvertising()
 {
@@ -77,11 +95,9 @@ void BluetoothTask::scan(bool active)
 
 void BluetoothTask::pair()
 {
-	ESP_LOGI(LOGTAG, "STARTING PAIRING\n");
-
-	// Connect to the remote BLE Server.
+	ESP_LOGI(LOGTAG, "STARTING PAIRING");
 	pPairingClient->connect(*pServerAddress);
-	ESP_LOGI(LOGTAG, "Connected to server\n");
+	ESP_LOGI(LOGTAG, "PAIRED");
 }
 
 void BluetoothTask::unpair()
@@ -109,7 +125,6 @@ void BluetoothTask::setB2BAdvData(std::string new_name, std::string new_man_data
 	adv_data.setFlags(0x6);
 	adv_data.setName(adv_name);
 	adv_data.setManufacturerData(adv_manufacturer);
-	//printf("ADV PAYLOAD: %s\n", adv_data.getPayload().c_str());
 
 	pAdvertising->setAdvertisementData(adv_data);
 
@@ -135,17 +150,45 @@ static void clientRxCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 }
 
 
-BLEDevice Device;
-BLEAdvertising Advertising;
-UartRxCharCallbacks UartRxCallbacks;
-UartServerCallbacks iUartServerCallbacks;
-UartClientCallbacks iUartClientCallbacks;
-MyScanCallbacks ScanCallbacks;
-
-bool isClient = false;
-bool firstSend = true;
-
 #define CbackQTimeout ((TickType_t) 500/portTICK_PERIOD_MS)
+unsigned long missed = 0;
+void BluetoothTask::do_client_behavior()
+{
+	char * msg = nullptr;
+	if (firstSend)
+	{
+		iUartClientCallbacks.pTxChar->writeValue("doodlebug");
+		firstSend = false;
+		return;
+	}
+
+	if(xQueueReceive(CallbackQueueHandle, &msg, CbackQTimeout) ==
+		pdTRUE)
+	{
+		ESP_LOGI(LOGTAG, "RX Queue read: %s", msg);
+		if (iUartClientCallbacks.connected)
+		{
+			iUartClientCallbacks.pTxChar->writeValue(msg);
+		}
+		free(msg);
+	}
+}
+
+void BluetoothTask::do_server_behavior()
+{
+	char * msg = nullptr;
+	if (iUartServerCallbacks.isConnected)
+	{
+		if(xQueueReceive(CallbackQueueHandle, &msg, CbackQTimeout) ==
+			pdTRUE)
+		{
+			ESP_LOGI(LOGTAG, "RX Queue read: %s", msg);
+			pUartTxCharacteristic->setValue(msg);
+			pUartTxCharacteristic->notify();
+			free(msg);
+		}
+	}
+}
 
 void BluetoothTask::dispatchCmd(BTCmd *cmd)
 {
@@ -175,49 +218,17 @@ void BluetoothTask::dispatchCmd(BTCmd *cmd)
 			*cmd = BT_CMD_PAIR;
 		break;
 	case BT_CMD_PAIR:
+		isActingClient = true;
 		pair();
 		iUartClientCallbacks.afterConnect();
 		iUartClientCallbacks.pRxChar->registerForNotify(&clientRxCallback);
 		*cmd = BT_CMD_UNK;
 		break;
 	default:
-		char * msg = nullptr;
-		if (isClient && firstSend)
-		{
-			iUartClientCallbacks.pTxChar->writeValue("doodlebug");
-			firstSend = false;
-		}
-		else if (isClient)
-		{
-			if(xQueueReceive(CallbackQueueHandle, &msg, CbackQTimeout) ==
-				pdTRUE)
-			{
-				ESP_LOGI(LOGTAG, "RX Queue read: %s", msg);
-				if (iUartClientCallbacks.connected)
-				{
-					iUartClientCallbacks.pTxChar->writeValue(msg);
-				}
-				free(msg);
-			}
-		}
+		if (isClient)
+			do_client_behavior();
 		else
-		{
-			if (iUartServerCallbacks.isConnected)
-			{
-				if(xQueueReceive(CallbackQueueHandle, &msg, CbackQTimeout) ==
-					pdTRUE)
-				{
-					ESP_LOGI(LOGTAG, "RX Queue read: %s", msg);
-					pUartTxCharacteristic->setValue(msg);
-					pUartTxCharacteristic->notify();
-					free(msg);
-				}
-			}
-			else
-			{
-
-			}
-		}
+			do_server_behavior();
 		break;
 	}
 }
@@ -235,15 +246,11 @@ void BluetoothTask::run(void * data)
 	}
 	while (1)
 	{
-		vTaskDelay(5000 / portTICK_PERIOD_MS);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
 		dispatchCmd(&cmd);
 	}
 }
 
-BLE2902 i2902;
-BLE2902 j2902;
-MySecurity *pMySecurity;
-BLESecurity *pSecurity;
 bool BluetoothTask::init()
 {
 	ESP_LOGI(LOGTAG, "INIT");
@@ -258,24 +265,23 @@ bool BluetoothTask::init()
 												CallbackBuffer,
 												&CallbackQueue);	
 	
-	pDevice = &Device;
-	pDevice->init("DCDN BLE Device");
+	BLEDevice::init("DCDN BLE Device");
 	
-	pDevice->setEncryptionLevel(ESP_BLE_SEC_ENCRYPT);
+	BLEDevice::setEncryptionLevel(ESP_BLE_SEC_ENCRYPT);
 	pMySecurity = new MySecurity();
 	pMySecurity->pBTTask = this;
-	pDevice->setSecurityCallbacks(pMySecurity);
+	BLEDevice::setSecurityCallbacks(pMySecurity);
 
 	pSecurity = new BLESecurity();
 
 	pSecurity->setKeySize();
-	pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_BOND);
-	pSecurity->setCapability(ESP_IO_CAP_IO);
+	pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_MITM_BOND);
+	pSecurity->setCapability(ESP_IO_CAP_OUT);
 	pSecurity->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
 	pSecurity->setInitEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
 
 	// Create out Bluetooth Server
-	pServer = pDevice->createServer();
+	pServer = BLEDevice::createServer();
 
 	// Create the UART Service
 	pService = pServer->createService(uartServiceUUID);
@@ -310,13 +316,13 @@ bool BluetoothTask::init()
 	startB2BAdvertising();
 
 	// setup pairing client
-	pPairingClient = pDevice->createClient();
+	pPairingClient = BLEDevice::createClient();
 	iUartClientCallbacks.pBTTask = this;
 	pPairingClient->setClientCallbacks(&iUartClientCallbacks);
 
 	// Setup scanning object and callbacks
-	pScan = pDevice->getScan();
-	pScanCallbacks = &ScanCallbacks;
+	pScan = BLEDevice::getScan();
+	pScanCallbacks = new MyScanCallbacks();
 	pScan->setAdvertisedDeviceCallbacks(pScanCallbacks);
 
 	return true;

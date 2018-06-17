@@ -10,6 +10,7 @@
 #include "pairing_server.h"
 #include "pairing_client.h"
 #include "scanning.h"
+#include "security.h"
 
 enum BTCmd
 {
@@ -32,6 +33,8 @@ public:
 	BLEClient *pPairingClient;
 	BLEService *pService;
 	BLEScan *pScan;
+	BLESecurity *pSecurity;
+	MySecurity *pMySecurity;
 	BLEAdvertising *pAdvertising;
 	MyScanCallbacks *pScanCallbacks;
 	BLECharacteristic *pUartTxCharacteristic;
@@ -86,6 +89,8 @@ public:
 	virtual void run(void *data);
 	virtual ~BluetoothTask();
 protected:
+	void do_client_behavior();
+	void do_server_behavior();
 };
 
 

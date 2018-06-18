@@ -24,3 +24,5 @@ table STMToESPRequest {
 	Msg:STMToESPAny;
 }
 
+root_type STMToESPRequest;
+

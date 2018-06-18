@@ -240,24 +240,29 @@ ErrorType DarkNet7::onInit() {
 	DIR d;
 	if(FR_OK==f_opendir(&d,"/")) {
 		FILINFO fno;
-		if(FR_OK==::f_findfirst(&d,&fno,"/",0)) {
+		if(FR_OK==::f_readdir(&d,&fno)) {
 			DBGMSG("%s",&fno.fname[0]);
 		}
 	}
 #endif
 
 #if 1
-	 flatbuffers::FlatBufferBuilder fb;
-	 auto setup = darknet7::CreateSetupAPDirect(fb,"test","test");
-	 flatbuffers::Offset<darknet7::STMToESPRequest> of = darknet7::CreateSTMToESPRequest(fb,1U,darknet7::STMToESPAny_SetupAP,setup.Union());
+	 flatbuffers::FlatBufferBuilder fbb;
+	 auto setup = darknet7::CreateSetupAPDirect(fbb,"test","test",darknet7::WifiMode_WPA2);
+	 flatbuffers::Offset<darknet7::STMToESPRequest> of = darknet7::CreateSTMToESPRequest(fbb,1U,darknet7::STMToESPAny_SetupAP,setup.Union());
+	 darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,of);
 
-	 fb.Finish(setup,(const char *)"test");
-	 uint8_t *p = fb.GetBufferPointer();
-	 flatbuffers::uoffset_t size = fb.GetSize();
-	 flatbuffers::Verifier v(p,size,0);
-	 darknet7::STMToESPRequest *s = (darknet7::STMToESPRequest*)p;
-	 if(s->Verify(v)) {
-		 const darknet7::SetupAP *setup = s->Msg_as<darknet7::SetupAP>();
+	 flatbuffers::uoffset_t size = fbb.GetSize();
+	 uint8_t *p = fbb.GetBufferPointer();
+
+	 flatbuffers::Verifier v(p,size);
+	 if(darknet7::VerifySizePrefixedSTMToESPRequestBuffer(v)) {
+		 v.GetComputedSize();
+		 auto t = darknet7::GetSizePrefixedSTMToESPRequest(p);
+		 auto msg = t->Msg_as_SetupAP();
+		 if(msg->mode()==darknet7::WifiMode_WPA2) {
+			 DBGMSG("yeah");
+		 }
 	 }
 #endif
 

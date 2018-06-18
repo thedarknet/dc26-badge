@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include "stdint.h"
 #include <display/display_device.h>
-#include "renderer.h"
+#include "3d/renderer.h"
 #include "menu3d.h"
+#include "../darknet7.h"
 
 using cmdc0de::RGBColor;
 
@@ -142,8 +143,8 @@ const unsigned short CubeIndexes[] = {
 const Vec3f Menu3D::center(0, 0, 0);
 const Vec3f Menu3D::up(0, 1, 0);
 
-Menu3D::Menu3D(cmdc0de::DisplayDevice * const dd) :
-		model(), light_dir(), eye(), CanvasWidth(0), CanvasHeight(0), DD(dd) {
+Menu3D::Menu3D() : Darknet7BaseState(),
+		model(), light_dir(), eye(), CanvasWidth(0), CanvasHeight(0) {
 }
 
 Menu3D::~Menu3D() {
@@ -168,15 +169,15 @@ cmdc0de::ErrorType Menu3D::onInit() {
 }
 
 void Menu3D::initMenu3d() {
-	CanvasHeight = getDisplay().getHeight() - 40;
-	CanvasWidth = getDisplay().getWidth()-18;
+	CanvasHeight = DarkNet7::get().getDisplay().getHeight();
+	CanvasWidth = DarkNet7::get().getDisplay().getWidth();
 	lookat(eye, center, up);
 	//shift viewport over by 5
 	viewport((CanvasWidth / 8)+5, CanvasHeight / 8, CanvasWidth * 0.75, CanvasHeight * 0.75);
 	//viewport(18, 13, 82, 90);
 	projection(-1.f / (eye - center).norm());
 	light_dir.normalize();
-	getDisplay().fillScreen(RGBColor::BLACK);
+	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 }
 
 cmdc0de::StateBase::ReturnStateContext Menu3D::onRun() {
@@ -232,16 +233,16 @@ void Menu3D::line(int x0, int y0, int x1, int y1, RGBColor& color) {
 		int y = y0 * (1. - t) + y1 * t;
 		if (x >= 0 && x < CanvasWidth && y >= 0 && y < CanvasHeight) {
 			if (steep) {
-				getDisplay().drawPixel(y, x, color);
+				DarkNet7::get().getDisplay().drawPixel(y, x, color);
 			} else {
-				getDisplay().drawPixel(x, y, color);
+				DarkNet7::get().getDisplay().drawPixel(x, y, color);
 			}
 		}
 	}
 }
 
 void Menu3D::render() {
-	getDisplay().fillRec(0, 0, CanvasWidth, CanvasHeight, RGBColor::BLACK);
+	DarkNet7::get().getDisplay().fillRec(0, 0, CanvasWidth, CanvasHeight, RGBColor::BLACK);
 	//rc.getDisplay().fillRec(0, 0, rc.getDisplay().getWidth(), rc.getDisplay().getHeight(), RGBColor::BLACK);
 
 	RGBColor c = RGBColor::WHITE;
@@ -259,7 +260,7 @@ void Menu3D::render() {
 	if (HAL_GetTick() - renderTime > 1000) {
 		char buf[12];
 		sprintf(&buf[0], "FPS: %lu:%lu", count, total_frames);
-		getDisplay().drawString(0, 140, &buf[0]);
+		DarkNet7::get().getDisplay().drawString(0, 140, &buf[0]);
 		count = 0;
 		renderTime = HAL_GetTick();
 	}

@@ -17,9 +17,16 @@
 #ifndef FLATBUFFERS_IDL_H_
 #define FLATBUFFERS_IDL_H_
 
+#ifdef STM32F411xE
+//TODO switch to ETL
 #include <map>
 #include <memory>
 #include <stack>
+#else
+#include <map>
+#include <memory>
+#include <stack>
+#endif
 
 #include "flatbuffers/base.h"
 #include "flatbuffers/flatbuffers.h"

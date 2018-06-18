@@ -1,13 +1,14 @@
 #include "mcu_to_mcu.h"
 #include "stm_to_esp_generated.h"
 #include "esp_to_stm_generated.h"
+#include "command_handler.h"
 #include <vector>
 
 const char *MCUToMCUTask::LOGTAG = "MCUToMCUTask";
 
-MCUToMCUTask::MCUToMCUTask(const std::string &tName, uint16_t stackSize, uint8_t p) 
+MCUToMCUTask::MCUToMCUTask(CmdHandlerTask *pcht, const std::string &tName, uint16_t stackSize, uint8_t p) 
 	: Task(tName,stackSize,p), STMToESPQueue(), STMToESPQueueHandle(nullptr), STMToESPBuffer(), 
-		ESPToSTMBuffer(), ESPToSTMQueue(), ESPToSTMQueueHandle(nullptr), BufSize(0) {
+		ESPToSTMBuffer(), ESPToSTMQueue(), ESPToSTMQueueHandle(nullptr), BufSize(0), CmdHandler(pcht) {
 
 }
 
@@ -39,6 +40,7 @@ void MCUToMCUTask::txTask() {
 	esp_log_level_set(LOGTAG, ESP_LOG_INFO);
 	OutgoingMsg *msgToSend =0;
 	while (1) {
+			  /*
 		if(xQueueReceive(ESPToSTMQueueHandle, &msgToSend, ( TickType_t ) 1000)) {
 			uint32_t bytesSent = 0;
 			while(bytesSent < msgToSend->Size) {
@@ -48,6 +50,7 @@ void MCUToMCUTask::txTask() {
 				vTaskDelay(portTICK_PERIOD_MS*10);
 			}
 		}
+		*/
 		//sendData(TX_TASK_TAG, "Hello world");
 		vTaskDelay(2000 / portTICK_PERIOD_MS);
 	}
@@ -83,6 +86,13 @@ void MCUToMCUTask::rxTask() {
 			memcpy(msg,sUARTBuffer.data(),size);
 			//FIX ME REALLY NEEDS TO MOVE BUFFER 
 			sUARTBuffer.clear();
+			switch(stmToESPRequest->Msg_type()) {
+				case darknet7::STMToESPAny_SetupAP:
+					CmdHandler->getQueueHandle();
+				break;
+				default:
+				break;
+			}
 		}
 		vTaskDelay(20000 / portTICK_PERIOD_MS);
 	}

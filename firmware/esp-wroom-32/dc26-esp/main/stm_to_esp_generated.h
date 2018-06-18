@@ -238,15 +238,11 @@ inline flatbuffers::Offset<DisplayMessage> CreateDisplayMessageDirect(
 struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_MSGINSTANCEID = 4,
-    VT_MTYPE = 6,
-    VT_MSG_TYPE = 8,
-    VT_MSG = 10
+    VT_MSG_TYPE = 6,
+    VT_MSG = 8
   };
   uint32_t msgInstanceID() const {
     return GetField<uint32_t>(VT_MSGINSTANCEID, 0);
-  }
-  MsgType MType() const {
-    return static_cast<MsgType>(GetField<int8_t>(VT_MTYPE, 0));
   }
   STMToESPAny Msg_type() const {
     return static_cast<STMToESPAny>(GetField<uint8_t>(VT_MSG_TYPE, 0));
@@ -267,7 +263,6 @@ struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_MSGINSTANCEID) &&
-           VerifyField<int8_t>(verifier, VT_MTYPE) &&
            VerifyField<uint8_t>(verifier, VT_MSG_TYPE) &&
            VerifyOffset(verifier, VT_MSG) &&
            VerifySTMToESPAny(verifier, Msg(), Msg_type()) &&
@@ -293,9 +288,6 @@ struct STMToESPRequestBuilder {
   void add_msgInstanceID(uint32_t msgInstanceID) {
     fbb_.AddElement<uint32_t>(STMToESPRequest::VT_MSGINSTANCEID, msgInstanceID, 0);
   }
-  void add_MType(MsgType MType) {
-    fbb_.AddElement<int8_t>(STMToESPRequest::VT_MTYPE, static_cast<int8_t>(MType), 0);
-  }
   void add_Msg_type(STMToESPAny Msg_type) {
     fbb_.AddElement<uint8_t>(STMToESPRequest::VT_MSG_TYPE, static_cast<uint8_t>(Msg_type), 0);
   }
@@ -317,14 +309,12 @@ struct STMToESPRequestBuilder {
 inline flatbuffers::Offset<STMToESPRequest> CreateSTMToESPRequest(
     flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t msgInstanceID = 0,
-    MsgType MType = MsgType_RESERVED,
     STMToESPAny Msg_type = STMToESPAny_NONE,
     flatbuffers::Offset<void> Msg = 0) {
   STMToESPRequestBuilder builder_(_fbb);
   builder_.add_Msg(Msg);
   builder_.add_msgInstanceID(msgInstanceID);
   builder_.add_Msg_type(Msg_type);
-  builder_.add_MType(MType);
   return builder_.Finish();
 }
 

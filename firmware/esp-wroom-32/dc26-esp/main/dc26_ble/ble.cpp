@@ -79,8 +79,7 @@ void BluetoothTask::scan(bool active)
 	scan_started = true;
 
 	pScan->setActiveScan(active);
-	//pScan->start(scan_time);
-	pScan->start(10);
+	pScan->start(3);
 
 	if (pScanCallbacks->server_found)
 	{
@@ -275,8 +274,8 @@ bool BluetoothTask::init()
 	pSecurity = new BLESecurity();
 
 	pSecurity->setKeySize();
-	pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_MITM_BOND);
-	pSecurity->setCapability(ESP_IO_CAP_OUT);
+	pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_MITM);
+	pSecurity->setCapability(ESP_IO_CAP_KBDISP);
 	pSecurity->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
 	pSecurity->setInitEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
 

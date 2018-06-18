@@ -78,6 +78,7 @@ static char tag[] = "main";
 
 void app_main()
 {
+	nvs_flash_erase(); // FIXME:  Remove this
 	nvs_flash_init();
 	if(SSD1306_Init(&I2cDisplay)>0) {
 		ESP_LOGI(tag,"display init successful");

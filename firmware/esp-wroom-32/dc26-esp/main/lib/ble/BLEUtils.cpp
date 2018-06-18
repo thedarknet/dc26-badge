@@ -1194,7 +1194,7 @@ void BLEUtils::dumpGapEvent(
 		// ESP_GAP_BLE_NC_REQ_EVT
 		//
 		case ESP_GAP_BLE_NC_REQ_EVT: {
-			ESP_LOGD(LOG_TAG, "[bd_addr: %s, passkey: %d]",
+			ESP_LOGD(LOG_TAG, "ENC_REQ_EVT - [bd_addr: %s, passkey: %d]",
 				BLEAddress(param->ble_security.key_notif.bd_addr).toString().c_str(),
 				param->ble_security.key_notif.passkey);
 			break;
@@ -1349,7 +1349,7 @@ void BLEUtils::dumpGapEvent(
 		// ESP_GAP_BLE_SEC_REQ_EVT
 		//
 		case ESP_GAP_BLE_SEC_REQ_EVT: {
-			ESP_LOGD(LOG_TAG, "[bd_addr: %s]", BLEAddress(param->ble_security.ble_req.bd_addr).toString().c_str());
+			ESP_LOGD(LOG_TAG, "SEC_REQ_EVT - [bd_addr: %s]", BLEAddress(param->ble_security.ble_req.bd_addr).toString().c_str());
 			break;
 		} // ESP_GAP_BLE_SEC_REQ_EVT
 

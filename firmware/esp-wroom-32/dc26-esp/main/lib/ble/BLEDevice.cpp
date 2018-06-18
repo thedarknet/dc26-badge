@@ -109,7 +109,7 @@ uint16_t   BLEDevice::m_localMTU = 23;
 
 		case ESP_GATTS_MTU_EVT: {
 			BLEDevice::m_localMTU = param->mtu.mtu;
-	        ESP_LOGI(LOG_TAG, "ESP_GATTS_MTU_EVT, MTU %d", BLEDevice::m_localMTU);
+	        ESP_LOGD(LOG_TAG, "ESP_GATTS_MTU_EVT, MTU %d", BLEDevice::m_localMTU);
 	        break;
 		}
 		default: {
@@ -184,16 +184,16 @@ uint16_t   BLEDevice::m_localMTU = 23;
 	switch(event) {
 
 		 case ESP_GAP_BLE_OOB_REQ_EVT:                                /* OOB request event */
-			 ESP_LOGI(LOG_TAG, "ESP_GAP_BLE_OOB_REQ_EVT");
+			 ESP_LOGD(LOG_TAG, "ESP_GAP_BLE_OOB_REQ_EVT");
 			 break;
 		 case ESP_GAP_BLE_LOCAL_IR_EVT:                               /* BLE local IR event */
-			 ESP_LOGI(LOG_TAG, "ESP_GAP_BLE_LOCAL_IR_EVT");
+			 ESP_LOGD(LOG_TAG, "ESP_GAP_BLE_LOCAL_IR_EVT");
 			 break;
 		 case ESP_GAP_BLE_LOCAL_ER_EVT:                               /* BLE local ER event */
-			 ESP_LOGI(LOG_TAG, "ESP_GAP_BLE_LOCAL_ER_EVT");
+			 ESP_LOGD(LOG_TAG, "ESP_GAP_BLE_LOCAL_ER_EVT");
 			 break;
 		 case ESP_GAP_BLE_NC_REQ_EVT:
-			 ESP_LOGI(LOG_TAG, "ESP_GAP_BLE_NC_REQ_EVT");
+			 ESP_LOGD(LOG_TAG, "ESP_GAP_BLE_NC_REQ_EVT");
 #ifdef CONFIG_BLE_SMP_ENABLE   // Check that BLE SMP (security) is configured in make menuconfig
 			if(BLEDevice::m_securityCallbacks!=nullptr){
 			 	 esp_ble_confirm_reply(param->ble_security.ble_req.bd_addr, BLEDevice::m_securityCallbacks->onConfirmPIN(param->ble_security.key_notif.passkey));
@@ -201,7 +201,7 @@ uint16_t   BLEDevice::m_localMTU = 23;
 #endif	// CONFIG_BLE_SMP_ENABLE
 			 break;
 		 case ESP_GAP_BLE_PASSKEY_REQ_EVT:                           /* passkey request event */
-			ESP_LOGI(LOG_TAG, "ESP_GAP_BLE_PASSKEY_REQ_EVT: ");
+			ESP_LOGD(LOG_TAG, "ESP_GAP_BLE_PASSKEY_REQ_EVT: ");
 			// esp_log_buffer_hex(LOG_TAG, m_remote_bda, sizeof(m_remote_bda));
 #ifdef CONFIG_BLE_SMP_ENABLE   // Check that BLE SMP (security) is configured in make menuconfig
 			if(BLEDevice::m_securityCallbacks!=nullptr){
@@ -215,7 +215,7 @@ uint16_t   BLEDevice::m_localMTU = 23;
 		 case ESP_GAP_BLE_SEC_REQ_EVT:
 			 /* send the positive(true) security response to the peer device to accept the security request.
 			 If not accept the security request, should sent the security response with negative(false) accept value*/
-			 ESP_LOGI(LOG_TAG, "ESP_GAP_BLE_SEC_REQ_EVT");
+			 ESP_LOGD(LOG_TAG, "ESP_GAP_BLE_SEC_REQ_EVT");
 #ifdef CONFIG_BLE_SMP_ENABLE   // Check that BLE SMP (security) is configured in make menuconfig
 			if(BLEDevice::m_securityCallbacks!=nullptr){
 				esp_ble_gap_security_rsp(param->ble_security.ble_req.bd_addr, BLEDevice::m_securityCallbacks->onSecurityRequest());
@@ -230,23 +230,23 @@ uint16_t   BLEDevice::m_localMTU = 23;
 			  */
 		 case ESP_GAP_BLE_PASSKEY_NOTIF_EVT:  ///the app will receive this evt when the IO  has Output capability and the peer device IO has Input capability.
 			 ///show the passkey number to the user to input it in the peer deivce.
-			 ESP_LOGI(LOG_TAG, "ESP_GAP_BLE_PASSKEY_NOTIF_EVT");
+			 ESP_LOGD(LOG_TAG, "ESP_GAP_BLE_PASSKEY_NOTIF_EVT");
 #ifdef CONFIG_BLE_SMP_ENABLE   // Check that BLE SMP (security) is configured in make menuconfig
 			if(BLEDevice::m_securityCallbacks!=nullptr){
-				ESP_LOGI(LOG_TAG, "passKey = %d", param->ble_security.key_notif.passkey);
+				ESP_LOGD(LOG_TAG, "passKey = %d", param->ble_security.key_notif.passkey);
 				BLEDevice::m_securityCallbacks->onPassKeyNotify(param->ble_security.key_notif.passkey);
 			}
 #endif	// CONFIG_BLE_SMP_ENABLE
 			 break;
 		 case ESP_GAP_BLE_KEY_EVT:
 			 //shows the ble key type info share with peer device to the user.
-			 ESP_LOGI(LOG_TAG, "ESP_GAP_BLE_KEY_EVT");
+			 ESP_LOGD(LOG_TAG, "ESP_GAP_BLE_KEY_EVT");
 #ifdef CONFIG_BLE_SMP_ENABLE   // Check that BLE SMP (security) is configured in make menuconfig
-			 ESP_LOGI(LOG_TAG, "key type = %s", BLESecurity::esp_key_type_to_str(param->ble_security.ble_key.key_type));
+			 ESP_LOGD(LOG_TAG, "key type = %s", BLESecurity::esp_key_type_to_str(param->ble_security.ble_key.key_type));
 #endif	// CONFIG_BLE_SMP_ENABLE
 			 break;
 		 case ESP_GAP_BLE_AUTH_CMPL_EVT:
-			 ESP_LOGI(LOG_TAG, "ESP_GAP_BLE_AUTH_CMPL_EVT");
+			 ESP_LOGD(LOG_TAG, "ESP_GAP_BLE_AUTH_CMPL_EVT");
 #ifdef CONFIG_BLE_SMP_ENABLE   // Check that BLE SMP (security) is configured in make menuconfig
 			 if(BLEDevice::m_securityCallbacks!=nullptr){
 				 BLEDevice::m_securityCallbacks->onAuthenticationComplete(param->ble_security.auth_cmpl);

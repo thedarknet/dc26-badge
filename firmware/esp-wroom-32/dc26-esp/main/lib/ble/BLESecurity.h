@@ -37,7 +37,7 @@ private:
  */
 class BLESecurityCallbacks {
 public:
-	virtual ~BLESecurityCallbacks() {};
+	~BLESecurityCallbacks() {};
 
 	/**
 	 * @brief Its request from peer device to input authentication pin code displayed on peer device.

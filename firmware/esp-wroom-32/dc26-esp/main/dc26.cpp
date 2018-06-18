@@ -15,7 +15,7 @@
 #include "mcu_to_mcu.h"
 #include "command_handler.h"
 
-#include "dc26_ble_proto.h"
+#include "dc26_ble/ble.h"
 
 static const int RX_BUF_SIZE = 1024;
 #define TXD_PIN (GPIO_NUM_4)
@@ -71,12 +71,14 @@ public:
 
 ESP32_I2CMaster I2cDisplay(GPIO_NUM_19,GPIO_NUM_18,1000000, I2C_NUM_0, 1024, 1024);
 CmdHandlerTask CmdTask("CmdTask");
+BluetoothTask BTTask("BluetoothTask");
 MCUToMCUTask ProcToProc(&CmdTask, "ProcToProc");
 
 static char tag[] = "main";
 
 void app_main()
 {
+	nvs_flash_erase(); // FIXME:  Remove this
 	nvs_flash_init();
 	if(SSD1306_Init(&I2cDisplay)>0) {
 		ESP_LOGI(tag,"display init successful");
@@ -88,7 +90,10 @@ void app_main()
 	init();
 	ProcToProc.init(TXD_PIN,RXD_PIN,RX_BUF_SIZE);
 	ProcToProc.start();
+	CmdTask.init();
 	CmdTask.start();
+	BTTask.init();
+	BTTask.start();
 
 	System::logSystemInfo();
 	wifi_config_t wifi_config;
@@ -104,7 +109,6 @@ void app_main()
 	dhcps_lease_t l;
 	wifi.initDHCPSLeaseInfo(l);
 	wifi.wifi_start_access_point(wifi_config,ipInfo,l);
-	dc26_bt_init();
 	vTaskDelete(NULL);
 }
 

@@ -1150,7 +1150,7 @@ void BLEUtils::dumpGapEvent(
 		// - esp_bt_dev_type_t dev_type
 		//
 		case ESP_GAP_BLE_AUTH_CMPL_EVT: {
-			ESP_LOGI(LOG_TAG, "[bd_addr: %s, key_present: %d, key: ***, key_type: %d, success: %d, fail_reason: %d, addr_type: ***, dev_type: %s]",
+			ESP_LOGD(LOG_TAG, "[bd_addr: %s, key_present: %d, key: ***, key_type: %d, success: %d, fail_reason: %d, addr_type: ***, dev_type: %s]",
 				BLEAddress(param->ble_security.auth_cmpl.bd_addr).toString().c_str(),
 				param->ble_security.auth_cmpl.key_present,
 				param->ble_security.auth_cmpl.key_type,
@@ -1194,7 +1194,7 @@ void BLEUtils::dumpGapEvent(
 		// ESP_GAP_BLE_NC_REQ_EVT
 		//
 		case ESP_GAP_BLE_NC_REQ_EVT: {
-			ESP_LOGI(LOG_TAG, "ENC_REQ_EVT - [bd_addr: %s, passkey: %d]",
+			ESP_LOGD(LOG_TAG, "ENC_REQ_EVT - [bd_addr: %s, passkey: %d]",
 				BLEAddress(param->ble_security.key_notif.bd_addr).toString().c_str(),
 				param->ble_security.key_notif.passkey);
 			break;
@@ -1349,7 +1349,7 @@ void BLEUtils::dumpGapEvent(
 		// ESP_GAP_BLE_SEC_REQ_EVT
 		//
 		case ESP_GAP_BLE_SEC_REQ_EVT: {
-			ESP_LOGI(LOG_TAG, "SEC_REQ_EVT - [bd_addr: %s]", BLEAddress(param->ble_security.ble_req.bd_addr).toString().c_str());
+			ESP_LOGD(LOG_TAG, "SEC_REQ_EVT - [bd_addr: %s]", BLEAddress(param->ble_security.ble_req.bd_addr).toString().c_str());
 			break;
 		} // ESP_GAP_BLE_SEC_REQ_EVT
 

@@ -351,6 +351,36 @@ inline bool VerifySTMToESPAnyVector(flatbuffers::Verifier &verifier, const flatb
   return true;
 }
 
+inline const darknet7::STMToESPRequest *GetSTMToESPRequest(const void *buf) {
+  return flatbuffers::GetRoot<darknet7::STMToESPRequest>(buf);
+}
+
+inline const darknet7::STMToESPRequest *GetSizePrefixedSTMToESPRequest(const void *buf) {
+  return flatbuffers::GetSizePrefixedRoot<darknet7::STMToESPRequest>(buf);
+}
+
+inline bool VerifySTMToESPRequestBuffer(
+    flatbuffers::Verifier &verifier) {
+  return verifier.VerifyBuffer<darknet7::STMToESPRequest>(nullptr);
+}
+
+inline bool VerifySizePrefixedSTMToESPRequestBuffer(
+    flatbuffers::Verifier &verifier) {
+  return verifier.VerifySizePrefixedBuffer<darknet7::STMToESPRequest>(nullptr);
+}
+
+inline void FinishSTMToESPRequestBuffer(
+    flatbuffers::FlatBufferBuilder &fbb,
+    flatbuffers::Offset<darknet7::STMToESPRequest> root) {
+  fbb.Finish(root);
+}
+
+inline void FinishSizePrefixedSTMToESPRequestBuffer(
+    flatbuffers::FlatBufferBuilder &fbb,
+    flatbuffers::Offset<darknet7::STMToESPRequest> root) {
+  fbb.FinishSizePrefixed(root);
+}
+
 }  // namespace darknet7
 
 #endif  // FLATBUFFERS_GENERATED_STMTOESP_DARKNET7_H_

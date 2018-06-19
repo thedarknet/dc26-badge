@@ -76,25 +76,31 @@ void MCUToMCUTask::rxTask() {
 	uint8_t dataBuf[1024];
 	while(1) {
 		const int rxBytes = uart_read_bytes(UART_NUM_1, &dataBuf[0], 
-			getBufferSize(), 1000 / portTICK_RATE_MS);
-		sUARTBuffer.insert(sUARTBuffer.end(),&dataBuf[0],&dataBuf[rxBytes-1]);
-		flatbuffers::Verifier verifier(sUARTBuffer.data(),sUARTBuffer.size());
-		darknet7::STMToESPRequest *stmToESPRequest = (darknet7::STMToESPRequest*)&dataBuf[0];
-		if(stmToESPRequest->Verify(verifier)) {
-			uint32_t size = verifier.GetComputedSize();
-			uint8_t *msg = new uint8_t[size];
-			memcpy(msg,sUARTBuffer.data(),size);
-			//FIX ME REALLY NEEDS TO MOVE BUFFER 
-			sUARTBuffer.clear();
-			switch(stmToESPRequest->Msg_type()) {
-				case darknet7::STMToESPAny_SetupAP:
-					CmdHandler->getQueueHandle();
-				break;
-				default:
-				break;
+							 sizeof(dataBuf), 1000 / portTICK_RATE_MS);
+		if(rxBytes>0) {
+			ESP_LOGI(LOGTAG, "bytes");
+			sUARTBuffer.insert(sUARTBuffer.end(),&dataBuf[0],&dataBuf[rxBytes-1]);
+		}
+		if(sUARTBuffer.size()>0) {
+			flatbuffers::Verifier verifier(sUARTBuffer.data(),sUARTBuffer.size());
+			if(darknet7::VerifySizePrefixedSTMToESPRequestBuffer(verifier)) {
+				uint32_t size = verifier.GetComputedSize();
+				uint8_t *msg = new uint8_t[size];
+				memcpy(msg,sUARTBuffer.data(),size);
+				std::vector<decltype(sUARTBuffer)::value_type>(sUARTBuffer.begin()+size, 
+								 sUARTBuffer.end()).swap(sUARTBuffer);
+
+				auto t = darknet7::GetSizePrefixedSTMToESPRequest(msg);
+				switch(t->Msg_type()) {
+					case darknet7::STMToESPAny_SetupAP:
+						xQueueSend(CmdHandler->getQueueHandle(),(void*)msg, ( TickType_t ) 0);
+						break;
+					default:
+						break;
+				}
 			}
 		}
-		vTaskDelay(20000 / portTICK_PERIOD_MS);
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
 	}
 #endif
 }

@@ -54,10 +54,10 @@ cmdc0de::StateBase::ReturnStateContext GameOfLife::onRun() {
 			for (uint16_t j = 0; j < height; j++) {
 				for (uint16_t k = 0; k < width; k++) {
 					if ((gol[j] & (1 << k)) != 0) {
-						DarkNet7::get().getDisplay().drawPixel(k * 4, j * 2 + 10, RGBColor::WHITE);
+						DarkNet7::get().getDisplay().drawPixel(j * 2 + 10, k * 4, RGBColor::WHITE);
 						count++;
 					} else {
-						DarkNet7::get().getDisplay().drawPixel(k * 4, j * 2 + 10, RGBColor::BLACK);
+						DarkNet7::get().getDisplay().drawPixel(j * 2 + 10, k * 4, RGBColor::BLACK);
 					}
 				}
 			}
@@ -84,11 +84,11 @@ cmdc0de::StateBase::ReturnStateContext GameOfLife::onRun() {
 		break;
 	}
 	cmdc0de::StateBase *next = DarkNet7::get().getDisplayMenuState();
-	//if (rc.getKB().getLastKeyReleased() == QKeyboard::NO_PIN_SELECTED) {
-	//	return ReturnStateContext(this);
-	//} else {
+	if (!DarkNet7::get().getButtonInfo().wasAnyButtonReleased()) {
+		return ReturnStateContext(this);
+	} else {
 		return ReturnStateContext(next);
-	//}
+	}
 }
 
 ErrorType GameOfLife::onShutdown() {

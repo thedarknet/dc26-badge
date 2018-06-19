@@ -54,6 +54,7 @@ public:
 		bool wereTheseButtonsReleased(const int32_t &b);
 		bool wereAnyOfTheseButtonsReleased(const int32_t &b);
 		bool wasAnyButtonReleased();
+		void reset();
 	protected:
 		void processButtons();
 		friend class DarkNet7;

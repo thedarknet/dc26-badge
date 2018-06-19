@@ -26,16 +26,16 @@ CmdHandlerTask::~CmdHandlerTask() {
 void CmdHandlerTask::run(void *data) {
 	darknet7::STMToESPRequest *msg;
 	while (1) {
-			  /*
-		if(xQueueReceive(InCommingQueueHandle, &msg, ( TickType_t ) 20000)/portTICK_PERIOD_MS) {
+		if(xQueueReceive(getQueueHandle(), &msg, ( TickType_t ) 20000)/portTICK_PERIOD_MS) {
 			switch(msg->Msg_type()) {
 				case darknet7::STMToESPAny_SetupAP:
 					break;
 				default:
 					break;
 			}
+			uint8_t *tmp = (uint8_t*)msg;
+			delete [] tmp;
 		}
-		*/
 		vTaskDelay(2000 / portTICK_PERIOD_MS);
 	}
 }

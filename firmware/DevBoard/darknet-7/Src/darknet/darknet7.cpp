@@ -68,6 +68,10 @@ DarkNet7::ButtonInfo::ButtonInfo() :
 		ButtonState(0),LastButtonState(0) {
 }
 
+void DarkNet7::ButtonInfo::reset() {
+	ButtonState = LastButtonState = 0;
+}
+
 bool DarkNet7::ButtonInfo::areTheseButtonsDown(const int32_t &b) {
 	return (ButtonState & b) == b;
 }
@@ -271,7 +275,7 @@ ErrorType DarkNet7::onInit() {
 
 static const char *RFAILED = "Receive Failed";
 static const char *TFAILED = "Transmit Failed";
-static const uint16_t ESP_ADDRESS = 1;
+//static const uint16_t ESP_ADDRESS = 1;
 
 ErrorType DarkNet7::onRun() {
 	MyButtons.processButtons();
@@ -356,7 +360,8 @@ ErrorType DarkNet7::onRun() {
 	if (rsc.Err.ok()) {
 		if (getCurrentState() != rsc.NextMenuToRun) {
 			//on state switches reset keyboard and give a 1 second pause on reading from keyboard.
-			//KB.reset();
+			MyButtons.reset();
+			setCurrentState(rsc.NextMenuToRun);
 		}
 		//if (CurrentState != StateFactory::getGameOfLifeState()
 		//		&& (tick > KB.getLastPinSelectedTick())

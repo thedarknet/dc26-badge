@@ -96,7 +96,7 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 			case 2:
 				nextState = DarkNet7::get().getAddressBookState();
 				break;
-			case 3:
+			case 4:
 				nextState = DarkNet7::get().get3DState();
 				break;
 			case 5:

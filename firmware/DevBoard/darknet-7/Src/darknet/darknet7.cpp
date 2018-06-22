@@ -193,6 +193,7 @@ ErrorType DarkNet7::onInit() {
 		HAL_Delay(1000);
 		items[0].set(0, "OLED_INIT");
 		DrawList.ItemsCount++;
+		Display.setTextColor(cmdc0de::RGBColor::WHITE);
 	}
 #if 1
 	HAL_GPIO_WritePin(SIMPLE_LED1_GPIO_Port, SIMPLE_LED1_Pin, GPIO_PIN_SET);

@@ -3,15 +3,13 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 
-// FIXME: remove this when we ship, it's just for building/testing ease
-#include "swaphack.h"
-
 // Main BLE library files
 #include "../lib/ble/BLE2902.h"
 #include "../lib/ble/BLEDevice.h"
 
 //DC26 BLE Files
 #include "ble.h"
+#include "services.h" // UUIDs for all potential services and characteristics
 #include "pairing_server.h"
 #include "pairing_client.h"
 #include "scanning.h"
@@ -286,19 +284,12 @@ bool BluetoothTask::init()
 	pService = pServer->createService(uartServiceUUID);
 	// setup characteristic for the server to send info
 	UartRxCallbacks.CallbackQueueHandle = CallbackQueueHandle;
-	pUartRxCharacteristic = pService->createCharacteristic(
-										uartRxUUID,
-										BLECharacteristic::PROPERTY_WRITE);
+	pUartRxCharacteristic = pService->createCharacteristic(uartCosiUUID, uartCosiCharProps);
 	pUartRxCharacteristic->setCallbacks(&UartRxCallbacks);
 	pUartRxCharacteristic->addDescriptor(&i2902);
 
 	// setup characteristic for the client to send info
-	pUartTxCharacteristic = pService->createCharacteristic(
-										uartTxUUID,
-										BLECharacteristic::PROPERTY_WRITE |
-										BLECharacteristic::PROPERTY_READ |
-										BLECharacteristic::PROPERTY_INDICATE |
-										BLECharacteristic::PROPERTY_NOTIFY);
+	pUartTxCharacteristic = pService->createCharacteristic(uartCisoUUID, uartCisoCharProps);
 	j2902.setNotifications(true);
 	pUartTxCharacteristic->addDescriptor(&j2902);
 

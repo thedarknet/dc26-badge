@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "ble.h"
+#include "services.h"
 #include "pairing_client.h"
 #include "pairing_server.h"
 #include "../lib/ble/BLEDevice.h"
@@ -27,14 +28,14 @@ void UartClientCallbacks::afterConnect()
 
 	// get the characteristic for the CLIENT to RECEIVE (TX)
 	vTaskDelay(1000 / portTICK_PERIOD_MS);
-	pRxChar = pRemoteService->getCharacteristic(uartTxUUID);
+	pRxChar = pRemoteService->getCharacteristic(uartCisoUUID);
 	if (pRxChar == nullptr) {
 		ESP_LOGE(PAIR_CLIENT_TAG, "first char finding error");
 		return;
 	}
 	
 	// get the characteristic for the CLIENT to SEND (RX)
-	pTxChar = pRemoteService->getCharacteristic(uartRxUUID);
+	pTxChar = pRemoteService->getCharacteristic(uartCosiUUID);
 	if (pTxChar == nullptr) {
 		ESP_LOGE(PAIR_CLIENT_TAG, "second char finding error");
 		return;

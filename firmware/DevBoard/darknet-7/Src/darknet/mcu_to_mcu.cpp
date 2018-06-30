@@ -5,9 +5,8 @@
  *      Author: cmdc0de
  */
 
-
+#include <usart.h>
 #include "mcu_to_mcu.h"
-#include "../stm32f4xx_hal_uart.h"
 #include "libstm32/etl/src/crc16.h"
 
 MCUToMCU *MCUToMCU::mSelf = 0;
@@ -47,7 +46,7 @@ void MCUToMCU::init(UART_HandleTypeDef *uart) {
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	if(huart==&huart1) {
 		if(huart->RxXferCount>0) {
-			MCUToMCU::handleMcuToMcu();
+			MCUToMCU::get().handleMcuToMcu();
 		}
 	}
 }
@@ -61,22 +60,27 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 }
 
 void MCUToMCU::onTransmitionComplete(UART_HandleTypeDef *huart) {
+	/*
 	etl::vector<decltype(TransmitBuffer)::value_type,1024>(TransmitBuffer.begin()+huart->TxXferCount,
 				TransmitBuffer.end()).swap(TransmitBuffer);
 	if(!TransmitBuffer.empty()) {
 		HAL_UART_Transmit_IT(UartHandler,&TransmitBuffer[0],(uint16_t)TransmitBuffer.size());
 	}
+	*/
 }
 
 MCUToMCU &MCUToMCU::get() {
 	if(0==mSelf) {
 		mSelf = new MCUToMCU();
 	}
-	return mSelf;
+	return *mSelf;
+}
+
+MCUToMCU::MCUToMCU() : InComing(), TransmitBuffer(), UartHandler(0) {
+
 }
 
 void MCUToMCU::handleMcuToMcu() {
-	MCUToMCU &comms = MCUToMCU::get();
 	uint16_t size = UartHandler->RxXferCount;
 	if(UartHandler->pRxBuffPtr-ENVELOP_HEADER==&UartRXBuffer[0]) {
 		//we just got header:
@@ -87,8 +91,8 @@ void MCUToMCU::handleMcuToMcu() {
 		uint16_t firstTwo = (*((uint16_t *)&UartHandler[0]));
 		uint16_t size = firstTwo&0x7FF; //0-10 bits are size
 		uint16_t crcFromESP = (*((uint16_t *)&UartHandler[2]));
-		etl::CRC16 crc16(&UartRXBuffer[ENVELOP_HEADER],&UartRXBuffer[ENVELOP_HEADER]+size);
-		if(crc16.value()==crcFromESP) {
+		etl::crc16 crc(&UartRXBuffer[ENVELOP_HEADER],&UartRXBuffer[ENVELOP_HEADER]+size);
+		if(crc.value()==crcFromESP) {
 			Message &m = InComing.push();
 			m.set(firstTwo,crcFromESP,&UartRXBuffer[ENVELOP_HEADER]);
 		}
@@ -99,13 +103,13 @@ void MCUToMCU::handleMcuToMcu() {
 bool MCUToMCU::send(const flatbuffers::FlatBufferBuilder &fbb) {
 	uint8_t *msg = fbb.GetBufferPointer();
 	uint32_t size = fbb.GetSize();
-	etl::CRC16 crc(msg,msg+size);
+	etl::crc16 crc(msg,msg+size);
 	uint16_t envelop[ENVELOP_HEADER/sizeof(uint16_t)];
 	envelop[0] = static_cast<uint16_t>(size&0xFFFF);
 	envelop[1] = crc.value();
-	TransmitBuffer.insert(static_cast<uint8_t*>(&envelop[0]),static_cast<uint8_t*>(&envelop[0])+ENVELOP_HEADER,ENVELOP_HEADER);
+	TransmitBuffer.insert(TransmitBuffer.end(),reinterpret_cast<uint8_t*>(&envelop[0]),reinterpret_cast<uint8_t*>(&envelop[0])+ENVELOP_HEADER);
 	TransmitBuffer.insert(TransmitBuffer.end(),fbb.GetBufferPointer(),fbb.GetBufferPointer()+fbb.GetSize());
-	HAL_UART_Transmit_IT(UartHandler,&TransmitBuffer[0],(uint16_t) TransmitBuffer.size());
+	return HAL_OK==HAL_UART_Transmit_IT(UartHandler,&TransmitBuffer[0],(uint16_t) TransmitBuffer.size());
 }
 
 static bool pastFirst = false;

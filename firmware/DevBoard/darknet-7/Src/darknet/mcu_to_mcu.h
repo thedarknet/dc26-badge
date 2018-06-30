@@ -29,12 +29,12 @@ public:
 	};
 public:
 	static MCUToMCU &get();
-	static void handleMcuToMcu();
 public:
 	void init(UART_HandleTypeDef *);
 	bool send(const flatbuffers::FlatBufferBuilder &fbb);
 	darknet7::ESPToSTM *getNext();
 	void onTransmitionComplete(UART_HandleTypeDef *huart);
+	void handleMcuToMcu();
 private:
 	MCUToMCU();
 	static MCUToMCU *mSelf;

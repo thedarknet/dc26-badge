@@ -9,7 +9,7 @@
 
 class BluetoothTask;
 
-class UartRxCharCallbacks : public BLECharacteristicCallbacks {
+class UartCosiCharCallbacks : public BLECharacteristicCallbacks {
 public:
 	QueueHandle_t CallbackQueueHandle = nullptr;
 public:

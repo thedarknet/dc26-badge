@@ -9,6 +9,7 @@
 
 //DC26 BLE Files
 #include "ble.h"
+#include "ble_serial.h"
 #include "services.h" // UUIDs for all potential services and characteristics
 #include "pairing_server.h"
 #include "pairing_client.h"
@@ -31,7 +32,7 @@ const char *BluetoothTask::LOGTAG = "BluetoothTask";
 BluetoothTask *pBTTask;
 
 //BLEDevice Device;
-UartRxCharCallbacks UartRxCallbacks;
+UartCosiCharCallbacks UartCosiCallbacks;
 UartServerCallbacks iUartServerCallbacks;
 UartClientCallbacks iUartClientCallbacks;
 BLE2902 i2902;
@@ -180,8 +181,8 @@ void BluetoothTask::do_server_behavior()
 			pdTRUE)
 		{
 			ESP_LOGI(LOGTAG, "RX Queue read: %s", msg);
-			pUartTxCharacteristic->setValue(msg);
-			pUartTxCharacteristic->notify();
+			pUartCisoCharacteristic->setValue(msg);
+			pUartCisoCharacteristic->notify();
 			free(msg);
 		}
 	}
@@ -282,16 +283,16 @@ bool BluetoothTask::init()
 
 	// Create the UART Service
 	pService = pServer->createService(uartServiceUUID);
-	// setup characteristic for the server to send info
-	UartRxCallbacks.CallbackQueueHandle = CallbackQueueHandle;
-	pUartRxCharacteristic = pService->createCharacteristic(uartCosiUUID, uartCosiCharProps);
-	pUartRxCharacteristic->setCallbacks(&UartRxCallbacks);
-	pUartRxCharacteristic->addDescriptor(&i2902);
-
 	// setup characteristic for the client to send info
-	pUartTxCharacteristic = pService->createCharacteristic(uartCisoUUID, uartCisoCharProps);
+	UartCosiCallbacks.CallbackQueueHandle = CallbackQueueHandle;
+	pUartCosiCharacteristic = pService->createCharacteristic(uartCosiUUID, uartCosiCharProps);
+	pUartCosiCharacteristic->setCallbacks(&UartCosiCallbacks);
+	pUartCosiCharacteristic->addDescriptor(&i2902);
+
+	// setup characteristic for the server to send info
+	pUartCisoCharacteristic = pService->createCharacteristic(uartCisoUUID, uartCisoCharProps);
 	j2902.setNotifications(true);
-	pUartTxCharacteristic->addDescriptor(&j2902);
+	pUartCisoCharacteristic->addDescriptor(&j2902);
 
 	// set the callbacks and start the service
 	iUartServerCallbacks.isConnected = false;
@@ -314,6 +315,8 @@ bool BluetoothTask::init()
 	pScan = BLEDevice::getScan();
 	pScanCallbacks = new MyScanCallbacks();
 	pScan->setAdvertisedDeviceCallbacks(pScanCallbacks);
+
+	init_ble_serial(pService);
 
 	return true;
 }

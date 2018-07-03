@@ -16,6 +16,17 @@ static BLEUUID uartCosiUUID(PAIRING_COSI_UUID);
                            BLECharacteristic::PROPERTY_NOTIFY)
 #define uartCosiCharProps (BLECharacteristic::PROPERTY_WRITE)
 
+
+// Serial adventure characteristics
+#define SERIAL_CISO_UUID   "646e0012-0001-0002-0003-000000000000"
+#define SERIAL_COSI_UUID   "646e0012-0001-0002-0003-000000000000"
+static BLEUUID serialCisoUUID(SERIAL_CISO_UUID);
+static BLEUUID serialCosiUUID(SERIAL_COSI_UUID);
+#define serialCisoCharProps (BLECharacteristic::PROPERTY_READ | \
+                           BLECharacteristic::PROPERTY_NOTIFY)
+#define serialCosiCharProps (BLECharacteristic::PROPERTY_WRITE)
+
+
 // Gulo-tachi feeding
 #define FOOD_STATION_CHAR  "646e0002-0001-0002-0003-000000000001"
 #define WATER_STATION_CHAR "646e0002-0001-0002-0003-000000000002"

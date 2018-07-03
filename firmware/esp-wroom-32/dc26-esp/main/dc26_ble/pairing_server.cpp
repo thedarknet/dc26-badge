@@ -6,19 +6,19 @@
 
 const char *PAIR_SVR_TAG = "BTPairingServer";
 
-void UartRxCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
+void UartCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 {
 	std::string rxValue = pCharacteristic->getValue();
 	if (rxValue.length() > 0)
 	{	
-		const char *msgOrig = pCharacteristic->getValue().c_str();
+		const char *msgOrig = rxValue.c_str();
 		uint32_t len = strlen(msgOrig);
 		char * msg = (char*)malloc(len+1);
 		memcpy(msg, msgOrig, len);
 		msg[len] = '\0';
 		xQueueSendFromISR(CallbackQueueHandle, &msg, NULL);
 	}
-};
+}
 
 void UartServerCallbacks::onConnect(BLEServer* server)
 {

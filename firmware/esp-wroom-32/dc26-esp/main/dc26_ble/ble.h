@@ -37,8 +37,8 @@ public:
 	MySecurity *pMySecurity;
 	BLEAdvertising *pAdvertising;
 	MyScanCallbacks *pScanCallbacks;
-	BLECharacteristic *pUartTxCharacteristic;
-	BLECharacteristic *pUartRxCharacteristic;
+	BLECharacteristic *pUartCisoCharacteristic;
+	BLECharacteristic *pUartCosiCharacteristic;
 	BLEAdvertisementData adv_data;
 
 	// Advertisement data

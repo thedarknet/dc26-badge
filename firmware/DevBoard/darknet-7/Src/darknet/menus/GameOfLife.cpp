@@ -8,7 +8,7 @@ using cmdc0de::ErrorType;
 using cmdc0de::RGBColor;
 using cmdc0de::BitArray;
 
-uint8_t GameOfLife::Buffer[(width*height/8)+1];
+uint8_t GameOfLife::Buffer[] = {0};
 
 GameOfLife::GameOfLife() : Darknet7BaseState(),
 		Generations(0), CurrentGeneration(0), Neighborhood(0), GOL(&Buffer[0],num_slots,1), UtilityBuf(), InternalState(GameOfLife::GAME), DisplayMessageUntil(0) {

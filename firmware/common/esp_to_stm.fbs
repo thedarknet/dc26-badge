@@ -16,3 +16,5 @@ table ESPToSTM {
 	Msg:ESPToSTMAny;
 }
 
+root_type ESPToSTM;
+

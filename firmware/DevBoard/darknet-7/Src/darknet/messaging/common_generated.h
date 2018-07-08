@@ -8,6 +8,8 @@
 
 namespace darknet7 {
 
+struct BytesToFromAddress;
+
 enum WifiMode {
   WifiMode_OPEN = 0,
   WifiMode_WPA2 = 1,
@@ -38,6 +40,68 @@ inline const char * const *EnumNamesWifiMode() {
 inline const char *EnumNameWifiMode(WifiMode e) {
   const size_t index = static_cast<int>(e);
   return EnumNamesWifiMode()[index];
+}
+
+struct BytesToFromAddress FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_ADDRESS = 4,
+    VT_BYTESTOSEND = 6
+  };
+  const flatbuffers::Vector<uint8_t> *Address() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_ADDRESS);
+  }
+  const flatbuffers::Vector<uint8_t> *BytesToSend() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_BYTESTOSEND);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_ADDRESS) &&
+           verifier.Verify(Address()) &&
+           VerifyOffset(verifier, VT_BYTESTOSEND) &&
+           verifier.Verify(BytesToSend()) &&
+           verifier.EndTable();
+  }
+};
+
+struct BytesToFromAddressBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_Address(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> Address) {
+    fbb_.AddOffset(BytesToFromAddress::VT_ADDRESS, Address);
+  }
+  void add_BytesToSend(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> BytesToSend) {
+    fbb_.AddOffset(BytesToFromAddress::VT_BYTESTOSEND, BytesToSend);
+  }
+  explicit BytesToFromAddressBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BytesToFromAddressBuilder &operator=(const BytesToFromAddressBuilder &);
+  flatbuffers::Offset<BytesToFromAddress> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BytesToFromAddress>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BytesToFromAddress> CreateBytesToFromAddress(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> Address = 0,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> BytesToSend = 0) {
+  BytesToFromAddressBuilder builder_(_fbb);
+  builder_.add_BytesToSend(BytesToSend);
+  builder_.add_Address(Address);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<BytesToFromAddress> CreateBytesToFromAddressDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<uint8_t> *Address = nullptr,
+    const std::vector<uint8_t> *BytesToSend = nullptr) {
+  return darknet7::CreateBytesToFromAddress(
+      _fbb,
+      Address ? _fbb.CreateVector<uint8_t>(*Address) : 0,
+      BytesToSend ? _fbb.CreateVector<uint8_t>(*BytesToSend) : 0);
 }
 
 }  // namespace darknet7

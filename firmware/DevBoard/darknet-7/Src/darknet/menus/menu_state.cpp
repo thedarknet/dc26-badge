@@ -11,6 +11,8 @@
 #include "badge_info_state.h"
 #include "mcu_info.h"
 #include "tamagotchi.h"
+#include "health.h"
+#include "scan.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::StateBase;
@@ -27,9 +29,6 @@ MenuState::~MenuState() {
 
 }
 
-const char *HasMessage = "DarkNet Msgs *";
-const char *NoHasMessage = "DarkNet Msgs";
-
 ErrorType MenuState::onInit() {
 	Items[0].id = 0;
 	if (DarkNet7::get().getContacts().getSettings().isNameSet()) {
@@ -41,27 +40,21 @@ ErrorType MenuState::onInit() {
 	Items[1].text = (const char *) "Badge Pair";
 	Items[2].id = 2;
 	Items[2].text = (const char *) "Address Book";
-	Items[3].id = 3;
-	if (DarkNet7::get().getMessageState()->hasNewMsg()) {
-		Items[3].text = HasMessage;
-	} else {
-		Items[3].text = NoHasMessage;
-	}
-	Items[4].id = 4;
+	Items[4].id = 3;
 	Items[4].text = (const char *) "3D";
-	Items[5].id = 5;
+	Items[5].id = 4;
 	Items[5].text = (const char *) "Screen Saver";
-	Items[6].id = 6;
+	Items[6].id = 5;
 	Items[6].text = (const char *) "Badge Info";
-	Items[7].id = 7;
+	Items[7].id = 6;
 	Items[7].text = (const char *) "MCU Info";
-	Items[8].id = 8;
+	Items[8].id = 7;
 	Items[8].text = (const char *) "Tamagotchi";
-	Items[9].id = 9;
+	Items[9].id = 8;
 	Items[9].text = (const char *) "Communications Settings";
-	Items[10].id = 10;
+	Items[10].id = 9;
 	Items[10].text = (const char *) "Health";
-	Items[11].id = 11;
+	Items[11].id = 10;
 	Items[11].text = (const char *) "Scan for NPCs";
 	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 	DarkNet7::get().getGUI().drawList(&this->MenuList);
@@ -100,23 +93,30 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 			case 2:
 				nextState = DarkNet7::get().getAddressBookState();
 				break;
-			case 4:
+			case 3:
 				nextState = DarkNet7::get().get3DState();
 				break;
-			case 5:
+			case 4:
 				nextState = DarkNet7::get().getGameOfLifeState();
 				break;
-			case 6:
+			case 5:
 				nextState = DarkNet7::get().getBadgeInfoState();
 				break;
-			case 7:
+			case 6:
 				nextState = DarkNet7::get().getMCUInfoState();
 				break;
-			case 8:
+			case 7:
 				nextState = DarkNet7::get().getTamagotchiState();
 				break;
-			case 9:
+			case 8:
 				nextState = DarkNet7::get().getCommunicationSettingState();
+				break;
+			case 9:
+				nextState = DarkNet7::get().getHealthState();
+				break;
+			case 10:
+				DarkNet7::get().getScanState()->setNPCOnly(true);
+				nextState = DarkNet7::get().getScanState();
 				break;
 
 		}

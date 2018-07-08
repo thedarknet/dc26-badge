@@ -28,6 +28,8 @@ class CommunicationSettingState;
 class BadgeInfoState;
 class MCUInfoState;
 class Tamagotchi;
+class Health;
+class Scan;
 
 class DarkNet7: public cmdc0de::App {
 public:
@@ -77,6 +79,8 @@ public:
 	BadgeInfoState * getBadgeInfoState();
 	MCUInfoState *getMCUInfoState();
 	Tamagotchi *getTamagotchiState();
+	Health *getHealthState();
+	Scan *getScanState();
 public:
 	cmdc0de::DisplayST7735 &getDisplay();
 	const cmdc0de::DisplayST7735 &getDisplay() const;

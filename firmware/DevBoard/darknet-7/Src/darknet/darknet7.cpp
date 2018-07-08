@@ -32,6 +32,8 @@
 #include "menus/communications_settings.h"
 #include "messaging/stm_to_esp_generated.h"
 #include "mcu_to_mcu.h"
+#include "menus/health.h"
+#include "menus/scan.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::DisplayST7735;
@@ -405,6 +407,8 @@ static CommunicationSettingState MyCommunicationSettings;
 static BadgeInfoState MyBadgeInfoState;
 static MCUInfoState MyMCUInfoState;
 static Tamagotchi MyTamagotchi;
+static Health MyHealth;
+static Scan MyScan;
 
 MenuState *DarkNet7::getDisplayMenuState() {
 	return &MyMenu;
@@ -452,4 +456,12 @@ MCUInfoState *DarkNet7::getMCUInfoState() {
 
 Tamagotchi *DarkNet7::getTamagotchiState() {
 	return &MyTamagotchi;
+}
+
+Health *DarkNet7::getHealthState() {
+	return &MyHealth;
+}
+
+Scan *DarkNet7::getScanState() {
+	return &MyScan;
 }

@@ -12,6 +12,10 @@ namespace darknet7 {
 
 struct GenericResponse;
 
+struct Badges;
+
+struct BadgesInArea;
+
 struct ESPSystemInfo;
 
 struct ESPToSTM;
@@ -151,6 +155,118 @@ inline flatbuffers::Offset<GenericResponse> CreateGenericResponseDirect(
       _fbb,
       successful,
       message ? _fbb.CreateString(message) : 0);
+}
+
+struct Badges FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_ADDRESS = 4,
+    VT_NAMES = 6
+  };
+  const flatbuffers::Vector<uint8_t> *Address() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_ADDRESS);
+  }
+  const flatbuffers::String *Names() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAMES);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_ADDRESS) &&
+           verifier.Verify(Address()) &&
+           VerifyOffset(verifier, VT_NAMES) &&
+           verifier.Verify(Names()) &&
+           verifier.EndTable();
+  }
+};
+
+struct BadgesBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_Address(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> Address) {
+    fbb_.AddOffset(Badges::VT_ADDRESS, Address);
+  }
+  void add_Names(flatbuffers::Offset<flatbuffers::String> Names) {
+    fbb_.AddOffset(Badges::VT_NAMES, Names);
+  }
+  explicit BadgesBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BadgesBuilder &operator=(const BadgesBuilder &);
+  flatbuffers::Offset<Badges> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Badges>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Badges> CreateBadges(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> Address = 0,
+    flatbuffers::Offset<flatbuffers::String> Names = 0) {
+  BadgesBuilder builder_(_fbb);
+  builder_.add_Names(Names);
+  builder_.add_Address(Address);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<Badges> CreateBadgesDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<uint8_t> *Address = nullptr,
+    const char *Names = nullptr) {
+  return darknet7::CreateBadges(
+      _fbb,
+      Address ? _fbb.CreateVector<uint8_t>(*Address) : 0,
+      Names ? _fbb.CreateString(Names) : 0);
+}
+
+struct BadgesInArea FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_BADGELIST = 4
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<Badges>> *BadgeList() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Badges>> *>(VT_BADGELIST);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_BADGELIST) &&
+           verifier.Verify(BadgeList()) &&
+           verifier.VerifyVectorOfTables(BadgeList()) &&
+           verifier.EndTable();
+  }
+};
+
+struct BadgesInAreaBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_BadgeList(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Badges>>> BadgeList) {
+    fbb_.AddOffset(BadgesInArea::VT_BADGELIST, BadgeList);
+  }
+  explicit BadgesInAreaBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BadgesInAreaBuilder &operator=(const BadgesInAreaBuilder &);
+  flatbuffers::Offset<BadgesInArea> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BadgesInArea>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BadgesInArea> CreateBadgesInArea(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Badges>>> BadgeList = 0) {
+  BadgesInAreaBuilder builder_(_fbb);
+  builder_.add_BadgeList(BadgeList);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<BadgesInArea> CreateBadgesInAreaDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<Badges>> *BadgeList = nullptr) {
+  return darknet7::CreateBadgesInArea(
+      _fbb,
+      BadgeList ? _fbb.CreateVector<flatbuffers::Offset<Badges>>(*BadgeList) : 0);
 }
 
 struct ESPSystemInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

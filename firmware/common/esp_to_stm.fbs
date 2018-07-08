@@ -11,6 +11,15 @@ table GenericResponse {
 	message:string;
 }
 
+table Badges {
+	Address:[ubyte];
+	Names:string;
+}
+
+table BadgesInArea {
+	BadgeList:[Badges];
+}
+
 table ESPSystemInfo {
 	heapSize:uint32;
 	model:int32;

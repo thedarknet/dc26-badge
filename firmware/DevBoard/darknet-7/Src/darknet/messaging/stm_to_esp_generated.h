@@ -14,6 +14,8 @@ struct SetupAP;
 
 struct StopAP;
 
+struct PairWithBadge;
+
 struct DisplayMessage;
 
 struct STMToESPRequest;
@@ -23,16 +25,18 @@ enum STMToESPAny {
   STMToESPAny_SetupAP = 1,
   STMToESPAny_StopAP = 2,
   STMToESPAny_DisplayMessage = 3,
+  STMToESPAny_BytesToFromAddress = 4,
   STMToESPAny_MIN = STMToESPAny_NONE,
-  STMToESPAny_MAX = STMToESPAny_DisplayMessage
+  STMToESPAny_MAX = STMToESPAny_BytesToFromAddress
 };
 
-inline const STMToESPAny (&EnumValuesSTMToESPAny())[4] {
+inline const STMToESPAny (&EnumValuesSTMToESPAny())[5] {
   static const STMToESPAny values[] = {
     STMToESPAny_NONE,
     STMToESPAny_SetupAP,
     STMToESPAny_StopAP,
-    STMToESPAny_DisplayMessage
+    STMToESPAny_DisplayMessage,
+    STMToESPAny_BytesToFromAddress
   };
   return values;
 }
@@ -43,6 +47,7 @@ inline const char * const *EnumNamesSTMToESPAny() {
     "SetupAP",
     "StopAP",
     "DisplayMessage",
+    "BytesToFromAddress",
     nullptr
   };
   return names;
@@ -67,6 +72,10 @@ template<> struct STMToESPAnyTraits<StopAP> {
 
 template<> struct STMToESPAnyTraits<DisplayMessage> {
   static const STMToESPAny enum_value = STMToESPAny_DisplayMessage;
+};
+
+template<> struct STMToESPAnyTraits<BytesToFromAddress> {
+  static const STMToESPAny enum_value = STMToESPAny_BytesToFromAddress;
 };
 
 bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, STMToESPAny type);
@@ -174,6 +183,55 @@ inline flatbuffers::Offset<StopAP> CreateStopAP(
   return builder_.Finish();
 }
 
+struct PairWithBadge FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_ADDRESS = 4
+  };
+  const flatbuffers::Vector<uint8_t> *Address() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_ADDRESS);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_ADDRESS) &&
+           verifier.Verify(Address()) &&
+           verifier.EndTable();
+  }
+};
+
+struct PairWithBadgeBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_Address(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> Address) {
+    fbb_.AddOffset(PairWithBadge::VT_ADDRESS, Address);
+  }
+  explicit PairWithBadgeBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  PairWithBadgeBuilder &operator=(const PairWithBadgeBuilder &);
+  flatbuffers::Offset<PairWithBadge> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<PairWithBadge>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<PairWithBadge> CreatePairWithBadge(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> Address = 0) {
+  PairWithBadgeBuilder builder_(_fbb);
+  builder_.add_Address(Address);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<PairWithBadge> CreatePairWithBadgeDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<uint8_t> *Address = nullptr) {
+  return darknet7::CreatePairWithBadge(
+      _fbb,
+      Address ? _fbb.CreateVector<uint8_t>(*Address) : 0);
+}
+
 struct DisplayMessage FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_MSG = 4,
@@ -260,6 +318,9 @@ struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const DisplayMessage *Msg_as_DisplayMessage() const {
     return Msg_type() == STMToESPAny_DisplayMessage ? static_cast<const DisplayMessage *>(Msg()) : nullptr;
   }
+  const BytesToFromAddress *Msg_as_BytesToFromAddress() const {
+    return Msg_type() == STMToESPAny_BytesToFromAddress ? static_cast<const BytesToFromAddress *>(Msg()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_MSGINSTANCEID) &&
@@ -280,6 +341,10 @@ template<> inline const StopAP *STMToESPRequest::Msg_as<StopAP>() const {
 
 template<> inline const DisplayMessage *STMToESPRequest::Msg_as<DisplayMessage>() const {
   return Msg_as_DisplayMessage();
+}
+
+template<> inline const BytesToFromAddress *STMToESPRequest::Msg_as<BytesToFromAddress>() const {
+  return Msg_as_BytesToFromAddress();
 }
 
 struct STMToESPRequestBuilder {
@@ -333,6 +398,10 @@ inline bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, 
     }
     case STMToESPAny_DisplayMessage: {
       auto ptr = reinterpret_cast<const DisplayMessage *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case STMToESPAny_BytesToFromAddress: {
+      auto ptr = reinterpret_cast<const BytesToFromAddress *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return false;

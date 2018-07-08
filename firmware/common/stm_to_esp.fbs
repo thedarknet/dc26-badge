@@ -2,7 +2,7 @@ include "common.fbs";
 
 namespace darknet7;
 
-union STMToESPAny { SetupAP, StopAP, DisplayMessage }
+union STMToESPAny { SetupAP, StopAP, DisplayMessage, BytesToFromAddress }
 
 table SetupAP {
 	ssid:string;
@@ -13,6 +13,11 @@ table SetupAP {
 table StopAP {
 	
 }
+
+table PairWithBadge {
+	Address:[ubyte];
+}
+
 
 table DisplayMessage {
 	msg:string;

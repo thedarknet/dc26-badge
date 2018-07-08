@@ -2,10 +2,58 @@
 #include "stm_to_esp_generated.h"
 #include "esp_to_stm_generated.h"
 #include "command_handler.h"
+#include <rom/crc.h>
 #include <vector>
 
 const char *MCUToMCUTask::LOGTAG = "MCUToMCUTask";
 
+
+const darknet7::ESPToSTM *MCUToMCUTask::Message::asESPToSTM() {
+	return darknet7::GetSizePrefixedESPToSTM(&MessageData[ENVELOP_HEADER]);
+}
+
+//We listen for the for our envelop portion of our message which is: 4 bytes:
+// bits 0-10 is the size of the message coming max message size = 1024
+// bit 11: reserved
+// bit 12: reserved
+// bit 13: reserved
+// bit 14: reserved
+// bit 15: reserved
+// bit 16-31: CRC 16 of entire message
+//set up for our 4 byte envelop header
+
+MCUToMCUTask::Message::Message() :
+		SizeAndFlags(0), Crc16(0), MessageData() {
+}
+
+void MCUToMCUTask::Message::set(uint16_t sf, uint16_t crc, uint8_t *data) {
+	SizeAndFlags = sf;
+	Crc16 = crc;
+	MessageData[0] = sf & 0xFF;
+	MessageData[1] = sf & 0xFF00 >> 8;
+	MessageData[2] = Crc16 & 0xFF;
+	MessageData[3] = Crc16 & 0xFF00 >> 8;
+	memcpy(&MessageData[ENVELOP_HEADER], data, getDataSize());
+}
+
+void MCUToMCUTask::Message::setFlag(uint16_t flags) {
+	SizeAndFlags|=flags;
+}
+
+bool MCUToMCUTask::Message::checkFlags(uint16_t flags) {
+	return (SizeAndFlags&flags)==flags;
+}
+
+bool MCUToMCUTask::Message::transmit() {
+	ESP_LOGI(MCUToMCUTask::LOGTAG, "sending with break!");
+	if(getMessageSize()==
+		uart_write_bytes_with_break(UART_NUM_1,(const char *)&MessageData[0],getMessageSize(),100)) {
+		return true;
+	}
+	return false;
+}
+
+////////////
 MCUToMCUTask::MCUToMCUTask(CmdHandlerTask *pcht, const std::string &tName, uint16_t stackSize, uint8_t p) 
 	: Task(tName,stackSize,p), STMToESPQueue(), STMToESPQueueHandle(nullptr), STMToESPBuffer(), 
 		ESPToSTMBuffer(), ESPToSTMQueue(), ESPToSTMQueueHandle(nullptr), BufSize(0), CmdHandler(pcht) {
@@ -33,6 +81,17 @@ bool MCUToMCUTask::init(gpio_num_t tx, gpio_num_t rx, uint16_t rxBufSize) {
 
 MCUToMCUTask::~MCUToMCUTask() {
 	uart_driver_delete(UART_NUM_1);
+}
+
+void MCUToMCUTask::send(const flatbuffers::FlatBufferBuilder &fbb) {
+	uint8_t *msg = fbb.GetBufferPointer();
+	uint32_t size = fbb.GetSize();
+	assert(size<MAX_MESSAGE_SIZE);
+	uint16_t crc = crc16_be(0,msg,size);
+	ESP_LOGI(LOGTAG, "size %d, crc %d\n",size,crc);
+	Message m;
+	m.set(size,crc,msg);
+	m.transmit();
 }
 
 void MCUToMCUTask::txTask() {

@@ -4,11 +4,20 @@ namespace darknet7;
 
 enum RESPONSE_SUCCESS : byte { False = 0, True = 1 }
 
-union ESPToSTMAny { GenericResponse }
+union ESPToSTMAny { GenericResponse, ESPSystemInfo }
 
 table GenericResponse {
 	successful:RESPONSE_SUCCESS;
 	message:string;
+}
+
+table ESPSystemInfo {
+	heapSize:uint32;
+	model:int32;
+	cores:int32;
+	revision:int32;
+	features:int32;
+	idf_version:string;
 }
 
 table ESPToSTM {

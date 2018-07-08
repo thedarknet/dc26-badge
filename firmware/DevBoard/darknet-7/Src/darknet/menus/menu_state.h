@@ -14,7 +14,7 @@ protected:
 	virtual cmdc0de::ErrorType onShutdown();
 private:
 	cmdc0de::GUIListData MenuList;
-	cmdc0de::GUIListItemData Items[10];
+	cmdc0de::GUIListItemData Items[12];
 };
 
 

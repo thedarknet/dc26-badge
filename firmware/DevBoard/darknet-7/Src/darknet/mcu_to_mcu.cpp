@@ -13,7 +13,7 @@
 MCUToMCU *MCUToMCU::mSelf = 0;
 uint8_t UartRXBuffer[MCUToMCU::TOTAL_MESSAGE_SIZE * 2] = { 0 };
 
-darknet7::ESPToSTM *MCUToMCU::Message::asESPToSTM() {
+const darknet7::ESPToSTM *MCUToMCU::Message::asESPToSTM() {
 	return darknet7::GetSizePrefixedESPToSTM(&MessageData[ENVELOP_HEADER]);
 }
 
@@ -50,8 +50,8 @@ bool MCUToMCU::Message::checkFlags(uint16_t flags) {
 	return (SizeAndFlags&flags)==flags;
 }
 
-HAL_StatusTypeDef MCUToMCU::Message::transmit() {
-	HAL_StatusTypeDef status = HAL_UART_Transmit_IT(UartHandler,&MessageData[0],getMessageSize());
+HAL_StatusTypeDef MCUToMCU::Message::transmit(UART_HandleTypeDef *huart) {
+	HAL_StatusTypeDef status = HAL_UART_Transmit_IT(huart,&MessageData[0],getMessageSize());
 	if(status==HAL_OK) {
 		setFlag(MESSAGE_FLAG_TRANSMITTED);
 	} else {
@@ -119,44 +119,30 @@ void MCUToMCU::handleMcuToMcu() {
 	uint16_t size = UartHandler->RxXferCount;
 	//we have received something and we have also gotten a line break
 	if (size > 0 && __HAL_UART_GET_FLAG(UartHandler, UART_FLAG_LBD)) {
-		uint16_t firstTwo = (*((uint16_t *) &UartHandler[0]));
+		uint16_t firstTwo = (*((uint16_t *) &UartRXBuffer[0]));
 		uint16_t size = firstTwo & 0x7FF; //0-10 bits are size
-		uint16_t crcFromESP = (*((uint16_t *) &UartHandler[2]));
+		uint16_t crcFromESP = (*((uint16_t *) &UartRXBuffer[2]));
 		assert(size < MAX_MESSAGE_SIZE);
 		etl::crc16 crc(&UartRXBuffer[ENVELOP_HEADER],
 				&UartRXBuffer[ENVELOP_HEADER] + size);
-		if (crc.value() == crcFromESP) {
+		//if (crc.value() == crcFromESP) {
 			Message &m = InComing.push();
 			m.set(firstTwo, crcFromESP, &UartRXBuffer[ENVELOP_HEADER]);
-		} else {
-			ERRMSG("CRC ERROR in handle MCU To MCU.\n");
-		}
+		//} else {
+		//	ERRMSG("CRC ERROR in handle MCU To MCU.\n");
+		//}
+		const darknet7::ESPToSTM *test = m.asESPToSTM();
+		const darknet7::ESPSystemInfo * system = test->Msg_as_ESPSystemInfo();
+		int32_t  cores = system->cores();
+		uint32_t headSize = system->heapSize();
+		const flatbuffers::String *version = system->idf_version();
+		const char *p = version->c_str();
 		HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[0], MAX_MESSAGE_SIZE);
 	} else if (UartHandler->RxXferCount > 0) {
 		//overflow
 		ERRMSG("RxCpltCallback overflow: %d\nResetting\n", UartHandler->RxXferCount);
 		resetUART();
 	}
-	/*
-	 if(UartHandler->pRxBuffPtr-ENVELOP_HEADER==&UartRXBuffer[0]) {
-	 //we just got header:
-	 uint16_t firstTwo = (*((uint16_t *)&UartHandler[0]));
-	 uint16_t size = firstTwo&0x7FF; //0-10 bits are size
-	 assert(size<MAX_MESSAGE_SIZE);
-	 HAL_UART_Receive_IT(UartHandler,UartHandler->pRxBuffPtr,size);
-	 } else {
-	 uint16_t firstTwo = (*((uint16_t *)&UartHandler[0]));
-	 uint16_t size = firstTwo&0x7FF; //0-10 bits are size
-	 uint16_t crcFromESP = (*((uint16_t *)&UartHandler[2]));
-	 assert(size<MAX_MESSAGE_SIZE);
-	 etl::crc16 crc(&UartRXBuffer[ENVELOP_HEADER],&UartRXBuffer[ENVELOP_HEADER]+size);
-	 if(crc.value()==crcFromESP) {
-	 Message &m = InComing.push();
-	 m.set(firstTwo,crcFromESP,&UartRXBuffer[ENVELOP_HEADER]);
-	 }
-	 HAL_UART_Receive_IT(UartHandler,&UartRXBuffer[0],ENVELOP_HEADER);
-	 }
-	 */
 }
 
 bool MCUToMCU::send(const flatbuffers::FlatBufferBuilder &fbb) {
@@ -179,12 +165,13 @@ bool MCUToMCU::transmitNow() {
 			&& !(UartHandler->gState&HAL_UART_STATE_BUSY_TX)
 			&& !Outgoing.empty()) {
 		Message &m = Outgoing.front();
-		m.transmit();
+		m.transmit(UartHandler);
 	}
+	return true;
 }
 
 static bool pastFirst = false;
-darknet7::ESPToSTM *MCUToMCU::getNext() {
+const darknet7::ESPToSTM *MCUToMCU::getNext() {
 	if (!InComing.empty()) {
 		if (!pastFirst) {
 			pastFirst = true;

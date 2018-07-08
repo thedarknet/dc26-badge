@@ -31,6 +31,7 @@
 #include "menus/tamagotchi.h"
 #include "menus/communications_settings.h"
 #include "messaging/stm_to_esp_generated.h"
+#include "mcu_to_mcu.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::DisplayST7735;
@@ -271,6 +272,7 @@ ErrorType DarkNet7::onInit() {
 	 }
 #endif
 
+	 MCUToMCU::get().init(&huart1);
 	return et;
 }
 

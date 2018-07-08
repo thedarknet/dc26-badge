@@ -17,13 +17,13 @@ public:
 	public:
 		static const uint16_t MESSAGE_FLAG_TRANSMITTED = 0x8000; //bit 15
 	public:
-		darknet7::ESPToSTM *asESPToSTM();
+		const darknet7::ESPToSTM *asESPToSTM();
 	protected:
 		Message();
 		void setFlag(uint16_t flags);
 		bool checkFlags(uint16_t flags);
 		void set(uint16_t sf, uint16_t crc, uint8_t *data);
-		HAL_StatusTypeDef transmit();
+		HAL_StatusTypeDef transmit(UART_HandleTypeDef *huart);
 		uint16_t getMessageSize() {return getDataSize()+ENVELOP_HEADER;}
 		uint16_t getDataSize() {return SizeAndFlags&ENVELOP_HEADER_SIZE_MASK;}
 		static uint16_t getDataSize(uint16_t s) {return s&ENVELOP_HEADER_SIZE_MASK;}
@@ -38,7 +38,7 @@ public:
 public:
 	void init(UART_HandleTypeDef *);
 	bool send(const flatbuffers::FlatBufferBuilder &fbb);
-	darknet7::ESPToSTM *getNext();
+	const darknet7::ESPToSTM *getNext();
 	void onTransmitionComplete();
 	void onError();
 	void handleMcuToMcu();

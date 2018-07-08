@@ -36,7 +36,7 @@
 #include "stm32f4xx_it.h"
 
 /* USER CODE BEGIN 0 */
-#include "darknet/mcu_to_mcu.h"
+
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -262,8 +262,8 @@ void USART1_IRQHandler(void)
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */
-  if(__HAL_UART_GET_FLAG(huart1,UART_FLAG_LBD)) {
-	  HAL_UART_RxCpltCallback(huart1);
+  if(__HAL_UART_GET_FLAG(&huart1,UART_FLAG_LBD)) {
+	  //HAL_UART_RxCpltCallback(&huart1);
   }
   /* USER CODE END USART1_IRQn 1 */
 }

@@ -59,6 +59,10 @@ ErrorType MenuState::onInit() {
 	Items[8].text = (const char *) "Tamagotchi";
 	Items[9].id = 9;
 	Items[9].text = (const char *) "Communications Settings";
+	Items[10].id = 10;
+	Items[10].text = (const char *) "Health";
+	Items[11].id = 11;
+	Items[11].text = (const char *) "Scan for NPCs";
 	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 	DarkNet7::get().getGUI().drawList(&this->MenuList);
 	return ErrorType();

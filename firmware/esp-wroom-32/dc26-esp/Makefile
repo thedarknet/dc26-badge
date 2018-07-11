@@ -11,6 +11,9 @@ include $(IDF_PATH)/make/project.mk
 
 flatBuffers: main/stm_to_esp_generated.h main/esp_to_stm_generated.h main/common_generated.h
 
+size:
+	xtensa-esp32-elf-size build/dc26esp.elf
+
 main/stm_to_esp_generated.h: ../../common/stm_to_esp.fbs
 	#../../tools/bin/linux/flatc --cpp -o main -M ../../common/stm_to_esp.fbs
 	../../tools/bin/linux/flatc --cpp -o main ../../common/stm_to_esp.fbs

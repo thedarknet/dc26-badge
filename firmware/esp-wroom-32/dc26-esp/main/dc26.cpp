@@ -1,4 +1,4 @@
-#if 1
+
 #include "esp_system.h"
 #include "esp_log.h"
 #include "driver/uart.h"
@@ -34,6 +34,10 @@ ESP32_I2CMaster I2cDisplay(GPIO_NUM_19,GPIO_NUM_18,1000000, I2C_NUM_0, 1024, 102
 CmdHandlerTask CmdTask("CmdTask");
 BluetoothTask BTTask("BluetoothTask");
 MCUToMCUTask ProcToProc(&CmdTask, "ProcToProc");
+
+MCUToMCUTask &getMCUToMCU() {
+	return ProcToProc;
+}
 
 static void IRAM_ATTR gpio_isr_handler(void* arg) {
 	uint32_t gpio_num = (uint32_t) arg;
@@ -168,5 +172,3 @@ void app_main()
 	wifi.wifi_start_access_point(wifi_config,ipInfo,l);
 	vTaskDelete(NULL);
 }
-
-#endif

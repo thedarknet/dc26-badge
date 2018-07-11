@@ -165,11 +165,6 @@ const DarkNet7::ButtonInfo& DarkNet7::getButtonInfo() const {
 	return MyButtons;
 }
 
-
-DarkNet7::AppEventBusType &DarkNet7::getEventBus() {
-	return AppEventBus;
-}
-
 DarkNet7::DarkNet7() :
 		Apa106s(GPIO_APA106_DATA_Pin, GPIO_APA106_DATA_GPIO_Port, TIM1, DMA2_Stream0, DMA2_Stream2_IRQn)
 				//		my Info, start setting address, start Contact address, end contact address
@@ -177,7 +172,7 @@ DarkNet7::DarkNet7() :
 				EndContactSector)
 				, Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT)
 		, DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH),static_cast<uint8_t>(DISPLAY_HEIGHT),&DrawBuffer[0],&Display)
-		, DMS(), MyGUI(&Display), MyButtons() {
+		, DMS(), MyGUI(&Display), MyButtons(), SequenceNum(0) {
 
 		}
 
@@ -359,6 +354,9 @@ ErrorType DarkNet7::onRun() {
 		HAL_Delay(2000);
 	}
 
+	//emit new messages
+	MCUToMCU::get().process();
+
 	cmdc0de::StateBase::ReturnStateContext rsc = getCurrentState()->run();
 	Display.swap();
 
@@ -393,6 +391,10 @@ cmdc0de::DisplayMessageState *DarkNet7::getDisplayMessageState(cmdc0de::StateBas
 	DMS.setTimeInState(timeToDisplay);
 	DMS.setDisplay(&Display);
 	return &DMS;
+}
+
+uint32_t DarkNet7::nextSeq() {
+	return ++SequenceNum;
 }
 
 static MenuState MyMenu;

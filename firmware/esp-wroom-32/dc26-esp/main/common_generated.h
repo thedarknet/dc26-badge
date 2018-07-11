@@ -8,6 +8,10 @@
 
 namespace darknet7 {
 
+struct BytesToFromAddress;
+
+struct DisplayMessage;
+
 enum WifiMode {
   WifiMode_OPEN = 0,
   WifiMode_WPA2 = 1,
@@ -38,6 +42,129 @@ inline const char * const *EnumNamesWifiMode() {
 inline const char *EnumNameWifiMode(WifiMode e) {
   const size_t index = static_cast<int>(e);
   return EnumNamesWifiMode()[index];
+}
+
+struct BytesToFromAddress FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_ADDRESS = 4,
+    VT_BYTESTOSEND = 6
+  };
+  const flatbuffers::Vector<uint8_t> *Address() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_ADDRESS);
+  }
+  const flatbuffers::Vector<uint8_t> *BytesToSend() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_BYTESTOSEND);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_ADDRESS) &&
+           verifier.Verify(Address()) &&
+           VerifyOffset(verifier, VT_BYTESTOSEND) &&
+           verifier.Verify(BytesToSend()) &&
+           verifier.EndTable();
+  }
+};
+
+struct BytesToFromAddressBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_Address(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> Address) {
+    fbb_.AddOffset(BytesToFromAddress::VT_ADDRESS, Address);
+  }
+  void add_BytesToSend(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> BytesToSend) {
+    fbb_.AddOffset(BytesToFromAddress::VT_BYTESTOSEND, BytesToSend);
+  }
+  explicit BytesToFromAddressBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BytesToFromAddressBuilder &operator=(const BytesToFromAddressBuilder &);
+  flatbuffers::Offset<BytesToFromAddress> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BytesToFromAddress>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BytesToFromAddress> CreateBytesToFromAddress(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> Address = 0,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> BytesToSend = 0) {
+  BytesToFromAddressBuilder builder_(_fbb);
+  builder_.add_BytesToSend(BytesToSend);
+  builder_.add_Address(Address);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<BytesToFromAddress> CreateBytesToFromAddressDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<uint8_t> *Address = nullptr,
+    const std::vector<uint8_t> *BytesToSend = nullptr) {
+  return darknet7::CreateBytesToFromAddress(
+      _fbb,
+      Address ? _fbb.CreateVector<uint8_t>(*Address) : 0,
+      BytesToSend ? _fbb.CreateVector<uint8_t>(*BytesToSend) : 0);
+}
+
+struct DisplayMessage FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_MSG = 4,
+    VT_DISPLAYTIME = 6
+  };
+  const flatbuffers::String *msg() const {
+    return GetPointer<const flatbuffers::String *>(VT_MSG);
+  }
+  int32_t displayTime() const {
+    return GetField<int32_t>(VT_DISPLAYTIME, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_MSG) &&
+           verifier.Verify(msg()) &&
+           VerifyField<int32_t>(verifier, VT_DISPLAYTIME) &&
+           verifier.EndTable();
+  }
+};
+
+struct DisplayMessageBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_msg(flatbuffers::Offset<flatbuffers::String> msg) {
+    fbb_.AddOffset(DisplayMessage::VT_MSG, msg);
+  }
+  void add_displayTime(int32_t displayTime) {
+    fbb_.AddElement<int32_t>(DisplayMessage::VT_DISPLAYTIME, displayTime, 0);
+  }
+  explicit DisplayMessageBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  DisplayMessageBuilder &operator=(const DisplayMessageBuilder &);
+  flatbuffers::Offset<DisplayMessage> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<DisplayMessage>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<DisplayMessage> CreateDisplayMessage(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> msg = 0,
+    int32_t displayTime = 0) {
+  DisplayMessageBuilder builder_(_fbb);
+  builder_.add_displayTime(displayTime);
+  builder_.add_msg(msg);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<DisplayMessage> CreateDisplayMessageDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *msg = nullptr,
+    int32_t displayTime = 0) {
+  return darknet7::CreateDisplayMessage(
+      _fbb,
+      msg ? _fbb.CreateString(msg) : 0,
+      displayTime);
 }
 
 }  // namespace darknet7

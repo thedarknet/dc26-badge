@@ -7,6 +7,10 @@
 
 #include "mcu_info.h"
 #include "../darknet7.h"
+#include "../messaging/stm_to_esp_generated.h"
+#include "../messaging/esp_to_stm_generated.h"
+#include "../mcu_to_mcu.h"
+#include "menu_state.h"
 
 using cmdc0de::RGBColor;
 using cmdc0de::ErrorType;
@@ -14,7 +18,8 @@ using cmdc0de::StateBase;
 
 
 MCUInfoState::MCUInfoState() : Darknet7BaseState(),
-	BadgeInfoList("Badge Info:", Items, 0, 0, 128, 160, 0, (sizeof(Items) / sizeof(Items[0]))) {
+	BadgeInfoList("MCU Info:", Items, 0, 0, 128, 160, 0, (sizeof(Items) / sizeof(Items[0])))
+	, ESPRequestID(0), InternalState(NONE) {
 
 }
 
@@ -23,75 +28,68 @@ MCUInfoState::~MCUInfoState()
 
 }
 
-ErrorType MCUInfoState::onInit()
-		{
-	/*
-	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
-	sprintf(&ListBuffer[0][0], "Name: %s", DarkNet7::get().getContacts().getSettings().getAgentName());
-	sprintf(&ListBuffer[1][0], "Num contacts: %u", DarkNet7::get().getContacts().getSettings().getNumContacts());
-	sprintf(&ListBuffer[2][0], "REG: %s", getRegCode(DarkNet7::get().getContacts()));
-	sprintf(&ListBuffer[3][0], "UID: %u", DarkNet7::get().getContacts().getMyInfo().getUniqueID());
-	uint8_t *pCP = DarkNet7::get().getContacts().getMyInfo().getCompressedPublicKey();
-	sprintf(&ListBuffer[4][0],
-			"PK: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-			pCP[0], pCP[1], pCP[2], pCP[3], pCP[4], pCP[5], pCP[6], pCP[7], pCP[8], pCP[9], pCP[10], pCP[11],
-			pCP[12],
-			pCP[13], pCP[14], pCP[15], pCP[16], pCP[17], pCP[18], pCP[19], pCP[20], pCP[21], pCP[22], pCP[23],
-			pCP[24]);
-	sprintf(&ListBuffer[5][0], "DEVID: %lu", HAL_GetDEVID());
-	sprintf(&ListBuffer[6][0], "REVID: %lu", HAL_GetREVID());
-	sprintf(&ListBuffer[7][0], "HAL Version: %lu", HAL_GetHalVersion());
-	sprintf(&ListBuffer[8][0], "SVer: %s", VERSION);
+void MCUInfoState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::ESPSystemInfo> *mevt) {
+	if(mevt->RequestID==this->ESPRequestID) {
+		InternalState = DISPLAY_DATA;
+		sprintf(&ListBuffer[0][0], "ESP Cores: %d", (int)mevt->InnerMsg->cores());
+		sprintf(&ListBuffer[1][0], "ESP Features: %d", (int)mevt->InnerMsg->features());
+		sprintf(&ListBuffer[2][0], "ESP HeapSize: %lu", mevt->InnerMsg->heapSize());
+		sprintf(&ListBuffer[3][0], "ESP idf: %s", mevt->InnerMsg->idf_version()->c_str());
+		sprintf(&ListBuffer[4][0], "ESP Model: %ld", mevt->InnerMsg->model());
+		sprintf(&ListBuffer[5][0], "ESP Revision: %ld", mevt->InnerMsg->revision());
+		MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
 
-	for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++) {
-		Items[i].text = &ListBuffer[i][0];
-		Items[i].id = i;
-		Items[i].setShouldScroll();
+		for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++) {
+			Items[i].text = &ListBuffer[i][0];
+			Items[i].id = i;
+			Items[i].setShouldScroll();
+		}
+
+		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+		DarkNet7::get().getGUI().drawList(&BadgeInfoList);
 	}
+}
+
+ErrorType MCUInfoState::onInit() {
+	InternalState = FETCHING_DATA;
+	flatbuffers::FlatBufferBuilder fbb;
+	auto r = darknet7::CreateESPRequest(fbb,darknet7::ESPRequestType::ESPRequestType_SYSTEM_INFO);
+	ESPRequestID = DarkNet7::get().nextSeq();
+	auto e = darknet7::CreateSTMToESPRequest(fbb,ESPRequestID,darknet7::STMToESPAny_ESPRequest, r.Union());
+	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
+	const MSGEvent<darknet7::ESPSystemInfo> *si = 0;
+	MCUToMCU::get().getBus().addListener(this,si,&MCUToMCU::get());
 	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-	DarkNet7::get().getGUI().drawList(&BadgeInfoList);
-	*/
+
+	DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Fetching data from ESP",RGBColor::BLUE);
+
+	MCUToMCU::get().send(fbb);
 	return ErrorType();
 
 }
 
 StateBase::ReturnStateContext MCUInfoState::onRun() {
-
 	StateBase *nextState = this;
-	/*
-	uint8_t key = rc.getKB().getLastKeyReleased();
-	switch (key) {
-		case QKeyboard::UP: {
-			if (BadgeInfoList.selectedItem == 0) {
-				BadgeInfoList.selectedItem = sizeof(Items) / sizeof(Items[0]) - 1;
-			} else {
-				BadgeInfoList.selectedItem--;
-			}
-			break;
+	switch(InternalState) {
+	case FETCHING_DATA:
+		if(this->getTimesRunCalledSinceLastReset()>2000) {
+			nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),
+					(const char *)"No info from ESP",2000);
 		}
-		case QKeyboard::DOWN: {
-			if (BadgeInfoList.selectedItem == (sizeof(Items) / sizeof(Items[0]) - 1)) {
-				BadgeInfoList.selectedItem = 0;
-			} else {
-				BadgeInfoList.selectedItem++;
-			}
-			break;
+		break;
+	case DISPLAY_DATA:
+		if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+			nextState = DarkNet7::get().getDisplayMenuState();
 		}
-		case QKeyboard::ENTER:
-			case QKeyboard::BACK:
-			nextState = StateFactory::getMenuState();
-			break;
+		break;
+	case NONE:
+		break;
 	}
-	if (rc.getKB().wasKeyReleased()
-			|| (Items[BadgeInfoList.selectedItem].shouldScroll() && getTimesRunCalledSinceLastReset() % 5 == 0)) {
-		rc.getGUI().drawList(&BadgeInfoList);
-	}
-	*/
 	return ReturnStateContext(nextState);
 }
 
-ErrorType MCUInfoState::onShutdown()
-{
+ErrorType MCUInfoState::onShutdown() {
 	return ErrorType();
 }
 

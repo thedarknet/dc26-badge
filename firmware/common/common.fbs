@@ -6,3 +6,8 @@ table BytesToFromAddress {
   Address:[ubyte];
   BytesToSend:[ubyte];
 }
+
+table DisplayMessage {
+	msg:string;
+	displayTime:int;
+}

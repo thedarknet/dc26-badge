@@ -14,7 +14,7 @@
 #include "libstm32/app/display_message_state.h"
 #include "libstm32/display/gui.h"
 #include "KeyStore.h"
-#include "libstm32/observer/event_bus.h"
+
 
 class MenuState;
 class MessageState;
@@ -35,7 +35,6 @@ class DarkNet7: public cmdc0de::App {
 public:
 	static const uint16_t BROADCAST_ADDR = 0xFFFF;
 public:
-	typedef cmdc0de::EventBus<10,10,10,10> AppEventBusType;
 	static DarkNet7 &get();
 	class ButtonInfo {
 	public:
@@ -90,7 +89,7 @@ public:
 	const cmdc0de::GUI &getGUI() const;
 	ButtonInfo &getButtonInfo();
 	const ButtonInfo&getButtonInfo() const;
-	AppEventBusType &getEventBus();
+	uint32_t nextSeq();
 	virtual ~DarkNet7();
 protected:
 	virtual cmdc0de::ErrorType onInit();
@@ -105,7 +104,7 @@ private:
 	cmdc0de::DisplayMessageState DMS;
 	cmdc0de::GUI MyGUI;
 	ButtonInfo MyButtons;
-	AppEventBusType AppEventBus;
+	uint32_t SequenceNum;
 private:
 	static DarkNet7 *mSelf;
 };

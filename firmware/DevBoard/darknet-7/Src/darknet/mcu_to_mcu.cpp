@@ -118,7 +118,7 @@ MCUToMCU::MCUToMCU() :
 void MCUToMCU::handleMcuToMcu() {
 	uint16_t size = UartHandler->RxXferCount;
 	//we have received something and we have also gotten a line break
-	if (size > 0 && __HAL_UART_GET_FLAG(UartHandler, UART_FLAG_LBD)) {
+	if (size > 4 && __HAL_UART_GET_FLAG(UartHandler, UART_FLAG_LBD)) {
 		uint16_t firstTwo = (*((uint16_t *) &UartRXBuffer[0]));
 		uint16_t size = firstTwo & 0x7FF; //0-10 bits are size
 		uint16_t crcFromESP = (*((uint16_t *) &UartRXBuffer[2]));
@@ -171,7 +171,7 @@ bool MCUToMCU::transmitNow() {
 }
 
 static bool pastFirst = false;
-const darknet7::ESPToSTM *MCUToMCU::getNext() {
+void MCUToMCU::process() {
 	if (!InComing.empty()) {
 		if (!pastFirst) {
 			pastFirst = true;
@@ -179,8 +179,17 @@ const darknet7::ESPToSTM *MCUToMCU::getNext() {
 			InComing.pop();
 		}
 		Message &m = InComing.front();
-		return m.asESPToSTM();
+		const darknet7::ESPToSTM *msg = m.asESPToSTM();
+		switch(msg->Msg_type()) {
+		case darknet7::ESPToSTMAny_ESPSystemInfo:
+		{
+			MSGEvent<darknet7::ESPSystemInfo> mevt(msg->Msg_as_ESPSystemInfo(),msg->msgInstanceID());
+			this->getBus().emitSignal(this,&mevt);
+		}
+			break;
+		default:
+			break;
+		}
 	}
-	return nullptr;
 }
 

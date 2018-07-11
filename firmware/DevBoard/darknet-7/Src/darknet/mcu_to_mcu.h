@@ -4,7 +4,14 @@
 #include "messaging/esp_to_stm_generated.h"
 #include "libstm32/etl/src/vector.h"
 #include "libstm32/etl/src/queue.h"
+#include "libstm32/observer/event_bus.h"
 
+template<typename T>
+struct MSGEvent {
+	const T *InnerMsg;
+	uint32_t RequestID;
+	MSGEvent(const T*im, uint32_t rid) : InnerMsg(im), RequestID(rid) {}
+};
 
 class MCUToMCU {
 public:
@@ -35,14 +42,16 @@ public:
 	};
 public:
 	static MCUToMCU &get();
+	typedef cmdc0de::EventBus<3,10,5,3> UART_EVENT_BUS_TYPE;
 public:
 	void init(UART_HandleTypeDef *);
 	bool send(const flatbuffers::FlatBufferBuilder &fbb);
-	const darknet7::ESPToSTM *getNext();
+	void process();
 	void onTransmitionComplete();
 	void onError();
 	void handleMcuToMcu();
 	const UART_HandleTypeDef * getUART() const {return UartHandler;}
+	UART_EVENT_BUS_TYPE &getBus() {return MessageBus;}
 protected:
 	void resetUART();
 	bool transmitNow();
@@ -53,6 +62,7 @@ private:
 	etl::queue<Message,4> InComing;
 	etl::queue<Message,4> Outgoing;
 	UART_HandleTypeDef *UartHandler;
+	UART_EVENT_BUS_TYPE MessageBus;
 };
 
 #endif

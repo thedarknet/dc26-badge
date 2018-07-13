@@ -170,26 +170,20 @@ bool MCUToMCU::transmitNow() {
 	return true;
 }
 
-static bool pastFirst = false;
 void MCUToMCU::process() {
 	if (!InComing.empty()) {
-		if (!pastFirst) {
-			pastFirst = true;
-		} else {
-			InComing.pop();
-		}
 		Message &m = InComing.front();
 		const darknet7::ESPToSTM *msg = m.asESPToSTM();
 		switch(msg->Msg_type()) {
-		case darknet7::ESPToSTMAny_ESPSystemInfo:
-		{
+		case darknet7::ESPToSTMAny_ESPSystemInfo: {
 			MSGEvent<darknet7::ESPSystemInfo> mevt(msg->Msg_as_ESPSystemInfo(),msg->msgInstanceID());
 			this->getBus().emitSignal(this,&mevt);
-		}
+			}
 			break;
 		default:
 			break;
 		}
+		InComing.pop();
 	}
 }
 

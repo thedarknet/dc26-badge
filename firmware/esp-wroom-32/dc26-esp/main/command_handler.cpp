@@ -49,7 +49,8 @@ void CmdHandlerTask::run(void *data) {
 						esp_chip_info_t chip;
 						System::getChipInfo(&chip);
 						auto info = darknet7::CreateESPSystemInfoDirect(fbb,
-								System::getFreeHeapSize(), chip.model, chip.cores,
+								System::getFreeHeapSize(), System::getMinimumFreeHeapSize(),
+								chip.model, chip.cores,
 								chip.revision, chip.features,
 								System::getIDFVersion());
 						flatbuffers::Offset<darknet7::ESPToSTM> of =

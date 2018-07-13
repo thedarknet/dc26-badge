@@ -18,7 +18,7 @@ using cmdc0de::StateBase;
 
 
 MCUInfoState::MCUInfoState() : Darknet7BaseState(),
-	BadgeInfoList("MCU Info:", Items, 0, 0, 128, 160, 0, (sizeof(Items) / sizeof(Items[0])))
+	BadgeInfoList("MCU Info:", Items, 0, 0, 160, 128, 0, (sizeof(Items) / sizeof(Items[0])))
 	, ESPRequestID(0), InternalState(NONE) {
 
 }
@@ -34,9 +34,10 @@ void MCUInfoState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::ESPSystemInf
 		sprintf(&ListBuffer[0][0], "ESP Cores: %d", (int)mevt->InnerMsg->cores());
 		sprintf(&ListBuffer[1][0], "ESP Features: %d", (int)mevt->InnerMsg->features());
 		sprintf(&ListBuffer[2][0], "ESP HeapSize: %lu", mevt->InnerMsg->heapSize());
-		sprintf(&ListBuffer[3][0], "ESP idf: %s", mevt->InnerMsg->idf_version()->c_str());
-		sprintf(&ListBuffer[4][0], "ESP Model: %ld", mevt->InnerMsg->model());
-		sprintf(&ListBuffer[5][0], "ESP Revision: %ld", mevt->InnerMsg->revision());
+		sprintf(&ListBuffer[3][0], "ESP Free HeapSize: %lu", mevt->InnerMsg->freeHeapSize());
+		sprintf(&ListBuffer[4][0], "ESP idf: %s", mevt->InnerMsg->idf_version()->c_str());
+		sprintf(&ListBuffer[5][0], "ESP Model: %ld", mevt->InnerMsg->model());
+		sprintf(&ListBuffer[6][0], "ESP Revision: %ld", mevt->InnerMsg->revision());
 		MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
 
 		for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++) {
@@ -73,7 +74,7 @@ StateBase::ReturnStateContext MCUInfoState::onRun() {
 	StateBase *nextState = this;
 	switch(InternalState) {
 	case FETCHING_DATA:
-		if(this->getTimesRunCalledSinceLastReset()>2000) {
+		if(this->getTimesRunCalledSinceLastReset()>200) {
 			nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),
 					(const char *)"No info from ESP",2000);
 		}

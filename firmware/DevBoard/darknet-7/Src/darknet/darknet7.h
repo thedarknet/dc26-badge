@@ -17,7 +17,7 @@
 
 
 class MenuState;
-class MessageState;
+class TestState;
 class SendMsgState;
 class SettingState;
 class PairingState;
@@ -67,7 +67,7 @@ public:
 	cmdc0de::DisplayMessageState *getDisplayMessageState(cmdc0de::StateBase *bm, const char *message,
 			uint16_t timeToDisplay);
 	MenuState *getDisplayMenuState();
-	MessageState *getMessageState();
+	TestState *getTestState();
 	SendMsgState *getSendMsgState();
 	SettingState *getSettingState();
 	PairingState *getPairingState();

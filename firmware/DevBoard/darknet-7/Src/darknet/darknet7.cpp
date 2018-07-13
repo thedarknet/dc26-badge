@@ -18,7 +18,7 @@
 #include "libstm32/app/display_message_state.h"
 #include <ff.h>
 #include "KeyStore.h"
-#include "menus/MessageState.h"
+#include "menus/test_state.h"
 #include "menus/SendMsgState.h"
 #include "menus/menu_state.h"
 #include "menus/setting_state.h"
@@ -279,80 +279,6 @@ static const char *TFAILED = "Transmit Failed";
 
 ErrorType DarkNet7::onRun() {
 	MyButtons.processButtons();
-	/*
-	if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_MID)) {
-		static const char *dis = "mid";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_RIGHT)) {
-		static const char *dis = "right";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_LEFT)) {
-		static const char *dis = "left";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_UP)) {
-		static const char *dis = "up";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_DOWN)) {
-		static const char *dis = "down";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_FIRE1)) {
-		static const char *dis = "fire";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	}
-	*/
-	if (HAL_GPIO_ReadPin(MID_BUTTON1_GPIO_Port, MID_BUTTON1_Pin)
-			== GPIO_PIN_RESET) {
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		char oBuf[129] = { '\0' };
-		char iBuf[129] = { '\0' };
-		strcpy(&oBuf[0], "1234567890");
-		//uint8_t i = 0;
-		//uint8_t o = 1;
-		Display.drawString(0, 10, &iBuf[0], cmdc0de::RGBColor::WHITE);
-		Display.drawString(0, 20, &oBuf[0], cmdc0de::RGBColor::WHITE);
-#if 1
-		//HAL_UART_IRQHandler()
-		if (HAL_OK
-				!= HAL_UART_Transmit(&huart1, (uint8_t *) &oBuf[0], 12, 1000)) {
-			Display.drawString(0, 30, TFAILED, cmdc0de::RGBColor::WHITE);
-		}
-		HAL_Delay(5);
-		//HAL_UART_GetState()
-		if (HAL_OK
-				!= HAL_UART_Receive(&huart1, (uint8_t *) &iBuf[0], 12, 1000)) {
-			Display.drawString(0, 30, RFAILED, cmdc0de::RGBColor::WHITE);
-		}
-#endif
-#if 0
-		if(HAL_OK==HAL_I2C_IsDeviceReady(&hi2c1,ESP_ADDRESS,10,1000)) {
-			if(HAL_OK==HAL_I2C_Master_Transmit(&hi2c1,ESP_ADDRESS,(uint8_t *)&oBuf[0],11,1000)) {
-				if(HAL_OK!=HAL_I2C_Master_Receive(&hi2c1,ESP_ADDRESS,(uint8_t*)&iBuf[0],129,1000)) {
-					Display.drawString(0,30,RFAILED, cmdc0de::RGBColor::WHITE);
-				}
-			} else {
-				Display.drawString(0,30,TFAILED, cmdc0de::RGBColor::WHITE);
-			}
-		} else {
-			Display.drawString(0,30,DFAILED, cmdc0de::RGBColor::WHITE);
-		}
-#endif
-		Display.drawString(0, 50, &oBuf[0], cmdc0de::RGBColor::WHITE);
-		Display.drawString(0, 60, &iBuf[0], cmdc0de::RGBColor::WHITE);
-		Display.swap();
-		HAL_Delay(2000);
-	}
 
 	//emit new messages
 	MCUToMCU::get().process();
@@ -398,7 +324,7 @@ uint32_t DarkNet7::nextSeq() {
 }
 
 static MenuState MyMenu;
-static MessageState MyMsgState;
+static TestState MyTestState;
 static SendMsgState MySendMsgState;
 static SettingState MySettingState;
 static PairingState MyPairingState;
@@ -416,8 +342,8 @@ MenuState *DarkNet7::getDisplayMenuState() {
 	return &MyMenu;
 }
 
-MessageState *DarkNet7::getMessageState() {
-	return &MyMsgState;
+TestState *DarkNet7::getTestState() {
+	return &MyTestState;
 }
 
 SendMsgState *DarkNet7::getSendMsgState() {

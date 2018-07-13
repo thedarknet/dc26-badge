@@ -30,7 +30,7 @@ protected:
 	virtual cmdc0de::ErrorType onShutdown();
 private:
 	cmdc0de::GUIListData BadgeInfoList;
-	cmdc0de::GUIListItemData Items[9];
+	cmdc0de::GUIListItemData Items[7];
 	char ListBuffer[6][48]; //height then width
 	uint32_t ESPRequestID;
 	INTERNAL_STATE InternalState;

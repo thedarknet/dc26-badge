@@ -36,9 +36,12 @@ void MCUToMCU::Message::set(uint16_t sf, uint16_t crc, uint8_t *data) {
 	SizeAndFlags = sf;
 	Crc16 = crc;
 	MessageData[0] = sf & 0xFF;
-	MessageData[1] = sf & 0xFF00 >> 8;
+	MessageData[1] = (sf & 0xFF00) >> 8;
+	uint16_t s = MessageData[0];
+	//s |= ((uint16_t) MessageData[1]) << 8;
+	//assert(s==getDataSize());
 	MessageData[2] = Crc16 & 0xFF;
-	MessageData[3] = Crc16 & 0xFF00 >> 8;
+	MessageData[3] = (Crc16 & 0xFF00) >> 8;
 	memcpy(&MessageData[ENVELOP_HEADER], data, getDataSize());
 }
 
@@ -67,6 +70,7 @@ void MCUToMCU::resetUART() {
 
 void MCUToMCU::init(UART_HandleTypeDef *uart) {
 	UartHandler = uart;
+	MX_USART1_UART_Init();
 	HAL_LIN_Init(UartHandler, UART_LINBREAKDETECTLENGTH_10B);
 	HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[0],
 			MCUToMCU::TOTAL_MESSAGE_SIZE);
@@ -98,7 +102,7 @@ void MCUToMCU::onTransmitionComplete() {
 	Message &m = Outgoing.front();
 	if(m.checkFlags(Message::MESSAGE_FLAG_TRANSMITTED)) {
 		Outgoing.pop();
-		HAL_LIN_SendBreak(UartHandler);
+		//HAL_LIN_SendBreak(UartHandler);
 	}
 	transmitNow();
 }
@@ -125,18 +129,12 @@ void MCUToMCU::handleMcuToMcu() {
 		assert(size < MAX_MESSAGE_SIZE);
 		etl::crc16 crc(&UartRXBuffer[ENVELOP_HEADER],
 				&UartRXBuffer[ENVELOP_HEADER] + size);
-		//if (crc.value() == crcFromESP) {
+		if (crc.value() == crcFromESP) {
 			Message &m = InComing.push();
 			m.set(firstTwo, crcFromESP, &UartRXBuffer[ENVELOP_HEADER]);
-		//} else {
-		//	ERRMSG("CRC ERROR in handle MCU To MCU.\n");
-		//}
-		const darknet7::ESPToSTM *test = m.asESPToSTM();
-		const darknet7::ESPSystemInfo * system = test->Msg_as_ESPSystemInfo();
-		int32_t  cores = system->cores();
-		uint32_t headSize = system->heapSize();
-		const flatbuffers::String *version = system->idf_version();
-		const char *p = version->c_str();
+		} else {
+			ERRMSG("CRC ERROR in handle MCU To MCU.\n");
+		}
 		HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[0], MAX_MESSAGE_SIZE);
 	} else if (UartHandler->RxXferCount > 0) {
 		//overflow
@@ -157,13 +155,10 @@ bool MCUToMCU::send(const flatbuffers::FlatBufferBuilder &fbb) {
 }
 
 bool MCUToMCU::transmitNow() {
-	if ((UartHandler->gState
-			& (HAL_UART_STATE_ERROR | HAL_UART_STATE_TIMEOUT))) {
+	if ((UartHandler->gState == HAL_UART_STATE_ERROR || UartHandler->gState==HAL_UART_STATE_TIMEOUT)) {
 		resetUART();
 	}
-	if ((UartHandler->gState & HAL_UART_STATE_READY) != 0
-			&& !(UartHandler->gState&HAL_UART_STATE_BUSY_TX)
-			&& !Outgoing.empty()) {
+	if ((UartHandler->gState == HAL_UART_STATE_READY) && !Outgoing.empty()) {
 		Message &m = Outgoing.front();
 		m.transmit(UartHandler);
 	}
@@ -177,7 +172,7 @@ void MCUToMCU::process() {
 		switch(msg->Msg_type()) {
 		case darknet7::ESPToSTMAny_ESPSystemInfo: {
 			MSGEvent<darknet7::ESPSystemInfo> mevt(msg->Msg_as_ESPSystemInfo(),msg->msgInstanceID());
-			this->getBus().emitSignal(this,&mevt);
+			this->getBus().emitSignal(this,mevt);
 			}
 			break;
 		default:

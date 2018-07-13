@@ -51,20 +51,7 @@ static void gpio_task_example(void* arg) {
 			uint32_t level = (uint32_t) gpio_get_level((gpio_num_t)io_num);
 			printf("GPIO[%d] intr, val: %d\n", io_num, level);
 			//build test message
-			flatbuffers::FlatBufferBuilder fbb;
 			System::logSystemInfo();
-			esp_chip_info_t chip;
-			System::getChipInfo(&chip);
-			auto info = darknet7::CreateESPSystemInfoDirect(fbb,
-				System::getFreeHeapSize()
-				, chip.model
-				, chip.cores
-				, chip.revision
-				, chip.features
-				, System::getIDFVersion());
-			flatbuffers::Offset<darknet7::ESPToSTM> of = darknet7::CreateESPToSTM(fbb,1U,darknet7::ESPToSTMAny_ESPSystemInfo, info.Union());
-			darknet7::FinishSizePrefixedESPToSTMBuffer(fbb,of);
-			ProcToProc.send(fbb);
 		}
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}

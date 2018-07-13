@@ -35,9 +35,9 @@ void MCUToMCUTask::Message::set(uint16_t sf, uint16_t crc, uint8_t *data) {
 	SizeAndFlags = sf;
 	Crc16 = crc;
 	MessageData[0] = sf & 0xFF;
-	MessageData[1] = sf & 0xFF00 >> 8;
+	MessageData[1] = (sf & 0xFF00) >> 8;
 	MessageData[2] = Crc16 & 0xFF;
-	MessageData[3] = Crc16 & 0xFF00 >> 8;
+	MessageData[3] = (Crc16 & 0xFF00) >> 8;
 	memcpy(&MessageData[ENVELOP_HEADER], data, getDataSize());
 }
 
@@ -126,15 +126,21 @@ void MCUToMCUTask::rxTask() {
 		if(rxBytes>0) {
 			ESP_LOGI(LOGTAG, "%d bytes received", rxBytes);
 			sUARTBuffer.insert(sUARTBuffer.end(),&dataBuf[0],&dataBuf[rxBytes-1]);
+			ESP_LOG_BUFFER_HEX(LOGTAG,&dataBuf[0],rxBytes);
+			ESP_LOG_BUFFER_HEX(LOGTAG,&sUARTBuffer[0],sUARTBuffer.size());
 		} else {
 			ESP_LOGI(LOGTAG, "%d bytes received", rxBytes);
 		}
 		if(sUARTBuffer.size()>ENVELOP_HEADER) {
-			ESP_LOGI(LOGTAG, "large enough to process");
-			uint16_t firstTwo = (*((uint16_t *) &sUARTBuffer[0]));
+			ESP_LOGI(LOGTAG, "large enough to process header");
+			uint16_t firstTwo = sUARTBuffer[0];
+			firstTwo |= ((uint16_t)sUARTBuffer[1]) <<8;
 			uint16_t size = firstTwo & 0x7FF; //0-10 bits are size
-			uint16_t crcFromSTM = (*((uint16_t *) &sUARTBuffer[2]));
-			assert(size < MAX_MESSAGE_SIZE);
+			uint16_t crcFromSTM = sUARTBuffer[2];
+			crcFromSTM |= ((uint16_t)sUARTBuffer[3]) << 8;
+			ESP_LOGI(LOGTAG, "buffer size needs to be: firstTwo (%u) size (%u) crc(%u)",
+									 firstTwo,size,crcFromSTM);
+			//assert(size < MAX_MESSAGE_SIZE);
 			if(sUARTBuffer.size()>=size) {
 				ESP_LOGI(LOGTAG, "large enough to get message: firstTwo (%u) size (%u) crc(%u)",
 									 firstTwo,size,crcFromSTM);
@@ -142,12 +148,15 @@ void MCUToMCUTask::rxTask() {
 				m->set(firstTwo,crcFromSTM,&sUARTBuffer[ENVELOP_HEADER]);
 				std::vector<decltype(sUARTBuffer)::value_type>(sUARTBuffer.begin()+size, 
 					sUARTBuffer.end()).swap(sUARTBuffer);
+				ESP_LOGI(LOGTAG, "size after swap %d", sUARTBuffer.size());
 				auto msg = m->asSTMToESP();
 				ESP_LOGI(LOGTAG, "MsgType %d", msg->Msg_type());
 				switch(msg->Msg_type()) {
 					case darknet7::STMToESPAny_SetupAP:
 					case darknet7::STMToESPAny_ESPRequest:
+						ESP_LOGI(LOGTAG,"sending to cmd handler");
 						xQueueSend(CmdHandler->getQueueHandle(),(void*)&m, ( TickType_t ) 0);
+						ESP_LOGI(LOGTAG,"after send to cmd handler");
 						break;
 					default:
 						break;

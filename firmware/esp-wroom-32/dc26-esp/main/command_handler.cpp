@@ -30,16 +30,20 @@ CmdHandlerTask::~CmdHandlerTask() {
 }
 
 void CmdHandlerTask::run(void *data) {
-	MCUToMCUTask::Message *m;
+	ESP_LOGI(LOGTAG, "CmdHandler Task started");
+	MCUToMCUTask::Message *m=0;
 	while (1) {
-		if (xQueueReceive(getQueueHandle(), &m, (TickType_t) 1000) / portTICK_PERIOD_MS) {
+		if (xQueueReceive(getQueueHandle(), &m, (TickType_t) 1000 / portTICK_PERIOD_MS)) {
+			ESP_LOGI(LOGTAG, "got message from queue");
 			const darknet7::STMToESPRequest *msg = m->asSTMToESP();
+			ESP_LOGI(LOGTAG, "message type is: %d", msg->Msg_type());
 			switch (msg->Msg_type()) {
 			case darknet7::STMToESPAny_SetupAP:
 				break;
-			case darknet7::STMToESPAny_ESPRequest:
-				switch (msg->Msg_as_ESPRequest()->requestType()) {
-					case darknet7::ESPRequestType_SYSTEM_INFO: {
+			case darknet7::STMToESPAny_ESPRequest: {
+				//switch (msg->Msg_as_ESPRequest()->requestType()) {
+				//	case darknet7::ESPRequestType_SYSTEM_INFO: {
+						ESP_LOGI(LOGTAG, "processing system info");
 						flatbuffers::FlatBufferBuilder fbb;
 						System::logSystemInfo();
 						esp_chip_info_t chip;
@@ -56,15 +60,13 @@ void CmdHandlerTask::run(void *data) {
 						getMCUToMCU().send(fbb);
 					}
 					break;
-					default:
-					break;
-				}
+				//	default:
+				//	break;
 			default:
 				break;
 			}
-			delete msg;
+			delete m;
 		}
-		vTaskDelay(100 / portTICK_PERIOD_MS);
 	}
 }
 

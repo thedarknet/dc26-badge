@@ -272,14 +272,18 @@ inline flatbuffers::Offset<BadgesInArea> CreateBadgesInAreaDirect(
 struct ESPSystemInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_HEAPSIZE = 4,
-    VT_MODEL = 6,
-    VT_CORES = 8,
-    VT_REVISION = 10,
-    VT_FEATURES = 12,
-    VT_IDF_VERSION = 14
+    VT_FREEHEAPSIZE = 6,
+    VT_MODEL = 8,
+    VT_CORES = 10,
+    VT_REVISION = 12,
+    VT_FEATURES = 14,
+    VT_IDF_VERSION = 16
   };
   uint32_t heapSize() const {
     return GetField<uint32_t>(VT_HEAPSIZE, 0);
+  }
+  uint32_t freeHeapSize() const {
+    return GetField<uint32_t>(VT_FREEHEAPSIZE, 0);
   }
   int32_t model() const {
     return GetField<int32_t>(VT_MODEL, 0);
@@ -299,6 +303,7 @@ struct ESPSystemInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_HEAPSIZE) &&
+           VerifyField<uint32_t>(verifier, VT_FREEHEAPSIZE) &&
            VerifyField<int32_t>(verifier, VT_MODEL) &&
            VerifyField<int32_t>(verifier, VT_CORES) &&
            VerifyField<int32_t>(verifier, VT_REVISION) &&
@@ -314,6 +319,9 @@ struct ESPSystemInfoBuilder {
   flatbuffers::uoffset_t start_;
   void add_heapSize(uint32_t heapSize) {
     fbb_.AddElement<uint32_t>(ESPSystemInfo::VT_HEAPSIZE, heapSize, 0);
+  }
+  void add_freeHeapSize(uint32_t freeHeapSize) {
+    fbb_.AddElement<uint32_t>(ESPSystemInfo::VT_FREEHEAPSIZE, freeHeapSize, 0);
   }
   void add_model(int32_t model) {
     fbb_.AddElement<int32_t>(ESPSystemInfo::VT_MODEL, model, 0);
@@ -345,6 +353,7 @@ struct ESPSystemInfoBuilder {
 inline flatbuffers::Offset<ESPSystemInfo> CreateESPSystemInfo(
     flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t heapSize = 0,
+    uint32_t freeHeapSize = 0,
     int32_t model = 0,
     int32_t cores = 0,
     int32_t revision = 0,
@@ -356,6 +365,7 @@ inline flatbuffers::Offset<ESPSystemInfo> CreateESPSystemInfo(
   builder_.add_revision(revision);
   builder_.add_cores(cores);
   builder_.add_model(model);
+  builder_.add_freeHeapSize(freeHeapSize);
   builder_.add_heapSize(heapSize);
   return builder_.Finish();
 }
@@ -363,6 +373,7 @@ inline flatbuffers::Offset<ESPSystemInfo> CreateESPSystemInfo(
 inline flatbuffers::Offset<ESPSystemInfo> CreateESPSystemInfoDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     uint32_t heapSize = 0,
+    uint32_t freeHeapSize = 0,
     int32_t model = 0,
     int32_t cores = 0,
     int32_t revision = 0,
@@ -371,6 +382,7 @@ inline flatbuffers::Offset<ESPSystemInfo> CreateESPSystemInfoDirect(
   return darknet7::CreateESPSystemInfo(
       _fbb,
       heapSize,
+      freeHeapSize,
       model,
       cores,
       revision,

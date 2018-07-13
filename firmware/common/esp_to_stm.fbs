@@ -22,6 +22,7 @@ table BadgesInArea {
 
 table ESPSystemInfo {
 	heapSize:uint32;
+	freeHeapSize:uint32;
 	model:int32;
 	cores:int32;
 	revision:int32;

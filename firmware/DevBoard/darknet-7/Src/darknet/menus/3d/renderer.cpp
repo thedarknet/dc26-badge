@@ -214,7 +214,7 @@ Vec3f barycentric(const Vec3i &A, const Vec3i &B, const Vec3i &C,
 	return Vec3f(-1, 1, 1); // in this case generate negative coordinates, it will be thrown away by the rasterizator
 }
 
-void triangle(Vec3i *pts, IShader &shader, BitArray &zbuffer,
+void triangle(Vec3i *pts, IShader &shader, cmdc0de::BitArray &zbuffer,
 		cmdc0de::DisplayDevice *display, const Vec2i &bboxmin,
 		const Vec2i &bboxmax, uint16_t canvasWidth) {
 	//Timer bt("bbbox");

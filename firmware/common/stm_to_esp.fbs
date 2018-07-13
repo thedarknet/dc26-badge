@@ -2,7 +2,7 @@ include "common.fbs";
 
 namespace darknet7;
 
-union STMToESPAny { SetupAP, StopAP, DisplayMessage }
+union STMToESPAny { SetupAP, StopAP, BytesToFromAddress, DisplayMessage, ESPRequest }
 
 table SetupAP {
 	ssid:string;
@@ -14,9 +14,14 @@ table StopAP {
 	
 }
 
-table DisplayMessage {
-	msg:string;
-	displayTime:int;
+table PairWithBadge {
+	Address:[ubyte];
+}
+
+enum ESPRequestType : byte { SYSTEM_INFO }
+
+table ESPRequest {
+	requestType:ESPRequestType;
 }
 
 table STMToESPRequest {

@@ -18,7 +18,7 @@
 #include "libstm32/app/display_message_state.h"
 #include <ff.h>
 #include "KeyStore.h"
-#include "menus/MessageState.h"
+#include "menus/test_state.h"
 #include "menus/SendMsgState.h"
 #include "menus/menu_state.h"
 #include "menus/setting_state.h"
@@ -31,6 +31,9 @@
 #include "menus/tamagotchi.h"
 #include "menus/communications_settings.h"
 #include "messaging/stm_to_esp_generated.h"
+#include "mcu_to_mcu.h"
+#include "menus/health.h"
+#include "menus/scan.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::DisplayST7735;
@@ -66,6 +69,10 @@ DarkNet7 *DarkNet7::mSelf = 0;
 
 DarkNet7::ButtonInfo::ButtonInfo() :
 		ButtonState(0),LastButtonState(0) {
+}
+
+void DarkNet7::ButtonInfo::reset() {
+	ButtonState = LastButtonState = 0;
 }
 
 bool DarkNet7::ButtonInfo::areTheseButtonsDown(const int32_t &b) {
@@ -158,11 +165,6 @@ const DarkNet7::ButtonInfo& DarkNet7::getButtonInfo() const {
 	return MyButtons;
 }
 
-
-DarkNet7::AppEventBusType &DarkNet7::getEventBus() {
-	return AppEventBus;
-}
-
 DarkNet7::DarkNet7() :
 		Apa106s(GPIO_APA106_DATA_Pin, GPIO_APA106_DATA_GPIO_Port, TIM1, DMA2_Stream0, DMA2_Stream2_IRQn)
 				//		my Info, start setting address, start Contact address, end contact address
@@ -170,7 +172,7 @@ DarkNet7::DarkNet7() :
 				EndContactSector)
 				, Display(DISPLAY_WIDTH, DISPLAY_HEIGHT, START_ROT)
 		, DisplayBuffer(static_cast<uint8_t>(DISPLAY_WIDTH),static_cast<uint8_t>(DISPLAY_HEIGHT),&DrawBuffer[0],&Display)
-		, DMS(), MyGUI(&Display), MyButtons() {
+		, DMS(), MyGUI(&Display), MyButtons(), SequenceNum(0) {
 
 		}
 
@@ -189,6 +191,7 @@ ErrorType DarkNet7::onInit() {
 		HAL_Delay(1000);
 		items[0].set(0, "OLED_INIT");
 		DrawList.ItemsCount++;
+		Display.setTextColor(cmdc0de::RGBColor::WHITE);
 	}
 #if 1
 	HAL_GPIO_WritePin(SIMPLE_LED1_GPIO_Port, SIMPLE_LED1_Pin, GPIO_PIN_SET);
@@ -266,89 +269,19 @@ ErrorType DarkNet7::onInit() {
 	 }
 #endif
 
+	 MCUToMCU::get().init(&huart1);
 	return et;
 }
 
 static const char *RFAILED = "Receive Failed";
 static const char *TFAILED = "Transmit Failed";
-static const uint16_t ESP_ADDRESS = 1;
+//static const uint16_t ESP_ADDRESS = 1;
 
 ErrorType DarkNet7::onRun() {
 	MyButtons.processButtons();
-	/*
-	if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_MID)) {
-		static const char *dis = "mid";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
 
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_RIGHT)) {
-		static const char *dis = "right";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_LEFT)) {
-		static const char *dis = "left";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_UP)) {
-		static const char *dis = "up";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_DOWN)) {
-		static const char *dis = "down";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_FIRE1)) {
-		static const char *dis = "fire";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	}
-	*/
-	if (HAL_GPIO_ReadPin(MID_BUTTON1_GPIO_Port, MID_BUTTON1_Pin)
-			== GPIO_PIN_RESET) {
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		char oBuf[129] = { '\0' };
-		char iBuf[129] = { '\0' };
-		strcpy(&oBuf[0], "1234567890");
-		//uint8_t i = 0;
-		//uint8_t o = 1;
-		Display.drawString(0, 10, &iBuf[0], cmdc0de::RGBColor::WHITE);
-		Display.drawString(0, 20, &oBuf[0], cmdc0de::RGBColor::WHITE);
-#if 1
-		//HAL_UART_IRQHandler()
-		if (HAL_OK
-				!= HAL_UART_Transmit(&huart1, (uint8_t *) &oBuf[0], 12, 1000)) {
-			Display.drawString(0, 30, TFAILED, cmdc0de::RGBColor::WHITE);
-		}
-		HAL_Delay(5);
-		//HAL_UART_GetState()
-		if (HAL_OK
-				!= HAL_UART_Receive(&huart1, (uint8_t *) &iBuf[0], 12, 1000)) {
-			Display.drawString(0, 30, RFAILED, cmdc0de::RGBColor::WHITE);
-		}
-#endif
-#if 0
-		if(HAL_OK==HAL_I2C_IsDeviceReady(&hi2c1,ESP_ADDRESS,10,1000)) {
-			if(HAL_OK==HAL_I2C_Master_Transmit(&hi2c1,ESP_ADDRESS,(uint8_t *)&oBuf[0],11,1000)) {
-				if(HAL_OK!=HAL_I2C_Master_Receive(&hi2c1,ESP_ADDRESS,(uint8_t*)&iBuf[0],129,1000)) {
-					Display.drawString(0,30,RFAILED, cmdc0de::RGBColor::WHITE);
-				}
-			} else {
-				Display.drawString(0,30,TFAILED, cmdc0de::RGBColor::WHITE);
-			}
-		} else {
-			Display.drawString(0,30,DFAILED, cmdc0de::RGBColor::WHITE);
-		}
-#endif
-		Display.drawString(0, 50, &oBuf[0], cmdc0de::RGBColor::WHITE);
-		Display.drawString(0, 60, &iBuf[0], cmdc0de::RGBColor::WHITE);
-		Display.swap();
-		HAL_Delay(2000);
-	}
+	//emit new messages
+	MCUToMCU::get().process();
 
 	cmdc0de::StateBase::ReturnStateContext rsc = getCurrentState()->run();
 	Display.swap();
@@ -356,7 +289,8 @@ ErrorType DarkNet7::onRun() {
 	if (rsc.Err.ok()) {
 		if (getCurrentState() != rsc.NextMenuToRun) {
 			//on state switches reset keyboard and give a 1 second pause on reading from keyboard.
-			//KB.reset();
+			MyButtons.reset();
+			setCurrentState(rsc.NextMenuToRun);
 		}
 		//if (CurrentState != StateFactory::getGameOfLifeState()
 		//		&& (tick > KB.getLastPinSelectedTick())
@@ -385,8 +319,12 @@ cmdc0de::DisplayMessageState *DarkNet7::getDisplayMessageState(cmdc0de::StateBas
 	return &DMS;
 }
 
+uint32_t DarkNet7::nextSeq() {
+	return ++SequenceNum;
+}
+
 static MenuState MyMenu;
-static MessageState MyMsgState;
+static TestState MyTestState;
 static SendMsgState MySendMsgState;
 static SettingState MySettingState;
 static PairingState MyPairingState;
@@ -397,13 +335,15 @@ static CommunicationSettingState MyCommunicationSettings;
 static BadgeInfoState MyBadgeInfoState;
 static MCUInfoState MyMCUInfoState;
 static Tamagotchi MyTamagotchi;
+static Health MyHealth;
+static Scan MyScan;
 
 MenuState *DarkNet7::getDisplayMenuState() {
 	return &MyMenu;
 }
 
-MessageState *DarkNet7::getMessageState() {
-	return &MyMsgState;
+TestState *DarkNet7::getTestState() {
+	return &MyTestState;
 }
 
 SendMsgState *DarkNet7::getSendMsgState() {
@@ -444,4 +384,12 @@ MCUInfoState *DarkNet7::getMCUInfoState() {
 
 Tamagotchi *DarkNet7::getTamagotchiState() {
 	return &MyTamagotchi;
+}
+
+Health *DarkNet7::getHealthState() {
+	return &MyHealth;
+}
+
+Scan *DarkNet7::getScanState() {
+	return &MyScan;
 }

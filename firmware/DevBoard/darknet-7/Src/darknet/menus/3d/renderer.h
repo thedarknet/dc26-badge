@@ -91,7 +91,7 @@ void viewport(int x, int y, int w, int h);
 void projection(float coeff = 0.f); // coeff = -1/c
 void lookat(const Vec3f &eye, const Vec3f &center, const Vec3f &up);
 //void triangle(Vec3i *pts, IShader &shader, BitArray &zbuffer, DisplayST7735 *display);
-void triangle(Vec3i *pts, IShader &shader, BitArray &zbuffer, cmdc0de::DisplayDevice *display, const Vec2i &bboxmin, const Vec2i &bboxmax, uint16_t canvasWdith);
+void triangle(Vec3i *pts, IShader &shader, cmdc0de::BitArray &zbuffer, cmdc0de::DisplayDevice *display, const Vec2i &bboxmin, const Vec2i &bboxmax, uint16_t canvasWdith);
 
 template<typename T> T CLAMP(const T& value, const T& low, const T& high) {
 	return value < low ? low : (value > high ? high : value);

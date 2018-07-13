@@ -65,7 +65,7 @@
 /* USER CODE BEGIN 1 */
 /* USER CODE END 1 */
 
-/* LIBJPEG init function */	
+/* LIBJPEG init function */
 void MX_LIBJPEG_Init(void);
 
 /* USER CODE BEGIN 2 */

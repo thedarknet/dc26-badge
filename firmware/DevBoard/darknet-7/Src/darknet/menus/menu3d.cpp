@@ -4,6 +4,7 @@
 #include "3d/renderer.h"
 #include "menu3d.h"
 #include "../darknet7.h"
+#include "menu_state.h"
 
 using cmdc0de::RGBColor;
 
@@ -169,22 +170,22 @@ cmdc0de::ErrorType Menu3D::onInit() {
 }
 
 void Menu3D::initMenu3d() {
-	CanvasHeight = DarkNet7::get().getDisplay().getHeight();
-	CanvasWidth = DarkNet7::get().getDisplay().getWidth();
+	CanvasHeight = DarkNet7::get().getDisplay().getHeight()-20;
+	CanvasWidth = DarkNet7::get().getDisplay().getWidth()-60;
 	lookat(eye, center, up);
-	//shift viewport over by 5
-	viewport((CanvasWidth / 8)+5, CanvasHeight / 8, CanvasWidth * 0.75, CanvasHeight * 0.75);
+	viewport((CanvasWidth / 8)+10, (CanvasHeight / 8), CanvasWidth * 0.75, CanvasHeight * 0.75);
 	//viewport(18, 13, 82, 90);
 	projection(-1.f / (eye - center).norm());
 	light_dir.normalize();
+	//model.scale(.5);
 	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 }
 
 cmdc0de::StateBase::ReturnStateContext Menu3D::onRun() {
 	cmdc0de::StateBase::ReturnStateContext sr(this);
-	//if(rc.getKB().wasKeyReleased()) {
-	//	sr.NextMenuToRun = StateFactory::getMenuState();
-	//}
+	if(DarkNet7::get().getButtonInfo().wasAnyButtonReleased()) {
+		sr.NextMenuToRun = DarkNet7::get().getDisplayMenuState();
+	}
 
 	switch (InternalState) {
 		case INIT:
@@ -242,7 +243,7 @@ void Menu3D::line(int x0, int y0, int x1, int y1, RGBColor& color) {
 }
 
 void Menu3D::render() {
-	DarkNet7::get().getDisplay().fillRec(0, 0, CanvasWidth, CanvasHeight, RGBColor::BLACK);
+	DarkNet7::get().getDisplay().fillRec(0, 0, 128, CanvasHeight, RGBColor::BLACK);
 	//rc.getDisplay().fillRec(0, 0, rc.getDisplay().getWidth(), rc.getDisplay().getHeight(), RGBColor::BLACK);
 
 	RGBColor c = RGBColor::WHITE;
@@ -258,9 +259,9 @@ void Menu3D::render() {
 		}
 	}
 	if (HAL_GetTick() - renderTime > 1000) {
-		char buf[12];
+		char buf[24];
 		sprintf(&buf[0], "FPS: %lu:%lu", count, total_frames);
-		DarkNet7::get().getDisplay().drawString(0, 140, &buf[0]);
+		DarkNet7::get().getDisplay().drawString(0, 110, &buf[0]);
 		count = 0;
 		renderTime = HAL_GetTick();
 	}

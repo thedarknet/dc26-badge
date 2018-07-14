@@ -41,83 +41,56 @@ UartClientCallbacks iUartClientCallbacks;
 BLE2902 i2902;
 BLE2902 j2902;
 
-void BluetoothTask::startB2BAdvertising()
+
+/*
+	notifyCallback:  called when the server sends a notify() for the characteristic
+
+	pData will contain the first 20 bytes of data, but the length could be longer
+	instead of playing the game of 20 byte chunks or trying to race to read it
+	before it is overwritten, what we'll do is pass the pointer to the characteristic
+	too the out queue, and do a read().  
+
+	On the server-side, we will not overwrite the current data unless
+		1) a read() has occurred, or
+		2) an override event occurs (i.e. a disconnection)
+*/
+static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, 
+							uint8_t* pData, size_t length, bool isNotify)
+{   
+	xQueueSendFromISR(pBTTask->CallbackQueueHandle, &pBLERemoteCharacteristic, NULL);
+	// FIXME: send the pointer to the characteristic in the queue
+	// then do a read() of the characteristic
+	// register an onRead callback which sets the characteristic to be
+	// write-able again.
+}
+
+void BluetoothTask::startAdvertising()
 {
 	if (!b2b_advertising_enabled)
 	{
 		ESP_LOGI(LOGTAG, "STARTING BT ADVERTISEMENT");
 		pAdvertising->start();
-		b2b_advertising_enabled = true;
-	}
-	else
-	{
-		ESP_LOGI(LOGTAG, "ADVERTISEMENT ALREADY RUNNING");
+		advertising_enabled = true;
 	}
 }
 
-void BluetoothTask::stopB2BAdvertising()
+void BluetoothTask::stopAdvertising()
 {
-	if (b2b_advertising_enabled)
+	if (advertising_enabled)
 	{
 		ESP_LOGI(LOGTAG, "STOPPING BT ADVERTISEMENT");
 		pAdvertising->stop();
-		b2b_advertising_enabled = false;
-	}
-	else
-	{
-		ESP_LOGI(LOGTAG, "ADVERTISEMENT ALREADY STOPPED");
+		advertising_enabled = false;
 	}
 }
 
-
-void BluetoothTask::scan(bool active)
+void BluetoothTask::refreshAdvertisementData()
 {
-	ESP_LOGI(LOGTAG, "STARTING SCAN");
-	if (scan_started)
-	{
-		ESP_LOGI(LOGTAG, "SCAN ALREADY IN PROGRESS. ABORTED.");
-		return;
-	}
-	scan_started = true;
-
-	pScan->setActiveScan(active);
-	pScan->start(3);
-
-	if (pScanCallbacks->server_found)
-	{
-		server_found = pScanCallbacks->server_found;
-		pServerAddress = pScanCallbacks->pServerAddress;
-	}
-
-	scan_started = false;
-	ESP_LOGI(LOGTAG, "SCAN COMPLETE");
-	return;
-}
-
-void BluetoothTask::pair()
-{
-	ESP_LOGI(LOGTAG, "STARTING PAIRING");
-	pPairingClient->connect(*pServerAddress);
-	ESP_LOGI(LOGTAG, "PAIRED");
-}
-
-void BluetoothTask::unpair()
-{
-	pPairingClient->disconnect();
-}
-
-void BluetoothTask::setB2BAdvData(std::string new_name, std::string new_man_data)
-{
-	// TODO: Check length < 10 characters
-	ESP_LOGI(LOGTAG, "SETTING ADVERTISMENT DATA");
-	adv_name = new_name;
-	adv_manufacturer = "DN" + new_man_data;
-
 	// Stop advertising, re-set data, return advertising to original state
-	bool original_state = b2b_advertising_enabled;
+	bool original_state = advertising_enabled;
 	if (original_state)
 	{
-		stopB2BAdvertising();
+		this->stopAdvertising();
 	}
 
 	// Setup data
@@ -126,136 +99,175 @@ void BluetoothTask::setB2BAdvData(std::string new_name, std::string new_man_data
 	adv_data.setFlags(0x6);
 	adv_data.setName(adv_name);
 	adv_data.setManufacturerData(adv_manufacturer);
-
 	pAdvertising->setAdvertisementData(adv_data);
 
 	// Restart if we were already advertising
 	if (original_state)
 	{
-		startB2BAdvertising();
+		this->startAdvertising();
 	}
 }
 
-static void clientRxCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic, 
-							uint8_t* pData, size_t length, bool isNotify)
-{   
-	//std::string dstr((const char*)pData, length); 
-	//ESP_LOGI("Client Notified of", "%s", dstr.c_str()); 
-	char *qbuf = (char *)malloc(length+1);
-	memcpy(qbuf, pData, length);
-	qbuf[length] = '\x00';
 
-	// FIXME: I almost certainly can't just pass the pointer to the RemoteChar
-	// it likely gets free'd the moment this function completes.
-	xQueueSendFromISR(pBTTask->CallbackQueueHandle, &qbuf, NULL);
-}
-
-
-#define CbackQTimeout ((TickType_t) 500/portTICK_PERIOD_MS)
-unsigned long missed = 0;
-void BluetoothTask::do_client_behavior()
+void BluetoothTask::getDeviceName()
 {
-	char * msg = nullptr;
-	if (firstSend)
-	{
-		iUartClientCallbacks.pTxChar->writeValue("doodlebug");
-		firstSend = false;
-		return;
-	}
-
-	if(xQueueReceive(CallbackQueueHandle, &msg, CbackQTimeout) ==
-		pdTRUE)
-	{
-		ESP_LOGI(LOGTAG, "RX Queue read: %s", msg);
-		if (iUartClientCallbacks.connected)
-		{
-			iUartClientCallbacks.pTxChar->writeValue(msg);
-		}
-		free(msg);
-	}
+	//TODO: serialize and return this->adv_name
 }
 
-void BluetoothTask::do_server_behavior()
+void BlueoothTask::setDeviceName(darknet7::STMToESPRequest* msg)
 {
-	char * msg = nullptr;
-	if (iUartServerCallbacks.isConnected)
-	{
-		if(xQueueReceive(CallbackQueueHandle, &msg, CbackQTimeout) ==
-			pdTRUE)
-		{
-			ESP_LOGI(LOGTAG, "RX Queue read: %s", msg);
-			pUartCisoCharacteristic->setValue(msg);
-			pUartCisoCharacteristic->notify();
-			free(msg);
-		}
-	}
+	//TODO: set this->adv_name to input
+	this->refreshAdvertisementData();
 }
 
-void BluetoothTask::dispatchCmd(BTCmd *cmd)
+void BluetoothTask::getInfectionData()
 {
-	switch(*cmd)
-	{
-	case BT_CMD_START_B2B:
-		startB2BAdvertising();
-		*cmd = BT_CMD_SET_B2B_ADV_DATA;
-		break;
-	case BT_CMD_STOP_B2B:
-		ESP_LOGI(LOGTAG, "");
-		stopB2BAdvertising();
-		*cmd = BT_CMD_UNK;
-		break;
-	case BT_CMD_SET_B2B_ADV_DATA:
-		setB2BAdvData("GOURRY!!!", "INFECT");
-		*cmd = BT_CMD_ACTIVE_SCAN;
-		break;
-	case BT_CMD_PASSIVE_SCAN:
-		scan(false);
-		if (server_found)
-			*cmd = BT_CMD_PAIR;
-		break;
-	case BT_CMD_ACTIVE_SCAN:
-		scan(true);
-		if (server_found)
-			*cmd = BT_CMD_PAIR;
-		break;
-	case BT_CMD_PAIR:
-		isActingClient = true;
-		pair();
-		iUartClientCallbacks.afterConnect();
-		iUartClientCallbacks.pRxChar->registerForNotify(&clientRxCallback);
-		*cmd = BT_CMD_UNK;
-		break;
-	default:
-		if (isClient)
-			do_client_behavior();
-		else
-			do_server_behavior();
-		break;
-	}
+	// TODO
 }
 
+void BluetoothTask::setInfectionData(darknet7::STMToESPRequest* msg)
+{
+	// TODO
+}
+
+void BluetoothTask::getCureData()
+{
+	// TODO
+}
+
+void BluetoothTask::setCureData(darknet7::STMToESPRequest* msg)
+{
+	// TODO
+}
+
+void BluetoothTask::scanForDevices(darknet7::STMToESPRequest* msg)
+{
+	// TODO: confirm msg to BLEScanForDevices object
+	// TODO: set scan filter
+	// TODO: pScan->setActiveScan(false)
+	// TODO: pScan->start(timeout)
+
+	// TODO: infection code
+	// TODO: cure code
+	// TODO: serialize name:address map into results
+	// TODO: send results back to STM
+	return;
+}
+
+void BluetoothTask::pairWithDevice(darknet7::STMToESPRequest* msg)
+{
+	// TODO
+}
+
+void getConnectedDevices()
+{
+	// TODO
+}
+
+void sendDataToDevice(darknet7::STMToESPRequest* msg)
+{
+	// TODO
+}
+
+void disconnectFromDevice(darknet7::STMToESPRequest* msg)
+{
+	// TODO
+}
+
+void disconnectFromAll()
+{
+	// TODO
+}
+
+
+/*
+	Command Handler:  handle BLE commands sent from the STM device
+
+	Switch on message type, and dispatch to the appropriate function
+*/
+void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
+{
+	const darknet7::STMToESPRequest* msg = m->asSTMToESP();
+	switch (msg->Msg_type())
+	{
+		case BLEToggleAdvertising:
+			// TODO 
+			// if (msg->state)
+				// this->startAdvertising();
+			// else 
+				// this->stopAdvertising();
+			break;
+		case BLEGetDeviceName:
+			// TODO: return device name
+			break;
+		case BLESetDeviceName:
+			// TODO: update name in advertising data
+			break;
+		case BLEGetInfectionData:
+			// TODO: return infection data from advertising data
+			break;
+		case BLESetInfectionData:
+			// TODO: set infection data in advertising data
+			break;
+		case BLEGetCureData:
+			// TODO: return cure data from advertising data
+			break;
+		case BLESetCureData:
+			// TODO: set cure data in advertising data
+			break;
+		case BLEScanForDevices:
+			// TODO: this->scanForDevices(msg) // msg has filter info
+			// TODO: send results/failure
+			break;
+		case BLEPairWithDevice:
+			// TODO: add address to pairWithBadge queue to be handled by the
+			// badge pairing task
+			break;
+		case BLESendPINConfirmation:
+			// TODO: set security callbacks confirmation value to true or cancel
+			break;
+		case BLEGetConnectedDevices:
+			// TODO: serialize name's of connected devices into return message
+			break;
+		case BLESendDataToDevice:
+			// TODO: this->sendDataToDevice(msg) // msg has addr and data
+			break;
+		case BLEDisconnectFromDevice:
+			// TODO: this->disconnectFromDevice(msg) // msg has address info
+			break;
+		case BLEDisconnectFromAll:
+			this->disconnectFromAll();
+			break;
+		default :
+			// send failure
+			break;
+	}
+	// send success
+}
+
+/* 
+	Main Bluetooth Task:  get messages from STMtoESP Queue and dispatch
+*/
+#define CmdQueueTimeout ((TickType_t) 1000 / portTICK_PERIOD_MS)
 void BluetoothTask::run(void * data)
 {
-	// TODO: Get commands from Queue
-	ESP_LOGI(LOGTAG, "RUNNING");
-	BTCmd cmd;
-	if (isClient)
-		cmd = BT_CMD_PASSIVE_SCAN;
-	else
-	{
-		cmd = BT_CMD_UNK;
-	}
+	MCUToMCUTask::Message* m = nullptr;
 	while (1)
 	{
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
-		dispatchCmd(&cmd);
+		if (xQueueReceive(getQueueHandle(), &m, CmdQueueTimeout)
+			dispatchCmd(m);
 	}
 }
 
 bool BluetoothTask::init()
 {
 	ESP_LOGI(LOGTAG, "INIT");
-	
+
+	// TODO: Setup pairing task with its own queue, for out-of-band command
+	// handling by the connection logic
+	// this is required to be able to cancel a connection request and to handle
+	// pin confirmation input
+
 	// Save a pointer to this globally so we can access the queues
 	// from a static function
 	pBTTask = this;

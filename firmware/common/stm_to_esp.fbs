@@ -14,8 +14,60 @@ table StopAP {
 	
 }
 
-table PairWithBadge {
+table BLEToggleAdvertising {
+	state:bool;
+}
+
+table BLEGetDeviceName {
+
+}
+
+table BLESetDeviceName {
+	name:string;
+}
+
+table BLEGetInfectionData {
+
+}
+
+table BLESetInfectionData {
+	vectors:uint16;
+}
+
+table BLESetCureData {
+	vectors:uint16;
+}
+
+table BLEGetCureData {
+
+}
+
+table BLEScanForDevices {
+	filter:uint8;
+}
+
+table BLEPairWithDevice {
 	Address:[ubyte];
+}
+
+table BLESendPINConfirmation {
+	confirm:bool;
+}
+
+table BLEGetConnectedDevices {
+}
+
+table BLESendDataToDevice {
+	data:string;
+	length:uint8;
+}
+
+table BLEDisconnectFromDevice {
+	name:string;
+}
+
+table BLEDisconnectFromAll {
+
 }
 
 enum ESPRequestType : byte { SYSTEM_INFO }

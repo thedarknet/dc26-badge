@@ -2,3 +2,12 @@ namespace darknet7;
 
 enum WifiMode : byte { OPEN, WPA2, WPA }
 
+table BytesToFromAddress {
+  Address:[ubyte];
+  BytesToSend:[ubyte];
+}
+
+table DisplayMessage {
+	msg:string;
+	displayTime:int;
+}

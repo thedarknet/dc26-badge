@@ -3,6 +3,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 
+// FIXME: remove this when we ship, it's just for building/testing ease
+#include "swaphack.h"
+
 // Main BLE library files
 #include "../lib/ble/BLE2902.h"
 #include "../lib/ble/BLEDevice.h"

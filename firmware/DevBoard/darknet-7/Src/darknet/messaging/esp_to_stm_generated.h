@@ -12,6 +12,12 @@ namespace darknet7 {
 
 struct GenericResponse;
 
+struct Badges;
+
+struct BadgesInArea;
+
+struct ESPSystemInfo;
+
 struct ESPToSTM;
 
 enum RESPONSE_SUCCESS {
@@ -46,14 +52,16 @@ inline const char *EnumNameRESPONSE_SUCCESS(RESPONSE_SUCCESS e) {
 enum ESPToSTMAny {
   ESPToSTMAny_NONE = 0,
   ESPToSTMAny_GenericResponse = 1,
+  ESPToSTMAny_ESPSystemInfo = 2,
   ESPToSTMAny_MIN = ESPToSTMAny_NONE,
-  ESPToSTMAny_MAX = ESPToSTMAny_GenericResponse
+  ESPToSTMAny_MAX = ESPToSTMAny_ESPSystemInfo
 };
 
-inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[2] {
+inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[3] {
   static const ESPToSTMAny values[] = {
     ESPToSTMAny_NONE,
-    ESPToSTMAny_GenericResponse
+    ESPToSTMAny_GenericResponse,
+    ESPToSTMAny_ESPSystemInfo
   };
   return values;
 }
@@ -62,6 +70,7 @@ inline const char * const *EnumNamesESPToSTMAny() {
   static const char * const names[] = {
     "NONE",
     "GenericResponse",
+    "ESPSystemInfo",
     nullptr
   };
   return names;
@@ -78,6 +87,10 @@ template<typename T> struct ESPToSTMAnyTraits {
 
 template<> struct ESPToSTMAnyTraits<GenericResponse> {
   static const ESPToSTMAny enum_value = ESPToSTMAny_GenericResponse;
+};
+
+template<> struct ESPToSTMAnyTraits<ESPSystemInfo> {
+  static const ESPToSTMAny enum_value = ESPToSTMAny_ESPSystemInfo;
 };
 
 bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, ESPToSTMAny type);
@@ -144,6 +157,239 @@ inline flatbuffers::Offset<GenericResponse> CreateGenericResponseDirect(
       message ? _fbb.CreateString(message) : 0);
 }
 
+struct Badges FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_ADDRESS = 4,
+    VT_NAMES = 6
+  };
+  const flatbuffers::Vector<uint8_t> *Address() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_ADDRESS);
+  }
+  const flatbuffers::String *Names() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAMES);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_ADDRESS) &&
+           verifier.Verify(Address()) &&
+           VerifyOffset(verifier, VT_NAMES) &&
+           verifier.Verify(Names()) &&
+           verifier.EndTable();
+  }
+};
+
+struct BadgesBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_Address(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> Address) {
+    fbb_.AddOffset(Badges::VT_ADDRESS, Address);
+  }
+  void add_Names(flatbuffers::Offset<flatbuffers::String> Names) {
+    fbb_.AddOffset(Badges::VT_NAMES, Names);
+  }
+  explicit BadgesBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BadgesBuilder &operator=(const BadgesBuilder &);
+  flatbuffers::Offset<Badges> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Badges>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Badges> CreateBadges(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> Address = 0,
+    flatbuffers::Offset<flatbuffers::String> Names = 0) {
+  BadgesBuilder builder_(_fbb);
+  builder_.add_Names(Names);
+  builder_.add_Address(Address);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<Badges> CreateBadgesDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<uint8_t> *Address = nullptr,
+    const char *Names = nullptr) {
+  return darknet7::CreateBadges(
+      _fbb,
+      Address ? _fbb.CreateVector<uint8_t>(*Address) : 0,
+      Names ? _fbb.CreateString(Names) : 0);
+}
+
+struct BadgesInArea FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_BADGELIST = 4
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<Badges>> *BadgeList() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Badges>> *>(VT_BADGELIST);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_BADGELIST) &&
+           verifier.Verify(BadgeList()) &&
+           verifier.VerifyVectorOfTables(BadgeList()) &&
+           verifier.EndTable();
+  }
+};
+
+struct BadgesInAreaBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_BadgeList(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Badges>>> BadgeList) {
+    fbb_.AddOffset(BadgesInArea::VT_BADGELIST, BadgeList);
+  }
+  explicit BadgesInAreaBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BadgesInAreaBuilder &operator=(const BadgesInAreaBuilder &);
+  flatbuffers::Offset<BadgesInArea> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BadgesInArea>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BadgesInArea> CreateBadgesInArea(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Badges>>> BadgeList = 0) {
+  BadgesInAreaBuilder builder_(_fbb);
+  builder_.add_BadgeList(BadgeList);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<BadgesInArea> CreateBadgesInAreaDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<Badges>> *BadgeList = nullptr) {
+  return darknet7::CreateBadgesInArea(
+      _fbb,
+      BadgeList ? _fbb.CreateVector<flatbuffers::Offset<Badges>>(*BadgeList) : 0);
+}
+
+struct ESPSystemInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_HEAPSIZE = 4,
+    VT_FREEHEAPSIZE = 6,
+    VT_MODEL = 8,
+    VT_CORES = 10,
+    VT_REVISION = 12,
+    VT_FEATURES = 14,
+    VT_IDF_VERSION = 16
+  };
+  uint32_t heapSize() const {
+    return GetField<uint32_t>(VT_HEAPSIZE, 0);
+  }
+  uint32_t freeHeapSize() const {
+    return GetField<uint32_t>(VT_FREEHEAPSIZE, 0);
+  }
+  int32_t model() const {
+    return GetField<int32_t>(VT_MODEL, 0);
+  }
+  int32_t cores() const {
+    return GetField<int32_t>(VT_CORES, 0);
+  }
+  int32_t revision() const {
+    return GetField<int32_t>(VT_REVISION, 0);
+  }
+  int32_t features() const {
+    return GetField<int32_t>(VT_FEATURES, 0);
+  }
+  const flatbuffers::String *idf_version() const {
+    return GetPointer<const flatbuffers::String *>(VT_IDF_VERSION);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint32_t>(verifier, VT_HEAPSIZE) &&
+           VerifyField<uint32_t>(verifier, VT_FREEHEAPSIZE) &&
+           VerifyField<int32_t>(verifier, VT_MODEL) &&
+           VerifyField<int32_t>(verifier, VT_CORES) &&
+           VerifyField<int32_t>(verifier, VT_REVISION) &&
+           VerifyField<int32_t>(verifier, VT_FEATURES) &&
+           VerifyOffset(verifier, VT_IDF_VERSION) &&
+           verifier.Verify(idf_version()) &&
+           verifier.EndTable();
+  }
+};
+
+struct ESPSystemInfoBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_heapSize(uint32_t heapSize) {
+    fbb_.AddElement<uint32_t>(ESPSystemInfo::VT_HEAPSIZE, heapSize, 0);
+  }
+  void add_freeHeapSize(uint32_t freeHeapSize) {
+    fbb_.AddElement<uint32_t>(ESPSystemInfo::VT_FREEHEAPSIZE, freeHeapSize, 0);
+  }
+  void add_model(int32_t model) {
+    fbb_.AddElement<int32_t>(ESPSystemInfo::VT_MODEL, model, 0);
+  }
+  void add_cores(int32_t cores) {
+    fbb_.AddElement<int32_t>(ESPSystemInfo::VT_CORES, cores, 0);
+  }
+  void add_revision(int32_t revision) {
+    fbb_.AddElement<int32_t>(ESPSystemInfo::VT_REVISION, revision, 0);
+  }
+  void add_features(int32_t features) {
+    fbb_.AddElement<int32_t>(ESPSystemInfo::VT_FEATURES, features, 0);
+  }
+  void add_idf_version(flatbuffers::Offset<flatbuffers::String> idf_version) {
+    fbb_.AddOffset(ESPSystemInfo::VT_IDF_VERSION, idf_version);
+  }
+  explicit ESPSystemInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ESPSystemInfoBuilder &operator=(const ESPSystemInfoBuilder &);
+  flatbuffers::Offset<ESPSystemInfo> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<ESPSystemInfo>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<ESPSystemInfo> CreateESPSystemInfo(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint32_t heapSize = 0,
+    uint32_t freeHeapSize = 0,
+    int32_t model = 0,
+    int32_t cores = 0,
+    int32_t revision = 0,
+    int32_t features = 0,
+    flatbuffers::Offset<flatbuffers::String> idf_version = 0) {
+  ESPSystemInfoBuilder builder_(_fbb);
+  builder_.add_idf_version(idf_version);
+  builder_.add_features(features);
+  builder_.add_revision(revision);
+  builder_.add_cores(cores);
+  builder_.add_model(model);
+  builder_.add_freeHeapSize(freeHeapSize);
+  builder_.add_heapSize(heapSize);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<ESPSystemInfo> CreateESPSystemInfoDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint32_t heapSize = 0,
+    uint32_t freeHeapSize = 0,
+    int32_t model = 0,
+    int32_t cores = 0,
+    int32_t revision = 0,
+    int32_t features = 0,
+    const char *idf_version = nullptr) {
+  return darknet7::CreateESPSystemInfo(
+      _fbb,
+      heapSize,
+      freeHeapSize,
+      model,
+      cores,
+      revision,
+      features,
+      idf_version ? _fbb.CreateString(idf_version) : 0);
+}
+
 struct ESPToSTM FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_MSGINSTANCEID = 4,
@@ -163,6 +409,9 @@ struct ESPToSTM FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const GenericResponse *Msg_as_GenericResponse() const {
     return Msg_type() == ESPToSTMAny_GenericResponse ? static_cast<const GenericResponse *>(Msg()) : nullptr;
   }
+  const ESPSystemInfo *Msg_as_ESPSystemInfo() const {
+    return Msg_type() == ESPToSTMAny_ESPSystemInfo ? static_cast<const ESPSystemInfo *>(Msg()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_MSGINSTANCEID) &&
@@ -175,6 +424,10 @@ struct ESPToSTM FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 
 template<> inline const GenericResponse *ESPToSTM::Msg_as<GenericResponse>() const {
   return Msg_as_GenericResponse();
+}
+
+template<> inline const ESPSystemInfo *ESPToSTM::Msg_as<ESPSystemInfo>() const {
+  return Msg_as_ESPSystemInfo();
 }
 
 struct ESPToSTMBuilder {
@@ -222,6 +475,10 @@ inline bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, 
       auto ptr = reinterpret_cast<const GenericResponse *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case ESPToSTMAny_ESPSystemInfo: {
+      auto ptr = reinterpret_cast<const ESPSystemInfo *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     default: return false;
   }
 }
@@ -236,6 +493,36 @@ inline bool VerifyESPToSTMAnyVector(flatbuffers::Verifier &verifier, const flatb
     }
   }
   return true;
+}
+
+inline const darknet7::ESPToSTM *GetESPToSTM(const void *buf) {
+  return flatbuffers::GetRoot<darknet7::ESPToSTM>(buf);
+}
+
+inline const darknet7::ESPToSTM *GetSizePrefixedESPToSTM(const void *buf) {
+  return flatbuffers::GetSizePrefixedRoot<darknet7::ESPToSTM>(buf);
+}
+
+inline bool VerifyESPToSTMBuffer(
+    flatbuffers::Verifier &verifier) {
+  return verifier.VerifyBuffer<darknet7::ESPToSTM>(nullptr);
+}
+
+inline bool VerifySizePrefixedESPToSTMBuffer(
+    flatbuffers::Verifier &verifier) {
+  return verifier.VerifySizePrefixedBuffer<darknet7::ESPToSTM>(nullptr);
+}
+
+inline void FinishESPToSTMBuffer(
+    flatbuffers::FlatBufferBuilder &fbb,
+    flatbuffers::Offset<darknet7::ESPToSTM> root) {
+  fbb.Finish(root);
+}
+
+inline void FinishSizePrefixedESPToSTMBuffer(
+    flatbuffers::FlatBufferBuilder &fbb,
+    flatbuffers::Offset<darknet7::ESPToSTM> root) {
+  fbb.FinishSizePrefixed(root);
 }
 
 }  // namespace darknet7

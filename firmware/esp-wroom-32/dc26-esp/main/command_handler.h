@@ -5,15 +5,12 @@
 #include "esp_log.h"
 #include "lib/Task.h"
 #include "freertos/queue.h"
-
-namespace darknet7 {
-	class STMToESPRequest;
-}
+#include "mcu_to_mcu.h"
 
 class CmdHandlerTask : public Task {
 public:
-	static const int STM_TO_ESP_MSG_QUEUE_SIZE = 10;
-	static const int STM_TO_ESP_MSG_ITEM_SIZE = sizeof(darknet7::STMToESPRequest*);
+	static const int STM_TO_ESP_MSG_QUEUE_SIZE = 4;
+	static const int STM_TO_ESP_MSG_ITEM_SIZE = sizeof(MCUToMCUTask::Message*);
 	static const char *LOGTAG;
 public:
 	CmdHandlerTask(const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);

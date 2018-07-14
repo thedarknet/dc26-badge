@@ -14,7 +14,9 @@ struct SetupAP;
 
 struct StopAP;
 
-struct DisplayMessage;
+struct PairWithBadge;
+
+struct ESPRequest;
 
 struct STMToESPRequest;
 
@@ -22,17 +24,21 @@ enum STMToESPAny {
   STMToESPAny_NONE = 0,
   STMToESPAny_SetupAP = 1,
   STMToESPAny_StopAP = 2,
-  STMToESPAny_DisplayMessage = 3,
+  STMToESPAny_BytesToFromAddress = 3,
+  STMToESPAny_DisplayMessage = 4,
+  STMToESPAny_ESPRequest = 5,
   STMToESPAny_MIN = STMToESPAny_NONE,
-  STMToESPAny_MAX = STMToESPAny_DisplayMessage
+  STMToESPAny_MAX = STMToESPAny_ESPRequest
 };
 
-inline const STMToESPAny (&EnumValuesSTMToESPAny())[4] {
+inline const STMToESPAny (&EnumValuesSTMToESPAny())[6] {
   static const STMToESPAny values[] = {
     STMToESPAny_NONE,
     STMToESPAny_SetupAP,
     STMToESPAny_StopAP,
-    STMToESPAny_DisplayMessage
+    STMToESPAny_BytesToFromAddress,
+    STMToESPAny_DisplayMessage,
+    STMToESPAny_ESPRequest
   };
   return values;
 }
@@ -42,7 +48,9 @@ inline const char * const *EnumNamesSTMToESPAny() {
     "NONE",
     "SetupAP",
     "StopAP",
+    "BytesToFromAddress",
     "DisplayMessage",
+    "ESPRequest",
     nullptr
   };
   return names;
@@ -65,12 +73,46 @@ template<> struct STMToESPAnyTraits<StopAP> {
   static const STMToESPAny enum_value = STMToESPAny_StopAP;
 };
 
+template<> struct STMToESPAnyTraits<BytesToFromAddress> {
+  static const STMToESPAny enum_value = STMToESPAny_BytesToFromAddress;
+};
+
 template<> struct STMToESPAnyTraits<DisplayMessage> {
   static const STMToESPAny enum_value = STMToESPAny_DisplayMessage;
 };
 
+template<> struct STMToESPAnyTraits<ESPRequest> {
+  static const STMToESPAny enum_value = STMToESPAny_ESPRequest;
+};
+
 bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, STMToESPAny type);
 bool VerifySTMToESPAnyVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types);
+
+enum ESPRequestType {
+  ESPRequestType_SYSTEM_INFO = 0,
+  ESPRequestType_MIN = ESPRequestType_SYSTEM_INFO,
+  ESPRequestType_MAX = ESPRequestType_SYSTEM_INFO
+};
+
+inline const ESPRequestType (&EnumValuesESPRequestType())[1] {
+  static const ESPRequestType values[] = {
+    ESPRequestType_SYSTEM_INFO
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesESPRequestType() {
+  static const char * const names[] = {
+    "SYSTEM_INFO",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameESPRequestType(ESPRequestType e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesESPRequestType()[index];
+}
 
 struct SetupAP FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
@@ -174,65 +216,93 @@ inline flatbuffers::Offset<StopAP> CreateStopAP(
   return builder_.Finish();
 }
 
-struct DisplayMessage FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+struct PairWithBadge FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_MSG = 4,
-    VT_DISPLAYTIME = 6
+    VT_ADDRESS = 4
   };
-  const flatbuffers::String *msg() const {
-    return GetPointer<const flatbuffers::String *>(VT_MSG);
-  }
-  int32_t displayTime() const {
-    return GetField<int32_t>(VT_DISPLAYTIME, 0);
+  const flatbuffers::Vector<uint8_t> *Address() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_ADDRESS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_MSG) &&
-           verifier.Verify(msg()) &&
-           VerifyField<int32_t>(verifier, VT_DISPLAYTIME) &&
+           VerifyOffset(verifier, VT_ADDRESS) &&
+           verifier.Verify(Address()) &&
            verifier.EndTable();
   }
 };
 
-struct DisplayMessageBuilder {
+struct PairWithBadgeBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_msg(flatbuffers::Offset<flatbuffers::String> msg) {
-    fbb_.AddOffset(DisplayMessage::VT_MSG, msg);
+  void add_Address(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> Address) {
+    fbb_.AddOffset(PairWithBadge::VT_ADDRESS, Address);
   }
-  void add_displayTime(int32_t displayTime) {
-    fbb_.AddElement<int32_t>(DisplayMessage::VT_DISPLAYTIME, displayTime, 0);
-  }
-  explicit DisplayMessageBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit PairWithBadgeBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  DisplayMessageBuilder &operator=(const DisplayMessageBuilder &);
-  flatbuffers::Offset<DisplayMessage> Finish() {
+  PairWithBadgeBuilder &operator=(const PairWithBadgeBuilder &);
+  flatbuffers::Offset<PairWithBadge> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<DisplayMessage>(end);
+    auto o = flatbuffers::Offset<PairWithBadge>(end);
     return o;
   }
 };
 
-inline flatbuffers::Offset<DisplayMessage> CreateDisplayMessage(
+inline flatbuffers::Offset<PairWithBadge> CreatePairWithBadge(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> msg = 0,
-    int32_t displayTime = 0) {
-  DisplayMessageBuilder builder_(_fbb);
-  builder_.add_displayTime(displayTime);
-  builder_.add_msg(msg);
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> Address = 0) {
+  PairWithBadgeBuilder builder_(_fbb);
+  builder_.add_Address(Address);
   return builder_.Finish();
 }
 
-inline flatbuffers::Offset<DisplayMessage> CreateDisplayMessageDirect(
+inline flatbuffers::Offset<PairWithBadge> CreatePairWithBadgeDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const char *msg = nullptr,
-    int32_t displayTime = 0) {
-  return darknet7::CreateDisplayMessage(
+    const std::vector<uint8_t> *Address = nullptr) {
+  return darknet7::CreatePairWithBadge(
       _fbb,
-      msg ? _fbb.CreateString(msg) : 0,
-      displayTime);
+      Address ? _fbb.CreateVector<uint8_t>(*Address) : 0);
+}
+
+struct ESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_REQUESTTYPE = 4
+  };
+  ESPRequestType requestType() const {
+    return static_cast<ESPRequestType>(GetField<int8_t>(VT_REQUESTTYPE, 0));
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_REQUESTTYPE) &&
+           verifier.EndTable();
+  }
+};
+
+struct ESPRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_requestType(ESPRequestType requestType) {
+    fbb_.AddElement<int8_t>(ESPRequest::VT_REQUESTTYPE, static_cast<int8_t>(requestType), 0);
+  }
+  explicit ESPRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ESPRequestBuilder &operator=(const ESPRequestBuilder &);
+  flatbuffers::Offset<ESPRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<ESPRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<ESPRequest> CreateESPRequest(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    ESPRequestType requestType = ESPRequestType_SYSTEM_INFO) {
+  ESPRequestBuilder builder_(_fbb);
+  builder_.add_requestType(requestType);
+  return builder_.Finish();
 }
 
 struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -257,8 +327,14 @@ struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const StopAP *Msg_as_StopAP() const {
     return Msg_type() == STMToESPAny_StopAP ? static_cast<const StopAP *>(Msg()) : nullptr;
   }
+  const BytesToFromAddress *Msg_as_BytesToFromAddress() const {
+    return Msg_type() == STMToESPAny_BytesToFromAddress ? static_cast<const BytesToFromAddress *>(Msg()) : nullptr;
+  }
   const DisplayMessage *Msg_as_DisplayMessage() const {
     return Msg_type() == STMToESPAny_DisplayMessage ? static_cast<const DisplayMessage *>(Msg()) : nullptr;
+  }
+  const ESPRequest *Msg_as_ESPRequest() const {
+    return Msg_type() == STMToESPAny_ESPRequest ? static_cast<const ESPRequest *>(Msg()) : nullptr;
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -278,8 +354,16 @@ template<> inline const StopAP *STMToESPRequest::Msg_as<StopAP>() const {
   return Msg_as_StopAP();
 }
 
+template<> inline const BytesToFromAddress *STMToESPRequest::Msg_as<BytesToFromAddress>() const {
+  return Msg_as_BytesToFromAddress();
+}
+
 template<> inline const DisplayMessage *STMToESPRequest::Msg_as<DisplayMessage>() const {
   return Msg_as_DisplayMessage();
+}
+
+template<> inline const ESPRequest *STMToESPRequest::Msg_as<ESPRequest>() const {
+  return Msg_as_ESPRequest();
 }
 
 struct STMToESPRequestBuilder {
@@ -331,8 +415,16 @@ inline bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, 
       auto ptr = reinterpret_cast<const StopAP *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case STMToESPAny_BytesToFromAddress: {
+      auto ptr = reinterpret_cast<const BytesToFromAddress *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     case STMToESPAny_DisplayMessage: {
       auto ptr = reinterpret_cast<const DisplayMessage *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case STMToESPAny_ESPRequest: {
+      auto ptr = reinterpret_cast<const ESPRequest *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return false;
@@ -349,6 +441,36 @@ inline bool VerifySTMToESPAnyVector(flatbuffers::Verifier &verifier, const flatb
     }
   }
   return true;
+}
+
+inline const darknet7::STMToESPRequest *GetSTMToESPRequest(const void *buf) {
+  return flatbuffers::GetRoot<darknet7::STMToESPRequest>(buf);
+}
+
+inline const darknet7::STMToESPRequest *GetSizePrefixedSTMToESPRequest(const void *buf) {
+  return flatbuffers::GetSizePrefixedRoot<darknet7::STMToESPRequest>(buf);
+}
+
+inline bool VerifySTMToESPRequestBuffer(
+    flatbuffers::Verifier &verifier) {
+  return verifier.VerifyBuffer<darknet7::STMToESPRequest>(nullptr);
+}
+
+inline bool VerifySizePrefixedSTMToESPRequestBuffer(
+    flatbuffers::Verifier &verifier) {
+  return verifier.VerifySizePrefixedBuffer<darknet7::STMToESPRequest>(nullptr);
+}
+
+inline void FinishSTMToESPRequestBuffer(
+    flatbuffers::FlatBufferBuilder &fbb,
+    flatbuffers::Offset<darknet7::STMToESPRequest> root) {
+  fbb.Finish(root);
+}
+
+inline void FinishSizePrefixedSTMToESPRequestBuffer(
+    flatbuffers::FlatBufferBuilder &fbb,
+    flatbuffers::Offset<darknet7::STMToESPRequest> root) {
+  fbb.FinishSizePrefixed(root);
 }
 
 }  // namespace darknet7

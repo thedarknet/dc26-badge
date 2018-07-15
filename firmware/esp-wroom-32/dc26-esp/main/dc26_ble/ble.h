@@ -7,6 +7,7 @@
 #include "freertos/queue.h"
 #include "../lib/Task.h"
 #include "../lib/ble/BLEDevice.h"
+#include "../mcu_to_mcu.h"
 #include "pairing_server.h"
 #include "pairing_client.h"
 #include "scanning.h"
@@ -44,7 +45,11 @@ public:
 	// Advertisement data
 	bool advertising_enabled = false;
 	std::string adv_name = "DN1";
-	std::string adv_manufacturer = "DN2";
+	std::string adv_manufacturer = "DN\0\0\0\0"; //DN - Infections - Cures
+
+	// Security stuff -- FIXME: remove actingClient/Server
+	bool isActingClient = false;
+	bool isActingServer = false;
 
 	// Callback message queue
 	static const int CBACK_MSG_QUEUE_SIZE = 10;
@@ -53,21 +58,28 @@ public:
 	QueueHandle_t CallbackQueueHandle = nullptr;
 	uint8_t CallbackBuffer[CBACK_MSG_QUEUE_SIZE * CBACK_MSG_ITEM_SIZE];
 
+	static const int STM_MSG_QUEUE_SIZE = 5;
+	static const int STM_MSG_ITEM_SIZE = sizeof(MCUToMCUTask::Message *);
+	StaticQueue_t STMQueue;
+	QueueHandle_t STMQueueHandle = nullptr;
+	uint8_t fromSTMBuffer[STM_MSG_QUEUE_SIZE*STM_MSG_ITEM_SIZE];
+	
+
 public: // API
 	void startAdvertising(void);
 	void stopAdvertising(void);
 	void getDeviceName(void);
-	void setDeviceName(darknet7::STMToESPRequest* msg);
+	void setDeviceName(std::string name);
 	void getInfectionData();
-	void setInfectionData(darknet7::STMToESPRequest* msg);
+	void setInfectionData(uint16_t infection_map);
 	void getCureData();
-	void setCureData(darknet7::STMToESPRequest* msg);
-	void scanForDevices(darknet7::STMToESPRequest* msg);
-	void pairWithDevice(darknet7::STMToESPRequest* msg);
-	void sendPINConfirmation(darknet7::STMToESPRequest* msg);
+	void setCureData(uint16_t cure_map);
+	void scanForDevices(uint8_t filter);
+	void pairWithDevice(std::string addr);
+	void sendPINConfirmation(bool confirm);
 	void getConnectedDevices();
-	void sendDataToDevice(darknet7::STMToESPRequest* msg);
-	void disconnectFromDevice(darknet7::STMToESPRequest* msg);
+	void sendDataToDevice(std::string addr, char* data, uint8_t length);
+	void disconnectFromDevice(std::string addr);
 	void disconnectFromAll();
 
 public:

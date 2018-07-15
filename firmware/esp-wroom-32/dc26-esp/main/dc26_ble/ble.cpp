@@ -3,6 +3,10 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 
+// include main dc26 ESP device code for flatbuffers
+#include "../mcu_to_mcu.h"
+#include "../stm_to_esp_generated.h"
+
 // FIXME: remove this when we ship, it's just for building/testing ease
 #include "swaphack.h"
 
@@ -66,7 +70,7 @@ static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 
 void BluetoothTask::startAdvertising()
 {
-	if (!b2b_advertising_enabled)
+	if (!advertising_enabled)
 	{
 		ESP_LOGI(LOGTAG, "STARTING BT ADVERTISEMENT");
 		pAdvertising->start();
@@ -114,33 +118,34 @@ void BluetoothTask::getDeviceName()
 	//TODO: serialize and return this->adv_name
 }
 
-void BlueoothTask::setDeviceName(darknet7::STMToESPRequest* msg)
+void BluetoothTask::setDeviceName(std::string name)
 {
-	//TODO: set this->adv_name to input
+	this->adv_name = name;
 	this->refreshAdvertisementData();
 }
 
 void BluetoothTask::getInfectionData()
 {
-	// TODO
+	// TODO: return this->adv_manufacturer[bytes]
 }
 
-void BluetoothTask::setInfectionData(darknet7::STMToESPRequest* msg)
+void BluetoothTask::setInfectionData(uint16_t infection_map)
 {
 	// TODO
 }
 
 void BluetoothTask::getCureData()
 {
-	// TODO
+	// TODO: return this->adv_manufacturer[bytes]
 }
 
-void BluetoothTask::setCureData(darknet7::STMToESPRequest* msg)
+
+void BluetoothTask::setCureData(uint16_t cure_map)
 {
 	// TODO
 }
 
-void BluetoothTask::scanForDevices(darknet7::STMToESPRequest* msg)
+void BluetoothTask::scanForDevices(uint8_t filter)
 {
 	// TODO: confirm msg to BLEScanForDevices object
 	// TODO: set scan filter
@@ -154,9 +159,21 @@ void BluetoothTask::scanForDevices(darknet7::STMToESPRequest* msg)
 	return;
 }
 
-void BluetoothTask::pairWithDevice(darknet7::STMToESPRequest* msg)
+void BluetoothTask::pairWithDevice(std::string addr)
 {
 	// TODO
+}
+
+void sendPINConfirmation(bool confirm)
+{
+	if (confirm)
+	{
+		// TODO allow
+	}
+	else
+	{
+		// TODO reject
+	}
 }
 
 void getConnectedDevices()
@@ -164,12 +181,12 @@ void getConnectedDevices()
 	// TODO
 }
 
-void sendDataToDevice(darknet7::STMToESPRequest* msg)
+void sendDataToDevice(std::string addr, char* data, uint8_t length)
 {
 	// TODO
 }
 
-void disconnectFromDevice(darknet7::STMToESPRequest* msg)
+void disconnectFromDevice(std::string addr)
 {
 	// TODO
 }
@@ -187,15 +204,19 @@ void disconnectFromAll()
 */
 void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 {
-	const darknet7::STMToESPRequest* msg = m->asSTMToESP();
-	switch (msg->Msg_type())
+	const darknet7::STMToESPRequest* m = msg->asSTMToESP();
+	switch (m->Msg_type())
 	{
-		case BLEToggleAdvertising:
+		case BLEAdvertise:
+			/*
+			auto advert = m->Msg_as_BLEAdvertise();
+			bool state = advert->state();
 			// TODO 
-			// if (msg->state)
-				// this->startAdvertising();
-			// else 
-				// this->stopAdvertising();
+			if (state)
+				this->startAdvertising();
+			else 
+				this->stopAdvertising();
+			*/
 			break;
 		case BLEGetDeviceName:
 			// TODO: return device name
@@ -247,6 +268,9 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 
 /* 
 	Main Bluetooth Task:  get messages from STMtoESP Queue and dispatch
+
+	If we haven't done a BLE scan in a while, go ahead and do it.
+	This is our primary infection-vector between badges
 */
 #define CmdQueueTimeout ((TickType_t) 1000 / portTICK_PERIOD_MS)
 void BluetoothTask::run(void * data)
@@ -254,8 +278,17 @@ void BluetoothTask::run(void * data)
 	MCUToMCUTask::Message* m = nullptr;
 	while (1)
 	{
-		if (xQueueReceive(getQueueHandle(), &m, CmdQueueTimeout)
-			dispatchCmd(m);
+		if (xQueueReceive(STMQueueHandle, &m, CmdQueueTimeout))
+		{
+			this->commandHandler(m);
+		}
+		else
+		{
+			// TODO: check how long since last scan, scan if beyond that time
+			// this is so we periodically attempt to get infected
+			// scan without filtering anything
+		}
+		delete m;
 	}
 }
 
@@ -318,8 +351,8 @@ bool BluetoothTask::init()
 	// Setup advertising object
 	pAdvertising = pServer->getAdvertising();
 	pAdvertising->addServiceUUID(uartServiceUUID);
-	setB2BAdvData(adv_name, adv_manufacturer);
-	startB2BAdvertising();
+	refreshAdvertisementData();
+	startAdvertising();
 
 	// setup pairing client
 	pPairingClient = BLEDevice::createClient();

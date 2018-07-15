@@ -91,6 +91,8 @@ StateBase::ReturnStateContext MCUInfoState::onRun() {
 }
 
 ErrorType MCUInfoState::onShutdown() {
+	const MSGEvent<darknet7::ESPSystemInfo> *mevt=0;
+	MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
 	return ErrorType();
 }
 

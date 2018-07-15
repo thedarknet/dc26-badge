@@ -17,6 +17,11 @@ const darknet7::ESPToSTM *MCUToMCU::Message::asESPToSTM() {
 	return darknet7::GetSizePrefixedESPToSTM(&MessageData[ENVELOP_HEADER]);
 }
 
+bool MCUToMCU::Message::verifyESPToSTM() {
+	flatbuffers::Verifier v(&MessageData[ENVELOP_HEADER],getDataSize());
+	return darknet7::VerifySizePrefixedESPToSTMBuffer(v);
+}
+
 //We listen for the for our envelop portion of our message which is: 4 bytes:
 // bits 0-10 is the size of the message coming max message size = 1024
 // bit 11: reserved
@@ -102,7 +107,7 @@ void MCUToMCU::onTransmitionComplete() {
 	Message &m = Outgoing.front();
 	if(m.checkFlags(Message::MESSAGE_FLAG_TRANSMITTED)) {
 		Outgoing.pop();
-		//HAL_LIN_SendBreak(UartHandler);
+		HAL_LIN_SendBreak(UartHandler);
 	}
 	transmitNow();
 }
@@ -120,26 +125,30 @@ MCUToMCU::MCUToMCU() :
 }
 
 void MCUToMCU::handleMcuToMcu() {
-	uint16_t size = UartHandler->RxXferCount;
+	uint16_t size = UartHandler->RxXferSize-UartHandler->RxXferCount;
 	//we have received something and we have also gotten a line break
-	if (size > 4 && __HAL_UART_GET_FLAG(UartHandler, UART_FLAG_LBD)) {
+	if (size > ENVELOP_HEADER && __HAL_UART_GET_FLAG(UartHandler, UART_FLAG_LBD)) {
 		uint16_t firstTwo = (*((uint16_t *) &UartRXBuffer[0]));
-		uint16_t size = firstTwo & 0x7FF; //0-10 bits are size
+		uint16_t dataSize = firstTwo & 0x7FF; //0-10 bits are size
 		uint16_t crcFromESP = (*((uint16_t *) &UartRXBuffer[2]));
-		assert(size < MAX_MESSAGE_SIZE);
-		etl::crc16 crc(&UartRXBuffer[ENVELOP_HEADER],
-				&UartRXBuffer[ENVELOP_HEADER] + size);
-		if (crc.value() == crcFromESP) {
+		if(dataSize<=size) {
+			etl::crc16 crc(&UartRXBuffer[ENVELOP_HEADER],
+					&UartRXBuffer[ENVELOP_HEADER] + dataSize);
+			if (crc.value() != crcFromESP) {
+				ERRMSG("CRC ERROR in handle MCU To MCU.\n");
+			}
 			Message &m = InComing.push();
 			m.set(firstTwo, crcFromESP, &UartRXBuffer[ENVELOP_HEADER]);
+			if(!m.verifyESPToSTM()) {
+				ERRMSG("invalid message");
+				//invalid message
+				InComing.pop();
+			}
+			HAL_UART_AbortReceive_IT(UartHandler);
+			HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[0], MAX_MESSAGE_SIZE);
 		} else {
-			ERRMSG("CRC ERROR in handle MCU To MCU.\n");
+			//HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[0], MAX_MESSAGE_SIZE);
 		}
-		HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[0], MAX_MESSAGE_SIZE);
-	} else if (UartHandler->RxXferCount > 0) {
-		//overflow
-		ERRMSG("RxCpltCallback overflow: %d\nResetting\n", UartHandler->RxXferCount);
-		resetUART();
 	}
 }
 

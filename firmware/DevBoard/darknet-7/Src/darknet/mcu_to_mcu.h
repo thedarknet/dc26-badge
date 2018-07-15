@@ -25,6 +25,7 @@ public:
 		static const uint16_t MESSAGE_FLAG_TRANSMITTED = 0x8000; //bit 15
 	public:
 		const darknet7::ESPToSTM *asESPToSTM();
+		bool verifyESPToSTM();
 	protected:
 		Message();
 		void setFlag(uint16_t flags);

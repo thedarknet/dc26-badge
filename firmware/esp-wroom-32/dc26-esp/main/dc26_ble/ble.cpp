@@ -244,28 +244,25 @@ void BluetoothTask::disconnectFromAll()
 */
 void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 {
-	const darknet7::STMToESPRequest* m = msg->asSTMToESP();
+	auto m = msg->asSTMToESP();
 	switch (m->Msg_type())
 	{
 		case darknet7::STMToESPAny_BLEAdvertise:
 			this->toggleAdvertising(m);
 			break;
 		case darknet7::STMToESPAny_BLEGetDeviceName:
-			// TODO: return device name
 			this->getDeviceName();
 			break;
 		case darknet7::STMToESPAny_BLESetDeviceName:
 			// TODO: update name in advertising data
 			break;
 		case darknet7::STMToESPAny_BLEGetInfectionData:
-			// TODO: return infection data from advertising data
 			this->getInfectionData();
 			break;
 		case darknet7::STMToESPAny_BLESetInfectionData:
 			// TODO: set infection data in advertising data
 			break;
 		case darknet7::STMToESPAny_BLEGetCureData:
-			// TODO: return cure data from advertising data
 			this->getCureData();
 			break;
 		case darknet7::STMToESPAny_BLESetCureData:
@@ -332,12 +329,35 @@ void BluetoothTask::run(void * data)
 
 static void initialize_test(QueueHandle_t queue)
 {
+	// Create message (STM Side)
 	flatbuffers::FlatBufferBuilder fbb;
 	auto advert = darknet7::CreateBLEAdvertise(fbb, true);
 	flatbuffers::Offset<darknet7::STMToESPRequest> of = 
-		darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEAdvertise, advert.Union());
+		darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEAdvertise,
+			advert.Union());
 	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
-	xQueueSend(queue, &advert, (TickType_t) 0);
+
+	// "Serialize"
+	flatbuffers::uoffset_t size = fbb.GetSize();
+	uint8_t *data = fbb.GetBufferPointer();
+
+	// Verify message before "sending"
+	flatbuffers::Verifier v(data, size);
+	if (darknet7::VerifySizePrefixedSTMToESPRequestBuffer(v))
+	{
+		v.GetComputedSize();
+		auto t = darknet7::GetSizePrefixedSTMToESPRequest(data);
+		auto msg = t->Msg_as_BLEAdvertise();
+		if (msg->state())
+		{
+			ESP_LOGI("DERPIFIER", "Verified message");
+		}
+	}
+
+	// "Read" message and convert to a Message*
+	MCUToMCUTask::Message* m = new MCUToMCUTask::Message();
+	m->read(data, size);
+	xQueueSend(queue, &m, (TickType_t) 0);
 	return;
 }
 

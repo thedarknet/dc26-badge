@@ -68,18 +68,19 @@ public:
 public: // API
 	void startAdvertising(void);
 	void stopAdvertising(void);
+	void toggleAdvertising(const darknet7::STMToESPRequest* m);
 	void getDeviceName(void);
-	void setDeviceName(std::string name);
+	void setDeviceName(const darknet7::STMToESPRequest* m);
 	void getInfectionData();
-	void setInfectionData(uint16_t infection_map);
+	void setInfectionData(const darknet7::STMToESPRequest* m);
 	void getCureData();
-	void setCureData(uint16_t cure_map);
-	void scanForDevices(uint8_t filter);
-	void pairWithDevice(std::string addr);
-	void sendPINConfirmation(bool confirm);
+	void setCureData(const darknet7::STMToESPRequest* m);
+	void scanForDevices(const darknet7::STMToESPRequest* m);
+	void pairWithDevice(const darknet7::STMToESPRequest* m);
+	void sendPINConfirmation(const darknet7::STMToESPRequest* m);
 	void getConnectedDevices();
-	void sendDataToDevice(std::string addr, char* data, uint8_t length);
-	void disconnectFromDevice(std::string addr);
+	void sendDataToDevice(const darknet7::STMToESPRequest* m);
+	void disconnectFromDevice(const darknet7::STMToESPRequest* m);
 	void disconnectFromAll();
 
 public:

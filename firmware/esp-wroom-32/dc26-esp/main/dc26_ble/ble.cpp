@@ -346,6 +346,9 @@ bool BluetoothTask::init()
 												CallbackBuffer,
 												&CallbackQueue);
 
+	STMQueueHandle = xQueueCreateStatic(STM_MSG_QUEUE_SIZE, STM_MSG_ITEM_SIZE,
+										fromSTMBuffer, &STMQueue);
+
 	BLEDevice::init("DCDN BLE Device");
 
 	BLEDevice::setEncryptionLevel(ESP_BLE_SEC_ENCRYPT);

@@ -54,7 +54,7 @@ void CmdHandlerTask::run(void *data) {
 								chip.revision, chip.features,
 								System::getIDFVersion());
 						flatbuffers::Offset<darknet7::ESPToSTM> of =
-								darknet7::CreateESPToSTM(fbb, 1U,
+								darknet7::CreateESPToSTM(fbb, msg->msgInstanceID(),
 										darknet7::ESPToSTMAny_ESPSystemInfo,
 										info.Union());
 						darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);

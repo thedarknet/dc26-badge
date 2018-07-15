@@ -37,6 +37,7 @@ public:
 		void setFlag(uint16_t flags);
 		bool checkFlags(uint16_t flags);
 		void set(uint16_t sf, uint16_t crc, uint8_t *data);
+		bool read(const uint8_t* data, uint32_t dataSize);
 		bool  transmit();
 		uint16_t getMessageSize() {return getDataSize()+ENVELOP_HEADER;}
 		uint16_t getDataSize() {return SizeAndFlags&ENVELOP_HEADER_SIZE_MASK;}
@@ -48,28 +49,20 @@ public:
 		friend class MCUToMCUTask;
 	};
 public:
-	static const int STM_TO_ESP_MSG_QUEUE_SIZE = 5;
 	static const int ESP_TO_STM_MSG_QUEUE_SIZE = 5;
-	static const int STM_TO_ESP_MSG_ITEM_SIZE = sizeof(Message *);
 	static const int ESP_TO_STM_MSG_ITEM_SIZE = sizeof(Message *);
 	static const char *LOGTAG;
 public:
 	MCUToMCUTask(CmdHandlerTask *pch, const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);
-	void txTask();
-	void rxTask();
 	bool init(gpio_num_t tx, gpio_num_t rx, uint16_t rxBufSize);
+	void processMessage(const uint8_t *data, uint32_t size);
 	uint16_t getBufferSize() {return BufSize;}
 	void send(const flatbuffers::FlatBufferBuilder &fbb);
 public:
 	virtual void run(void *data);
 	virtual ~MCUToMCUTask();
 protected:
-	StaticQueue_t STMToESPQueue;
-	QueueHandle_t STMToESPQueueHandle = nullptr;
-	uint8_t STMToESPBuffer[STM_TO_ESP_MSG_QUEUE_SIZE*STM_TO_ESP_MSG_ITEM_SIZE];
 	uint8_t ESPToSTMBuffer[ESP_TO_STM_MSG_QUEUE_SIZE*ESP_TO_STM_MSG_ITEM_SIZE];
-	StaticQueue_t ESPToSTMQueue;
-	QueueHandle_t ESPToSTMQueueHandle = nullptr;
 	uint16_t BufSize;
 	CmdHandlerTask *CmdHandler;
 };

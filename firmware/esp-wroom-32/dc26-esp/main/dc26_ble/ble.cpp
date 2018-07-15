@@ -164,7 +164,7 @@ void BluetoothTask::pairWithDevice(std::string addr)
 	// TODO
 }
 
-void sendPINConfirmation(bool confirm)
+void BluetoothTask::sendPINConfirmation(bool confirm)
 {
 	if (confirm)
 	{
@@ -176,22 +176,22 @@ void sendPINConfirmation(bool confirm)
 	}
 }
 
-void getConnectedDevices()
+void BluetoothTask::getConnectedDevices()
 {
 	// TODO
 }
 
-void sendDataToDevice(std::string addr, char* data, uint8_t length)
+void BluetoothTask::sendDataToDevice(std::string addr, char* data, uint8_t length)
 {
 	// TODO
 }
 
-void disconnectFromDevice(std::string addr)
+void BluetoothTask::disconnectFromDevice(std::string addr)
 {
 	// TODO
 }
 
-void disconnectFromAll()
+void BluetoothTask::disconnectFromAll()
 {
 	// TODO
 }
@@ -207,7 +207,7 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 	const darknet7::STMToESPRequest* m = msg->asSTMToESP();
 	switch (m->Msg_type())
 	{
-		case BLEAdvertise:
+		case darknet7::STMToESPAny_BLEAdvertise:
 			/*
 			auto advert = m->Msg_as_BLEAdvertise();
 			bool state = advert->state();
@@ -218,45 +218,45 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 				this->stopAdvertising();
 			*/
 			break;
-		case BLEGetDeviceName:
+		case darknet7::STMToESPAny_BLEGetDeviceName:
 			// TODO: return device name
 			break;
-		case BLESetDeviceName:
+		case darknet7::STMToESPAny_BLESetDeviceName:
 			// TODO: update name in advertising data
 			break;
-		case BLEGetInfectionData:
+		case darknet7::STMToESPAny_BLEGetInfectionData:
 			// TODO: return infection data from advertising data
 			break;
-		case BLESetInfectionData:
+		case darknet7::STMToESPAny_BLESetInfectionData:
 			// TODO: set infection data in advertising data
 			break;
-		case BLEGetCureData:
+		case darknet7::STMToESPAny_BLEGetCureData:
 			// TODO: return cure data from advertising data
 			break;
-		case BLESetCureData:
+		case darknet7::STMToESPAny_BLESetCureData:
 			// TODO: set cure data in advertising data
 			break;
-		case BLEScanForDevices:
+		case darknet7::STMToESPAny_BLEScanForDevices:
 			// TODO: this->scanForDevices(msg) // msg has filter info
 			// TODO: send results/failure
 			break;
-		case BLEPairWithDevice:
+		case darknet7::STMToESPAny_BLEPairWithDevice:
 			// TODO: add address to pairWithBadge queue to be handled by the
 			// badge pairing task
 			break;
-		case BLESendPINConfirmation:
+		case darknet7::STMToESPAny_BLESendPINConfirmation:
 			// TODO: set security callbacks confirmation value to true or cancel
 			break;
-		case BLEGetConnectedDevices:
+		case darknet7::STMToESPAny_BLEGetConnectedDevices:
 			// TODO: serialize name's of connected devices into return message
 			break;
-		case BLESendDataToDevice:
+		case darknet7::STMToESPAny_BLESendDataToDevice:
 			// TODO: this->sendDataToDevice(msg) // msg has addr and data
 			break;
-		case BLEDisconnectFromDevice:
+		case darknet7::STMToESPAny_BLEDisconnectFromDevice:
 			// TODO: this->disconnectFromDevice(msg) // msg has address info
 			break;
-		case BLEDisconnectFromAll:
+		case darknet7::STMToESPAny_BLEDisconnectFromAll:
 			this->disconnectFromAll();
 			break;
 		default :

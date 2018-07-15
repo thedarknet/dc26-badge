@@ -3,7 +3,7 @@ include "common.fbs";
 namespace darknet7;
 
 union STMToESPAny { SetupAP, StopAP, BytesToFromAddress, DisplayMessage, ESPRequest,
-				 	BLEToggleAdvertise, BLEGetDeviceName, BLESetDeviceName,
+				 	BLEAdvertise, BLEGetDeviceName, BLESetDeviceName,
 					BLEGetInfectionData, BLESetInfectionData, BLEGetCureData, BLESetCureData,
 					BLEScanForDevices, BLEPairWithDevice, BLESendPINConfirmation, 
 					BLEGetConnectedDevices, BLESendDataToDevice, BLEDisconnectFromDevice,
@@ -63,7 +63,7 @@ table BLEGetConnectedDevices {
 }
 
 table BLESendDataToDevice {
-	addr:string
+	addr:string;
 	data:[ubyte];
 	length:uint8;
 }

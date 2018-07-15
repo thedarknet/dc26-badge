@@ -315,7 +315,11 @@ void BluetoothTask::run(void * data)
 	{
 		if (xQueueReceive(STMQueueHandle, &m, CmdQueueTimeout))
 		{
-			this->commandHandler(m);
+			if (m != nullptr)
+			{
+				this->commandHandler(m);
+				delete m;
+			}
 		}
 		else
 		{
@@ -323,8 +327,18 @@ void BluetoothTask::run(void * data)
 			// this is so we periodically attempt to get infected
 			// scan without filtering anything
 		}
-		delete m;
 	}
+}
+
+static void initialize_test(QueueHandle_t queue)
+{
+	flatbuffers::FlatBufferBuilder fbb;
+	auto advert = darknet7::CreateBLEAdvertise(fbb, true);
+	flatbuffers::Offset<darknet7::STMToESPRequest> of = 
+		darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEAdvertise, advert.Union());
+	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
+	xQueueSend(queue, &advert, (TickType_t) 0);
+	return;
 }
 
 bool BluetoothTask::init()
@@ -348,6 +362,9 @@ bool BluetoothTask::init()
 
 	STMQueueHandle = xQueueCreateStatic(STM_MSG_QUEUE_SIZE, STM_MSG_ITEM_SIZE,
 										fromSTMBuffer, &STMQueue);
+
+
+	initialize_test(STMQueueHandle);
 
 	BLEDevice::init("DCDN BLE Device");
 
@@ -390,7 +407,7 @@ bool BluetoothTask::init()
 	pAdvertising = pServer->getAdvertising();
 	pAdvertising->addServiceUUID(uartServiceUUID);
 	refreshAdvertisementData();
-	startAdvertising();
+	//startAdvertising();
 
 	// setup pairing client
 	pPairingClient = BLEDevice::createClient();
@@ -402,7 +419,7 @@ bool BluetoothTask::init()
 	pScanCallbacks = new MyScanCallbacks();
 	pScan->setAdvertisedDeviceCallbacks(pScanCallbacks);
 
-	init_ble_serial(pService);
+	//init_ble_serial(pService);
 
 	return true;
 }

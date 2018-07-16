@@ -27,10 +27,10 @@ static SectorInfo SectorToAddress[] =
 				, { FLASH_BASE + 0x00004000, 16384 } //(0x4000 16kB) not protected - data for settings
 				, { FLASH_BASE + 0x00008000, 16384 } //(0x4000 16kB) not protected - data for address
 				, { FLASH_BASE + 0x0000c000, 16384 } //(0x4000 16kB) not protected - data
-				, { FLASH_BASE + 0x00010000, 65536 } //(0x10000 64kB) not protected - program
+				, { FLASH_BASE + 0x00010000, 65536 } //(0x10000 64kB) not protected - data resources
 				, { FLASH_BASE + 0x00020000, 131072 } //(0x20000 128kB) not protected - program
 				, { FLASH_BASE + 0x00040000, 131072 } //(0x20000 128kB) not protected - program
-				, { FLASH_BASE + 0x00060000, 131072 } //(0x20000 128kB) not protected - data resources
+				, { FLASH_BASE + 0x00060000, 131072 } //(0x20000 128kB) not protected - program
 		};
 
 #define SECTOR_TO_ADDRESS(sector) (SectorToAddress[sector].StartAddress)

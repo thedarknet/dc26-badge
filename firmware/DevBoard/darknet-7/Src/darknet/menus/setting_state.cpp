@@ -67,15 +67,16 @@ StateBase::ReturnStateContext SettingState::onRun() {
 			switch (SubState) {
 			case 100:
 				memset(&AgentName[0], 0, sizeof(AgentName));
-				VKB.init(VirtualKeyBoard::STDKB, &IHC, 5, DarkNet7::DISPLAY_WIDTH-5, 100, cmdc0de::RGBColor::WHITE, RGBColor::BLACK, RGBColor::BLUE, '_');
+				VKB.init(VirtualKeyBoard::STDKBNames, &IHC, 5, DarkNet7::DISPLAY_WIDTH-5, 80, cmdc0de::RGBColor::WHITE, RGBColor::BLACK, RGBColor::BLUE, '_');
 				DarkNet7::get().getDisplay().drawString(0, 10, (const char*) "Current agent name:");
 				if (*DarkNet7::get().getContacts().getSettings().getAgentName()	== '\0') {
 					DarkNet7::get().getDisplay().drawString(0, 20, (const char *) "NOT SET");
 				} else {
 					DarkNet7::get().getDisplay().drawString(0, 20, DarkNet7::get().getContacts().getSettings().getAgentName());
 				}
-				DarkNet7::get().getDisplay().drawString(0, 30, (const char*) "Set agent name:");
-				DarkNet7::get().getDisplay().drawString(0, 40, &AgentName[0]);
+				DarkNet7::get().getDisplay().drawString(0, 40, (const char*) "MID button completes entry");
+				DarkNet7::get().getDisplay().drawString(0, 50, (const char*) "Set agent name:");
+				DarkNet7::get().getDisplay().drawString(0, 60, &AgentName[0]);
 				break;
 			case 101:
 				DarkNet7::get().getDisplay().drawString(0, 10, (const char*) "Time until badge\ngoes to sleep:", RGBColor::WHITE, RGBColor::BLACK, 1, true);
@@ -101,7 +102,7 @@ StateBase::ReturnStateContext SettingState::onRun() {
 					nextState = DarkNet7::get().getDisplayMessageState(	DarkNet7::get().getDisplayMenuState(), (const char *)"Save FAILED!",	4000);
 				}
 			} else {
-				DarkNet7::get().getDisplay().drawString(0, 40, &AgentName[0]);
+				DarkNet7::get().getDisplay().drawString(0, 60, &AgentName[0]);
 			}
 			break;
 		case 101: {

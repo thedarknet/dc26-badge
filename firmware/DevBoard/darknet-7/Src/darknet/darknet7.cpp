@@ -43,17 +43,13 @@ using cmdc0de::GUIListItemData;
 using cmdc0de::GUI;
 using cmdc0de::RGBColor;
 
-//TODO Can't swap between landscape and portait
-
-
 static const uint32_t DISPLAY_OPT_WRITE_ROWS = DarkNet7::DISPLAY_HEIGHT;
 static uint16_t DrawBuffer[DarkNet7::DISPLAY_WIDTH * DISPLAY_OPT_WRITE_ROWS]; //120 wide, 10 pixels high, 2 bytes per pixel (uint16_t)
-//cmdc0de::DrawBufferNoBuffer NoBuffer(&Display, &DrawBuffer[0],DISPLAY_OPT_WRITE_ROWS);
 
-static const uint8_t MyAddressInfoSector = 3;
+static const uint8_t MyAddressInfoSector = 1; //same sector as settings just first thing
 static const uint32_t MyAddressInfoOffSet = 0;
 static const uint8_t SettingSector = 1;
-static const uint32_t SettingOffset = 0;
+static const uint32_t SettingOffset = 128;
 static const uint8_t StartContactSector = 2;
 static const uint8_t EndContactSector = 3;
 

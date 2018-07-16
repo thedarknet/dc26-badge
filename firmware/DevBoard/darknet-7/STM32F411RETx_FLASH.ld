@@ -46,19 +46,18 @@ flash size = 512kbytes
         #  1: 0x00004000 (0x4000 16kB) not protected - data for settings
         #  2: 0x00008000 (0x4000 16kB) not protected - data for address
         #  3: 0x0000c000 (0x4000 16kB) not protected - data 
-        #  4: 0x00010000 (0x10000 64kB) not protected - program
+        #  4: 0x00010000 (0x10000 64kB) not protected - data resources
         #  5: 0x00020000 (0x20000 128kB) not protected - program
         #  6: 0x00040000 (0x20000 128kB) not protected - program
-        #  7: 0x00060000 (0x20000 128kB) not protected - data resources
+        #  7: 0x00060000 (0x20000 128kB) not protected - program
 */
 /* Specify the memory areas */
 MEMORY
 {
 RAM (xrw)              : ORIGIN = 0x20000000, LENGTH = 128K
 FLASH0 (rx)            : ORIGIN =  0x8000000, LENGTH = 16K
-DATA_ADDRESS_BOOK(xrw) : ORIGIN =  0x8004000, LENGTH = 48K
-FLASH (rx)             : ORIGIN =  0x8010000, LENGTH = 320K
-DATA_RESOURCES(xrw)    : ORIGIN =  0x8060000, LENGTH = 128K
+DATA_ADDRESS_BOOK(xrw) : ORIGIN =  0x8004000, LENGTH = 112K
+FLASH (rx)             : ORIGIN =  0x801C000, LENGTH = 384K
 }
 
 /* Define output sections */
@@ -134,15 +133,7 @@ SECTIONS
     . = ALIGN(4);
    } > DATA_ADDRESS_BOOK
    
-    /* app flash RO resources data */
-  .app_resource :
-  {
-    . = ALIGN(4);
-    *(.app_resource)
-    . = ALIGN(4);
-   } > DATA_RESOURCES
-
-  /* used by the startup to initialize data */
+   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);
 
   /* Initialized data sections goes into RAM, load LMA copy after code */

@@ -256,10 +256,10 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 		case darknet7::STMToESPAny_BLESetDeviceName:
 			// TODO: update name in advertising data
 			break;
-		case darknet7::STMToESPAny_BLEGetExposedData:
-			break;
-		case darknet7::STMToESPAny_BLESetExposedData:
-			break;
+		//case darknet7::STMToESPAny_BLEGetExposedData:
+	//		break;
+	//	case darknet7::STMToESPAny_BLESetExposedData:
+	//		break;
 		case darknet7::STMToESPAny_BLEGetInfectionData:
 			this->getInfectionData();
 			break;

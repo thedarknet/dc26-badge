@@ -7,6 +7,7 @@
 #include "freertos/queue.h"
 #include "../lib/Task.h"
 #include "../lib/ble/BLEDevice.h"
+#include "../mcu_to_mcu.h"
 #include "pairing_server.h"
 #include "pairing_client.h"
 #include "scanning.h"
@@ -37,26 +38,16 @@ public:
 	MySecurity *pMySecurity;
 	BLEAdvertising *pAdvertising;
 	MyScanCallbacks *pScanCallbacks;
-	BLECharacteristic *pUartTxCharacteristic;
-	BLECharacteristic *pUartRxCharacteristic;
+	BLECharacteristic *pUartCisoCharacteristic;
+	BLECharacteristic *pUartCosiCharacteristic;
 	BLEAdvertisementData adv_data;
 
 	// Advertisement data
-	bool b2b_advertising_enabled = false;
+	bool advertising_enabled = false;
 	std::string adv_name = "DN1";
-	std::string adv_manufacturer = "DN2";
+	std::string adv_manufacturer = "DN\0\0\0\0"; //DN - Infections - Cures
 
-	// Scanning related data
-	uint32_t scan_time = 30;
-	bool scan_started = false;
-	bool cancel_scan = false;
-
-	// Client Connecting Data
-	bool server_found;
-	BLEAddress *pServerAddress;
-	BLERemoteCharacteristic *pRemoteCharacteristic;
-
-	// Client/Server Behavior differentiating data
+	// Security stuff -- FIXME: remove actingClient/Server
 	bool isActingClient = false;
 	bool isActingServer = false;
 
@@ -67,30 +58,39 @@ public:
 	QueueHandle_t CallbackQueueHandle = nullptr;
 	uint8_t CallbackBuffer[CBACK_MSG_QUEUE_SIZE * CBACK_MSG_ITEM_SIZE];
 
+	static const int STM_MSG_QUEUE_SIZE = 5;
+	static const int STM_MSG_ITEM_SIZE = sizeof(MCUToMCUTask::Message *);
+	StaticQueue_t STMQueue;
+	QueueHandle_t STMQueueHandle = nullptr;
+	uint8_t fromSTMBuffer[STM_MSG_QUEUE_SIZE*STM_MSG_ITEM_SIZE];
+	
+
+public: // API
+	void startAdvertising(void);
+	void stopAdvertising(void);
+	void toggleAdvertising(const darknet7::STMToESPRequest* m);
+	void getDeviceName(void);
+	void setDeviceName(const darknet7::STMToESPRequest* m);
+	void getInfectionData();
+	void setInfectionData(const darknet7::STMToESPRequest* m);
+	void getCureData();
+	void setCureData(const darknet7::STMToESPRequest* m);
+	void scanForDevices(const darknet7::STMToESPRequest* m);
+	void pairWithDevice(const darknet7::STMToESPRequest* m);
+	void sendPINConfirmation(const darknet7::STMToESPRequest* m);
+	void getConnectedDevices();
+	void sendDataToDevice(const darknet7::STMToESPRequest* m);
+	void disconnectFromDevice(const darknet7::STMToESPRequest* m);
+	void disconnectFromAll();
+
 public:
 	BluetoothTask(const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);
 	bool init();
-
-	// DC26 Badge-life protocol advertising
-	void setB2BAdvData(std::string new_name, std::string new_man_data);
-	void startB2BAdvertising();
-	void stopB2BAdvertising();
-
-	// Scanning for advertising device
-	void scan(bool active);
-
-	// Simple pairing demo
-	void pair();
-	void unpair();
-
-	// Serial badge-to-??? comms
-public:
-	void dispatchCmd(BTCmd *cmd);
+	void commandHandler(MCUToMCUTask::Message* cmd);
 	virtual void run(void *data);
 	virtual ~BluetoothTask();
 protected:
-	void do_client_behavior();
-	void do_server_behavior();
+	void refreshAdvertisementData(void);
 };
 
 

@@ -2,7 +2,12 @@ include "common.fbs";
 
 namespace darknet7;
 
-union STMToESPAny { SetupAP, StopAP, BytesToFromAddress, DisplayMessage, ESPRequest }
+union STMToESPAny { SetupAP, StopAP, BytesToFromAddress, DisplayMessage, ESPRequest,
+				 	BLEAdvertise, BLEGetDeviceName, BLESetDeviceName,
+					BLEGetInfectionData, BLESetInfectionData, BLEGetCureData, BLESetCureData,
+					BLEScanForDevices, BLEPairWithDevice, BLESendPINConfirmation, 
+					BLEGetConnectedDevices, BLESendDataToDevice, BLEDisconnectFromDevice,
+					BLEDisconnectFromAll}
 
 table SetupAP {
 	ssid:string;
@@ -14,8 +19,61 @@ table StopAP {
 	
 }
 
-table PairWithBadge {
-	Address:[ubyte];
+table BLEAdvertise {
+	state:bool;
+}
+
+table BLEGetDeviceName {
+
+}
+
+table BLESetDeviceName {
+	name:string;
+}
+
+table BLEGetInfectionData {
+
+}
+
+table BLESetInfectionData {
+	vectors:uint16;
+}
+
+table BLEGetCureData {
+
+}
+
+table BLESetCureData {
+	vectors:uint16;
+}
+
+table BLEScanForDevices {
+	filter:uint8;
+}
+
+table BLEPairWithDevice {
+	addr:string;
+}
+
+table BLESendPINConfirmation {
+	confirm:bool;
+}
+
+table BLEGetConnectedDevices {
+}
+
+table BLESendDataToDevice {
+	addr:string;
+	data:[ubyte];
+	length:uint8;
+}
+
+table BLEDisconnectFromDevice {
+	name:string;
+}
+
+table BLEDisconnectFromAll {
+
 }
 
 enum ESPRequestType : byte { SYSTEM_INFO }

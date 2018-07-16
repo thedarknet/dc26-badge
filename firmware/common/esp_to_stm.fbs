@@ -12,7 +12,7 @@ table GenericResponse {
 }
 
 table Badges {
-	Address:[ubyte];
+	Address:string;
 	Names:string;
 }
 

@@ -256,6 +256,10 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 		case darknet7::STMToESPAny_BLESetDeviceName:
 			// TODO: update name in advertising data
 			break;
+		case darknet7::STMToESPAny_BLEGetExposedData:
+			break;
+		case darknet7::STMToESPAny_BLESetExposedData:
+			break;
 		case darknet7::STMToESPAny_BLEGetInfectionData:
 			this->getInfectionData();
 			break;
@@ -354,9 +358,18 @@ static void initialize_test(QueueHandle_t queue)
 		}
 	}
 
+	// Add header bytes via magic
+	
 	// "Read" message and convert to a Message*
 	MCUToMCUTask::Message* m = new MCUToMCUTask::Message();
-	m->read(data, size);
+	m->set(size, 0, data);
+	//m->read(data, size);
+	
+	// Verify that we can convert back and check the type
+	auto masg = m->asSTMToESP();
+	ESP_LOGI("DERPIFIER", "Message type %d\n", masg->Msg_type());
+
+	// Add to queue
 	xQueueSend(queue, &m, (TickType_t) 0);
 	return;
 }
@@ -382,8 +395,6 @@ bool BluetoothTask::init()
 
 	STMQueueHandle = xQueueCreateStatic(STM_MSG_QUEUE_SIZE, STM_MSG_ITEM_SIZE,
 										fromSTMBuffer, &STMQueue);
-
-
 	initialize_test(STMQueueHandle);
 
 	BLEDevice::init("DCDN BLE Device");

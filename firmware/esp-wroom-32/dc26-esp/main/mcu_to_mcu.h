@@ -34,10 +34,10 @@ public:
 		const darknet7::ESPToSTM *asESPToSTM();
 		Message(); // TODO: return to protected
 		bool read(const uint8_t* data, uint32_t dataSize); // return to protected
+		void set(uint16_t sf, uint16_t crc, uint8_t *data);
 	protected:
 		void setFlag(uint16_t flags);
 		bool checkFlags(uint16_t flags);
-		void set(uint16_t sf, uint16_t crc, uint8_t *data);
 		bool  transmit();
 		uint16_t getMessageSize() {return getDataSize()+ENVELOP_HEADER;}
 		uint16_t getDataSize() {return SizeAndFlags&ENVELOP_HEADER_SIZE_MASK;}

@@ -52,7 +52,7 @@ public:
 	bool isActingServer = false;
 
 	// Callback message queue
-	static const int CBACK_MSG_QUEUE_SIZE = 10;
+	static const int CBACK_MSG_QUEUE_SIZE = 5;
 	static const int CBACK_MSG_ITEM_SIZE = sizeof(void *); // TODO: Msg Size?
 	StaticQueue_t CallbackQueue;
 	QueueHandle_t CallbackQueueHandle = nullptr;

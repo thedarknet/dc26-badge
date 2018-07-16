@@ -20,6 +20,10 @@ struct BLEGetDeviceName;
 
 struct BLESetDeviceName;
 
+struct BLEGetExposedData;
+
+struct BLESetExposedData;
+
 struct BLEGetInfectionData;
 
 struct BLESetInfectionData;
@@ -455,6 +459,62 @@ inline flatbuffers::Offset<BLESetDeviceName> CreateBLESetDeviceNameDirect(
   return darknet7::CreateBLESetDeviceName(
       _fbb,
       name ? _fbb.CreateString(name) : 0);
+}
+
+struct BLEGetExposedData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct BLEGetExposedDataBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit BLEGetExposedDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BLEGetExposedDataBuilder &operator=(const BLEGetExposedDataBuilder &);
+  flatbuffers::Offset<BLEGetExposedData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BLEGetExposedData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BLEGetExposedData> CreateBLEGetExposedData(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  BLEGetExposedDataBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+struct BLESetExposedData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct BLESetExposedDataBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit BLESetExposedDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BLESetExposedDataBuilder &operator=(const BLESetExposedDataBuilder &);
+  flatbuffers::Offset<BLESetExposedData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BLESetExposedData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BLESetExposedData> CreateBLESetExposedData(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  BLESetExposedDataBuilder builder_(_fbb);
+  return builder_.Finish();
 }
 
 struct BLEGetInfectionData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

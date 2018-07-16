@@ -53,6 +53,10 @@ static const uint32_t SettingOffset = 128;
 static const uint8_t StartContactSector = 2;
 static const uint8_t EndContactSector = 3;
 
+const char *DarkNet7::sYES="Yes";
+const char *DarkNet7::sNO="No";
+
+
 
 DarkNet7 *DarkNet7::mSelf = 0;
 

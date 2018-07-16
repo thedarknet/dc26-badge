@@ -2,7 +2,7 @@ include "common.fbs";
 
 namespace darknet7;
 
-union STMToESPAny { SetupAP, StopAP, BytesToFromAddress, DisplayMessage, ESPRequest,
+union STMToESPAny { SetupAP, StopAP, BytesToFromAddress, DisplayMessage, ESPRequest, CommunicationStatusRequest,
 				 	BLEAdvertise, BLEGetDeviceName, BLESetDeviceName,
 					BLEGetInfectionData, BLESetInfectionData, BLEGetCureData, BLESetCureData,
 					BLEScanForDevices, BLEPairWithDevice, BLESendPINConfirmation, 
@@ -17,6 +17,9 @@ table SetupAP {
 
 table StopAP {
 	
+}
+
+table CommunicationStatusRequest {
 }
 
 table BLEAdvertise {

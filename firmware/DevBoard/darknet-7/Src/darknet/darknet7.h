@@ -32,8 +32,12 @@ class Health;
 class Scan;
 class VirtualKeyBoard;
 
+
 class DarkNet7: public cmdc0de::App {
 public:
+	static const char *sYES;
+	static const char *sNO;
+
 	#define START_LANDSCAPE
 	#ifdef START_LANDSCAPE
 		static const uint32_t DISPLAY_WIDTH = 160;

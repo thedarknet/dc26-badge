@@ -3,58 +3,56 @@
 #include "menu_state.h"
 
 using cmdc0de::ErrorType;
+using cmdc0de::RGBColor;
 
 
-TestState::TestState() : Darknet7BaseState() {
-}
-
-TestState::~TestState() {
+TestState::TestState() : Darknet7BaseState(), ButtonList("Button Info:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0]))), TimesFireHasBeenHeld(0) {
 
 }
 
+ TestState::~TestState() {
 
+}
+
+
+static const char *sYES="Yes";
+static const char *sNO="No";
 
 ErrorType TestState::onInit() {
+	TimesFireHasBeenHeld=0;
+	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
+	sprintf(&ListBuffer[6][0], "Exit hold fire1");
+
+	for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++) {
+		Items[i].text = &ListBuffer[i][0];
+		Items[i].id = i;
+		Items[i].setShouldScroll();
+	}
+	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+	DarkNet7::get().getGUI().drawList(&ButtonList);
 	return ErrorType();
 }
 
 cmdc0de::StateBase::ReturnStateContext TestState::onRun() {
 	StateBase *nextState = this;
 
-#if 0
-	/*
-	if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_MID)) {
-		static const char *dis = "mid";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_RIGHT)) {
-		static const char *dis = "right";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_LEFT)) {
-		static const char *dis = "left";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_UP)) {
-		static const char *dis = "up";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_DOWN)) {
-		static const char *dis = "down";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
-	} else if (MyButtons.wereAnyOfTheseButtonsReleased(ButtonInfo::BUTTON_FIRE1)) {
-		static const char *dis = "fire";
-		Display.fillScreen(cmdc0de::RGBColor::BLACK);
-		Display.drawString(0, 20, dis, cmdc0de::RGBColor::WHITE);
-
+	sprintf(&ListBuffer[0][0], "   UP: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_UP)?sYES:sNO);
+	sprintf(&ListBuffer[1][0], " DOWN: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_DOWN)?sYES:sNO);
+	sprintf(&ListBuffer[2][0], " LEFT: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_LEFT)?sYES:sNO);
+	sprintf(&ListBuffer[3][0], "RIGHT: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_RIGHT)?sYES:sNO);
+	sprintf(&ListBuffer[4][0], "  MID: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_MID)?sYES:sNO);
+	sprintf(&ListBuffer[5][0], "FIRE1: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_FIRE1)?sYES:sNO);
+	if(DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+		TimesFireHasBeenHeld++;
+	} else {
+		TimesFireHasBeenHeld=0;
 	}
-	*/
+	if(TimesFireHasBeenHeld>EXIT_COUNT) {
+		nextState = DarkNet7::get().getDisplayMenuState();
+	}
+
+
+#if 0
 	if (HAL_GPIO_ReadPin(MID_BUTTON1_GPIO_Port, MID_BUTTON1_Pin)
 			== GPIO_PIN_RESET) {
 		Display.fillScreen(cmdc0de::RGBColor::BLACK);

@@ -25,6 +25,9 @@ Health::~Health()
 }
 
 ErrorType Health::onInit() {
+	//BLE - get exposure data
+	//BLE - get cure data
+
 	/*
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
 	sprintf(&ListBuffer[0][0], "Name: %s", DarkNet7::get().getContacts().getSettings().getAgentName());

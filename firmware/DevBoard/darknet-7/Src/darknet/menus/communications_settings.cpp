@@ -22,6 +22,12 @@ CommunicationSettingState::~CommunicationSettingState()
 }
 
 ErrorType CommunicationSettingState::onInit() {
+	//turn on AP on / off
+	// below see bluetoothtask class
+	//BLE discoverable off/on
+	//BLE set/get device name
+	//
+
 	/*
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
 	for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++) {

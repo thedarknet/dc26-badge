@@ -16,5 +16,10 @@ protected:
 	virtual cmdc0de::StateBase::ReturnStateContext onRun();
 	virtual cmdc0de::ErrorType onShutdown();
 private:
+	static const uint32_t EXIT_COUNT = 20;
+	cmdc0de::GUIListData ButtonList;
+	cmdc0de::GUIListItemData Items[7];
+	char ListBuffer[7][24]; //height then width
+	uint32_t TimesFireHasBeenHeld;
 };
 #endif

@@ -45,9 +45,9 @@ ErrorType MenuState::onInit() {
 	Items[4].id = 4;
 	Items[4].text = (const char *) "Screen Saver";
 	Items[5].id = 5;
-	Items[5].text = (const char *) "Badge Info";
+	Items[5].text = (const char *) "STM Info";
 	Items[6].id = 6;
-	Items[6].text = (const char *) "MCU Info";
+	Items[6].text = (const char *) "ESP Info";
 	Items[7].id = 7;
 	Items[7].text = (const char *) "Tamagotchi";
 	Items[8].id = 8;
@@ -56,6 +56,8 @@ ErrorType MenuState::onInit() {
 	Items[9].text = (const char *) "Health";
 	Items[10].id = 10;
 	Items[10].text = (const char *) "Scan for NPCs";
+	Items[11].id = 11;
+	Items[11].text = (const char *) "Test Badge";
 	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 	DarkNet7::get().getGUI().drawList(&this->MenuList);
 	return ErrorType();
@@ -117,6 +119,9 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 			case 10:
 				DarkNet7::get().getScanState()->setNPCOnly(true);
 				nextState = DarkNet7::get().getScanState();
+				break;
+			case 11:
+				nextState = DarkNet7::get().getTestState();
 				break;
 
 		}

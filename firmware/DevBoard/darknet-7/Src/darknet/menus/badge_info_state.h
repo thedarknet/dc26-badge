@@ -24,7 +24,7 @@ protected:
 private:
 	cmdc0de::GUIListData BadgeInfoList;
 	cmdc0de::GUIListItemData Items[9];
-	char ListBuffer[9][64]; //height then width
+	char ListBuffer[9][32]; //height then width
 	char RegCode[18];
 };
 

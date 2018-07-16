@@ -41,21 +41,13 @@ using cmdc0de::DrawBufferNoBuffer;
 using cmdc0de::GUIListData;
 using cmdc0de::GUIListItemData;
 using cmdc0de::GUI;
+using cmdc0de::RGBColor;
 
 //TODO Can't swap between landscape and portait
-#define START_LANDSCAPE
-#ifdef START_LANDSCAPE
-static const uint32_t DISPLAY_WIDTH = 160;
-static const uint32_t DISPLAY_HEIGHT = 128;
-#define START_ROT DisplayST7735::LANDSCAPE_TOP_LEFT
-#else
-static const uint32_t DISPLAY_WIDTH = 128;
-static const uint32_t DISPLAY_HEIGHT = 160;
-#define START_ROT DisplayST7735::PORTAIT_TOP_LEFT
-#endif
 
-static const uint32_t DISPLAY_OPT_WRITE_ROWS = DISPLAY_HEIGHT;
-static uint16_t DrawBuffer[DISPLAY_WIDTH * DISPLAY_OPT_WRITE_ROWS]; //120 wide, 10 pixels high, 2 bytes per pixel (uint16_t)
+
+static const uint32_t DISPLAY_OPT_WRITE_ROWS = DarkNet7::DISPLAY_HEIGHT;
+static uint16_t DrawBuffer[DarkNet7::DISPLAY_WIDTH * DISPLAY_OPT_WRITE_ROWS]; //120 wide, 10 pixels high, 2 bytes per pixel (uint16_t)
 //cmdc0de::DrawBufferNoBuffer NoBuffer(&Display, &DrawBuffer[0],DISPLAY_OPT_WRITE_ROWS);
 
 static const uint8_t MyAddressInfoSector = 3;
@@ -64,6 +56,7 @@ static const uint8_t SettingSector = 1;
 static const uint32_t SettingOffset = 0;
 static const uint8_t StartContactSector = 2;
 static const uint8_t EndContactSector = 3;
+
 
 DarkNet7 *DarkNet7::mSelf = 0;
 
@@ -269,7 +262,7 @@ ErrorType DarkNet7::onInit() {
 	 }
 #endif
 
-	 MCUToMCU::get().init(&huart1);
+	MCUToMCU::get().init(&huart1);
 	return et;
 }
 
@@ -322,6 +315,8 @@ cmdc0de::DisplayMessageState *DarkNet7::getDisplayMessageState(cmdc0de::StateBas
 uint32_t DarkNet7::nextSeq() {
 	return ++SequenceNum;
 }
+
+
 
 static MenuState MyMenu;
 static TestState MyTestState;

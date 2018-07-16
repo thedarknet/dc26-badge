@@ -30,9 +30,20 @@ class MCUInfoState;
 class Tamagotchi;
 class Health;
 class Scan;
+class VirtualKeyBoard;
 
 class DarkNet7: public cmdc0de::App {
 public:
+	#define START_LANDSCAPE
+	#ifdef START_LANDSCAPE
+		static const uint32_t DISPLAY_WIDTH = 160;
+		static const uint32_t DISPLAY_HEIGHT = 128;
+		#define START_ROT DisplayST7735::LANDSCAPE_TOP_LEFT
+	#else
+		static const uint32_t DISPLAY_WIDTH = 128;
+		static const uint32_t DISPLAY_HEIGHT = 160;
+		#define START_ROT DisplayST7735::PORTAIT_TOP_LEFT
+	#endif
 	static const uint16_t BROADCAST_ADDR = 0xFFFF;
 public:
 	static DarkNet7 &get();

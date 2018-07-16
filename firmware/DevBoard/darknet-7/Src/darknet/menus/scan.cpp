@@ -25,6 +25,8 @@ Scan::~Scan()
 }
 
 ErrorType Scan::onInit() {
+	//BLE - scan for devices - (see filters in scan.h
+	//WIFI scan for devices
 	/*
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
 	sprintf(&ListBuffer[0][0], "Name: %s", DarkNet7::get().getContacts().getSettings().getAgentName());

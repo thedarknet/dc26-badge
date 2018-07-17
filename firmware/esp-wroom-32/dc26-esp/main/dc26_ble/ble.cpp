@@ -2,6 +2,7 @@
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
+#include <map>
 
 // include main dc26 ESP device code for flatbuffers
 #include "../mcu_to_mcu.h"
@@ -92,11 +93,11 @@ void BluetoothTask::toggleAdvertising(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLEAdvertise* advert = m->Msg_as_BLEAdvertise();
 	bool state = advert->state();
-	// TODO
 	if (state)
 		this->startAdvertising();
 	else
 		this->stopAdvertising();
+	// TODO: return result
 	return;
 }
 
@@ -124,36 +125,64 @@ void BluetoothTask::refreshAdvertisementData()
 	}
 }
 
+void BluetoothTask::setDeviceType(uint8_t devtype)
+{
+	// third byte of the adv_menufacturer device is the device type
+	this->adv_manufacturer[2] = (char)devtype;
+}
+
 
 void BluetoothTask::getDeviceName()
 {
 	//TODO: serialize and return this->adv_name
+	// TODO: return result
 }
 
 void BluetoothTask::setDeviceName(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESetDeviceName* devName = m->Msg_as_BLESetDeviceName();
-	// TODO: length limit?
 	this->adv_name = devName->name()->str();
 	this->refreshAdvertisementData();
+	// TODO: return result
+}
+
+void BluetoothTask::getExposureData()
+{
+	// TODO: return result
+	uint16_t exposures = pScanCallbacks->getExposures();
+	(void)exposures;
+}
+
+void BluetoothTask::setExposureData(const darknet7::STMToESPRequest* m)
+{
+	const darknet7::BLESetExposureData* msg = m->Msg_as_BLESetExposureData();
+	uint16_t edata = msg->vectors();
+	(void) edata;
+	// TODO: 
 }
 
 void BluetoothTask::getInfectionData()
 {
-	// TODO: return this->adv_manufacturer[bytes]
+	uint16_t infections = (adv_manufacturer[3] << 8) | (adv_manufacturer[4]);
+	(void) infections;
+	// TODO: return result
 }
 
 void BluetoothTask::setInfectionData(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESetInfectionData* msg = m->Msg_as_BLESetInfectionData();
 	uint16_t idata = msg->vectors();
-	(void) idata; // TODO: manufacturerData[slice] = idata
+	this->adv_manufacturer[3] = (char)((idata >> 8) & 0xFF);
+	this->adv_manufacturer[4] = (char)(idata & 0xFF);
 	this->refreshAdvertisementData();
+	// TODO: return result
 }
 
 void BluetoothTask::getCureData()
 {
-	// TODO: return this->adv_manufacturer[bytes]
+	uint16_t cures = pScanCallbacks->getCures();
+	(void)cures;
+	// TODO: return result
 }
 
 
@@ -161,25 +190,37 @@ void BluetoothTask::setCureData(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESetCureData* msg = m->Msg_as_BLESetCureData();
 	uint16_t cdata = msg->vectors();
-	(void) cdata; // TODO: manufacturerData[slice] = idata
+	this->adv_manufacturer[5] = (char)((cdata >> 8) & 0xFF);
+	this->adv_manufacturer[6] = (char)(cdata & 0xFF);
 	this->refreshAdvertisementData();
+	// TODO: return result
 }
 
 void BluetoothTask::scanForDevices(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLEScanForDevices* msg = m->Msg_as_BLEScanForDevices();
 	uint8_t filter = msg->filter();
-	(void) filter;
-	// TODO: m->filter()
-	// TODO: confirm msg to BLEScanForDevices object
-	// TODO: set scan filter
-	// TODO: pScan->setActiveScan(false)
-	// TODO: pScan->start(timeout)
+	printf("scanning!\n");
+
+	pScanCallbacks->setFilter(filter);
+	pScan->setActiveScan(true);
+	pScan->start(10);
+	std::map<std::string, std::string> results = pScanCallbacks->getResults();
+
+	for(const auto &p : results)
+	{
+		printf("Device Found: %s - %s\n", p.first.c_str(), p.second.c_str());
+	}
+	
+	printf("done scanning!\n");
+
+	
 
 	// TODO: infection code
 	// TODO: cure code
 	// TODO: serialize name:address map into results
 	// TODO: send results back to STM
+	// TODO: return result
 	return;
 }
 
@@ -189,7 +230,10 @@ void BluetoothTask::pairWithDevice(const darknet7::STMToESPRequest* m)
 	std::string addr = msg->addr()->str();
 	(void) addr;
 	// TODO: m->addr()
-	// TODO
+	// TODO: add the address to PairingTask queue and move on
+	// TODO: pairing occurs out-of-band because otherwise we can't respond to
+	// TODO: security requests for PIN confirmation
+	// TODO: return result (just SUCCESS)
 }
 
 void BluetoothTask::sendPINConfirmation(const darknet7::STMToESPRequest* m)
@@ -204,11 +248,13 @@ void BluetoothTask::sendPINConfirmation(const darknet7::STMToESPRequest* m)
 	{
 		// TODO reject
 	}
+	// TODO: return result
 }
 
 void BluetoothTask::getConnectedDevices()
 {
 	// TODO
+	// TODO: return result
 }
 
 void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
@@ -220,7 +266,8 @@ void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 	(void)addr;
 	(void)length;
 	(void)data;
-	// TODO
+	// TODO: see ping/pong from original ble.cpp code
+	// TODO: return result
 }
 
 void BluetoothTask::disconnectFromDevice(const darknet7::STMToESPRequest* m)
@@ -229,11 +276,13 @@ void BluetoothTask::disconnectFromDevice(const darknet7::STMToESPRequest* m)
 	std::string name = msg->name()->str();
 	(void)name;
 	// TODO: name->device map, disconnect
+	// TODO: return result
 }
 
 void BluetoothTask::disconnectFromAll()
 {
 	// TODO: for all device in name->device map, disconnect
+	// TODO: return result
 }
 
 
@@ -254,43 +303,43 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 			this->getDeviceName();
 			break;
 		case darknet7::STMToESPAny_BLESetDeviceName:
-			// TODO: update name in advertising data
+			this->setDeviceName(m);
 			break;
 		case darknet7::STMToESPAny_BLEGetExposureData:
+			this->getExposureData();
 			break;
 		case darknet7::STMToESPAny_BLESetExposureData:
+			this->setExposureData(m);
 			break;
 		case darknet7::STMToESPAny_BLEGetInfectionData:
 			this->getInfectionData();
 			break;
 		case darknet7::STMToESPAny_BLESetInfectionData:
-			// TODO: set infection data in advertising data
+			this->setInfectionData(m);
 			break;
 		case darknet7::STMToESPAny_BLEGetCureData:
 			this->getCureData();
 			break;
 		case darknet7::STMToESPAny_BLESetCureData:
-			// TODO: set cure data in advertising data
+			this->setCureData(m);
 			break;
 		case darknet7::STMToESPAny_BLEScanForDevices:
-			// TODO: this->scanForDevices(msg) // msg has filter info
-			// TODO: send results/failure
+			this->scanForDevices(m);
 			break;
 		case darknet7::STMToESPAny_BLEPairWithDevice:
-			// TODO: add address to pairWithBadge queue to be handled by the
-			// badge pairing task
+			this->pairWithDevice(m);
 			break;
 		case darknet7::STMToESPAny_BLESendPINConfirmation:
-			// TODO: set security callbacks confirmation value to true or cancel
+			this->sendPINConfirmation(m);
 			break;
 		case darknet7::STMToESPAny_BLEGetConnectedDevices:
-			// TODO: serialize name's of connected devices into return message
+			this->getConnectedDevices();
 			break;
 		case darknet7::STMToESPAny_BLESendDataToDevice:
-			// TODO: this->sendDataToDevice(msg) // msg has addr and data
+			this->sendDataToDevice(m);
 			break;
 		case darknet7::STMToESPAny_BLEDisconnectFromDevice:
-			// TODO: this->disconnectFromDevice(msg) // msg has address info
+			this->disconnectFromDevice(m);
 			break;
 		case darknet7::STMToESPAny_BLEDisconnectFromAll:
 			this->disconnectFromAll();
@@ -327,50 +376,43 @@ void BluetoothTask::run(void * data)
 			// TODO: check how long since last scan, scan if beyond that time
 			// this is so we periodically attempt to get infected
 			// scan without filtering anything
+			pScanCallbacks->reset();
+			pScan->setActiveScan(true);
+			pScan->start(10);
 		}
 	}
 }
 
 static void initialize_test(QueueHandle_t queue)
 {
-	// Create message (STM Side)
 	flatbuffers::FlatBufferBuilder fbb;
+	uint8_t *data = nullptr;
+	MCUToMCUTask::Message* m;
+	flatbuffers::Offset<darknet7::STMToESPRequest> of;
+	flatbuffers::uoffset_t size;
+
+	// Setup Advertising
 	auto advert = darknet7::CreateBLEAdvertise(fbb, true);
-	flatbuffers::Offset<darknet7::STMToESPRequest> of = 
-		darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEAdvertise,
-			advert.Union());
+	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEAdvertise,
+		advert.Union());
 	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
-
-	// "Serialize"
-	flatbuffers::uoffset_t size = fbb.GetSize();
-	uint8_t *data = fbb.GetBufferPointer();
-
-	// Verify message before "sending"
-	flatbuffers::Verifier v(data, size);
-	if (darknet7::VerifySizePrefixedSTMToESPRequestBuffer(v))
-	{
-		v.GetComputedSize();
-		auto t = darknet7::GetSizePrefixedSTMToESPRequest(data);
-		auto msg = t->Msg_as_BLEAdvertise();
-		if (msg->state())
-		{
-			ESP_LOGI("DERPIFIER", "Verified message");
-		}
-	}
-
-	// Add header bytes via magic
-	
-	// "Read" message and convert to a Message*
-	MCUToMCUTask::Message* m = new MCUToMCUTask::Message();
+	size = fbb.GetSize();
+	data = fbb.GetBufferPointer();
+	m = new MCUToMCUTask::Message();
 	m->set(size, 0, data);
-	//m->read(data, size);
-	
-	// Verify that we can convert back and check the type
-	auto masg = m->asSTMToESP();
-	ESP_LOGI("DERPIFIER", "Message type %d\n", masg->Msg_type());
-
-	// Add to queue
 	xQueueSend(queue, &m, (TickType_t) 0);
+
+	// Scan for Devices
+	auto scan = darknet7::CreateBLEScanForDevices(fbb, darknet7::BLEDeviceFilter_BADGE);
+	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEScanForDevices,
+		scan.Union());
+	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
+	size = fbb.GetSize();
+	data = fbb.GetBufferPointer();
+	m = new MCUToMCUTask::Message();
+	m->set(size, 0, data);
+	xQueueSend(queue, &m, (TickType_t) 0);
+	
 	return;
 }
 
@@ -437,7 +479,10 @@ bool BluetoothTask::init()
 	// Setup advertising object
 	pAdvertising = pServer->getAdvertising();
 	pAdvertising->addServiceUUID(uartServiceUUID);
-	refreshAdvertisementData();
+
+	// setup the advertising data
+	this->setDeviceType(darknet7::BLEDeviceFilter_BADGE);
+	this->refreshAdvertisementData();
 	//startAdvertising();
 
 	// setup pairing client

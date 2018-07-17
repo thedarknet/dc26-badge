@@ -2,6 +2,7 @@
 #include <string.h>
 #include "ble.h"
 #include "scanning.h"
+#include <map>
 #include "../common_generated.h"
 #include "../lib/ble/BLEDevice.h"
 
@@ -9,26 +10,28 @@
 void MyScanCallbacks::reset(void)
 {
 	// reset any old settings from prior scans
-	this->filter = darknet7::BLEDeviceFilter_NONE;
-	//this->infections = 0x0;
-	//this->cures = 0x0;
-	// TODO: clear results map
-	// TODO: deallocate the map memory and reallocate an empty one
+	// default to the INFECT scan since that's when we'll usually be calling this
+	this->filter = darknet7::BLEDeviceFilter_INFECT;
+	this->results.clear();
 }
 
-uint16_t MyScanCallbacks::getInfections(void)
+uint16_t MyScanCallbacks::getExposures(void)
 {
-	return 0; // TODO this->infections;
+	uint16_t retval = this->exposures;
+	this->exposures = 0x0000;
+	return retval;
 }
 
 uint16_t MyScanCallbacks::getCures(void)
 {
-	return 0; // TODO this->cures;
+	uint16_t retval = this->cures;
+	this->cures = 0x0000;
+	return retval;
 }
 
-void MyScanCallbacks::getResults(void) // TODO: Return value
+std::map<std::string, std::string> MyScanCallbacks::getResults(void)
 {
-	return; // TODO this->results;
+	return this->results;
 }
 
 void MyScanCallbacks::setFilter(uint8_t val)
@@ -40,20 +43,27 @@ void MyScanCallbacks::onResult(BLEAdvertisedDevice advertisedDevice)
 {
 	// filter out DC26 devices only
 	if (advertisedDevice.haveAppearance() &&
-		advertisedDevice.getAppearance() == 0x26DC) // TODO:  && 
-		//advertisedDevice.haveManufacturerData() && 
-		//((advertisedDevice.getManufacturerData() & this->filter) != 0))
+		advertisedDevice.getAppearance() == 0x26DC)
 	{
-		// get manufacturer data for infection vectors
-		std::string manData = advertisedDevice.getManufacturerData();
-		// TODO: parse manData for infection/cure information
-		// ... this->infections |= infection_data;
-		// ... this->cures |= cure_data;
+		// filter out only the requested devices (Badge or NPC)
+		if (this->filter == darknet7::BLEDeviceFilter_ALL ||
+			this->filter == darknet7::BLEDeviceFilter_INFECT ||
+			(advertisedDevice.haveManufacturerData() && 
+			((advertisedDevice.getManufacturerData()[2] == this->filter) != 0)))
+		{
+			// get manufacturer data for infection vectors
+			std::string manData = advertisedDevice.getManufacturerData();
+			this->exposures |= ((manData[3] << 8) | manData[4]);
+			this->cures |= ((manData[5] << 8) | manData[6]);
 
-		// add result to final message
-		std::string name = advertisedDevice.getName();
-		std::string address = advertisedDevice.getAddress().toString();
-		// TODO: build results map
-		// TODO: Serialize into ESPToSTM Message?
+			// add result to final message
+			// if this is an infection only scan, don't record anything
+			if (this->filter != darknet7::BLEDeviceFilter_INFECT)
+			{ 
+				std::string name = advertisedDevice.getName();
+				std::string address = advertisedDevice.getAddress().toString();
+				this->results[address] = name;
+			}
+		}
 	}
 }

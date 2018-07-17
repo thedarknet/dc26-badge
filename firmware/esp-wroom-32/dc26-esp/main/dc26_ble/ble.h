@@ -45,7 +45,7 @@ public:
 	// Advertisement data
 	bool advertising_enabled = false;
 	std::string adv_name = "DN1";
-	std::string adv_manufacturer = "DN\0\0\0\0"; //DN - Infections - Cures
+	std::string adv_manufacturer = "DNAAAAA"; //DN-devType-Infection-Cure
 
 	// Security stuff -- FIXME: remove actingClient/Server
 	bool isActingClient = false;
@@ -69,8 +69,11 @@ public: // API
 	void startAdvertising(void);
 	void stopAdvertising(void);
 	void toggleAdvertising(const darknet7::STMToESPRequest* m);
+	void setDeviceType(uint8_t devtype);
 	void getDeviceName(void);
 	void setDeviceName(const darknet7::STMToESPRequest* m);
+	void getExposureData(void);
+	void setExposureData(const darknet7::STMToESPRequest* m);
 	void getInfectionData();
 	void setInfectionData(const darknet7::STMToESPRequest* m);
 	void getCureData();

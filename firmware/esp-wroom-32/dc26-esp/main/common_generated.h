@@ -46,18 +46,20 @@ inline const char *EnumNameWifiMode(WifiMode e) {
 
 enum BLEDeviceFilter {
   BLEDeviceFilter_ALL = 0,
-  BLEDeviceFilter_BADGES = 1,
-  BLEDeviceFilter_NPCS = 2,
+  BLEDeviceFilter_BADGE = 65,
+  BLEDeviceFilter_NPC = 66,
+  BLEDeviceFilter_INFECT = 254,
   BLEDeviceFilter_NONE = 255,
   BLEDeviceFilter_MIN = BLEDeviceFilter_ALL,
   BLEDeviceFilter_MAX = BLEDeviceFilter_NONE
 };
 
-inline const BLEDeviceFilter (&EnumValuesBLEDeviceFilter())[4] {
+inline const BLEDeviceFilter (&EnumValuesBLEDeviceFilter())[5] {
   static const BLEDeviceFilter values[] = {
     BLEDeviceFilter_ALL,
-    BLEDeviceFilter_BADGES,
-    BLEDeviceFilter_NPCS,
+    BLEDeviceFilter_BADGE,
+    BLEDeviceFilter_NPC,
+    BLEDeviceFilter_INFECT,
     BLEDeviceFilter_NONE
   };
   return values;

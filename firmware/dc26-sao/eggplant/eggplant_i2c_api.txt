@@ -1,0 +1,83 @@
+# Overview
+
+Basic I2C operations for the Darknet "Official" Shitty Add-On (SAO) board
+
+
+# Operations:
+
+Read from badge
+- Type
+- Version
+- Serial number
+- Custom name
+- LED Mode
+- Infection
+- Memory Location
+
+Write to badge
+- Custom name
+- LED Mode
+- Infection
+- Memory Location
+
+For nouns, even are read operations, and odd are write operations.
+
+For example 0x04 is requesting to read from memory, and 0x05 is requesting to write to memory
+
+
+# I2C Address:
+
+I2C Slave Address of Eggplant 0x36 - i.e. EGplant, or the best you can do in 7 bits.
+
+
+# ATTiny memory:
+
+0x00 - 0x08		9 bytes - null terminated 8 byte string for badge type			"EGGPLANT"
+0x09 - 0x11		9 bytes - null terminated 8 byte string for firmware version	"1.0.0"
+0x12 - 0x1A		9 bytes - option bytes
+					OPTIONS[0] = led_mode
+					OPTIONS[1] = infection status
+					OPTIONS[2] = permananet infection status
+0x1B - 0x23		9 bytes - null terminated 8 byte string for serial number		randomly set on first i2c operation if not set
+0x24 - 0x2C		13 bytes - null terminated 12 byte string for custom name		"NonameEggie"
+
+
+# Read Operations:
+
+NOUN, VERB, DATA
+
+0x00 - System Info
+0x00, 0x00								- Type					STRING		EGGPLANT
+0x00, 0x01								- Version				STRING		1.0.0
+0x00, 0x02								- Serial				STRING		8 Chars
+0x00, 0x03								- Name					STRING		12 Chars
+
+0x02 - LED Mode
+0x02, 0x00								- LED Mode				BYTE		0 - 5 (6 is off)
+
+0x04 - Infection Mode
+0x04, 0x00								- Try to infect me		BYTE		Roll the dice
+0x04, 0x01								- Infection Status		BYTE		Reports true status (i.e. doctor report)
+
+0x08 - Memory Page 2
+0x08, <ADDRESS_2_BYTES>, <LENGTH>		- Read EEPROM 			Up to 16 BYTES
+
+
+Write Operations:
+
+NOUN, VERB, DATA (up to 14 bytes)
+
+0x01 - System Info
+0x01, 0x03, DATA						- Name					STRING		12 Chars
+
+0x03 - LED Mode
+0x03, 0x00, <BYTE>						- LED Mode				BYTE		0 - 6 (6 = off)
+
+0x05 - Infection Mode
+0x05, 0x00, <BYTE>						- Infection Infect		BYTE		Set to infect.  Only acts on bits 7 & 8
+0x05, 0x01, <BYTE>						- Infection Cure		BYTE		Set to cure.  Only acts on bits 7 & 8
+
+0x09 - Memory Page 2
+0x09, <ADDRESS_2_BYTES>, <BYTES>, DATA	- Write EEPROM 			BYTES 		Up to 10 bytes 
+
+

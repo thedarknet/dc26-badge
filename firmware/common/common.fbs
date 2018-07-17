@@ -2,6 +2,8 @@ namespace darknet7;
 
 enum WifiMode : byte { OPEN, WPA2, WPA }
 
+enum BLEDeviceFilter : byte { ALL = 0, BADGES = 1, NPCS = 2, NONE = 0xFF }
+
 table BytesToFromAddress {
   Address:[ubyte];
   BytesToSend:[ubyte];

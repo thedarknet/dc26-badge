@@ -44,6 +44,25 @@ inline const char *EnumNameWifiMode(WifiMode e) {
   return EnumNamesWifiMode()[index];
 }
 
+enum BLEDeviceFilter {
+  BLEDeviceFilter_ALL = 0,
+  BLEDeviceFilter_BADGES = 1,
+  BLEDeviceFilter_NPCS = 2,
+  BLEDeviceFilter_NONE = 255,
+  BLEDeviceFilter_MIN = BLEDeviceFilter_ALL,
+  BLEDeviceFilter_MAX = BLEDeviceFilter_NONE
+};
+
+inline const BLEDeviceFilter (&EnumValuesBLEDeviceFilter())[4] {
+  static const BLEDeviceFilter values[] = {
+    BLEDeviceFilter_ALL,
+    BLEDeviceFilter_BADGES,
+    BLEDeviceFilter_NPCS,
+    BLEDeviceFilter_NONE
+  };
+  return values;
+}
+
 struct BytesToFromAddress FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_ADDRESS = 4,

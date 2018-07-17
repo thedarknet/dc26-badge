@@ -162,8 +162,8 @@ struct Badges FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_ADDRESS = 4,
     VT_NAMES = 6
   };
-  const flatbuffers::Vector<uint8_t> *Address() const {
-    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_ADDRESS);
+  const flatbuffers::String *Address() const {
+    return GetPointer<const flatbuffers::String *>(VT_ADDRESS);
   }
   const flatbuffers::String *Names() const {
     return GetPointer<const flatbuffers::String *>(VT_NAMES);
@@ -181,7 +181,7 @@ struct Badges FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct BadgesBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Address(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> Address) {
+  void add_Address(flatbuffers::Offset<flatbuffers::String> Address) {
     fbb_.AddOffset(Badges::VT_ADDRESS, Address);
   }
   void add_Names(flatbuffers::Offset<flatbuffers::String> Names) {
@@ -201,7 +201,7 @@ struct BadgesBuilder {
 
 inline flatbuffers::Offset<Badges> CreateBadges(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> Address = 0,
+    flatbuffers::Offset<flatbuffers::String> Address = 0,
     flatbuffers::Offset<flatbuffers::String> Names = 0) {
   BadgesBuilder builder_(_fbb);
   builder_.add_Names(Names);
@@ -211,11 +211,11 @@ inline flatbuffers::Offset<Badges> CreateBadges(
 
 inline flatbuffers::Offset<Badges> CreateBadgesDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<uint8_t> *Address = nullptr,
+    const char *Address = nullptr,
     const char *Names = nullptr) {
   return darknet7::CreateBadges(
       _fbb,
-      Address ? _fbb.CreateVector<uint8_t>(*Address) : 0,
+      Address ? _fbb.CreateString(Address) : 0,
       Names ? _fbb.CreateString(Names) : 0);
 }
 

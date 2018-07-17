@@ -7,11 +7,6 @@
 #include "../lib/Task.h"
 #include "../lib/ble/BLEDevice.h"
 
-#define DEVICE_FILTER_ALL         0x0
-#define DEVICE_FILTER_BADGES_ONLY 0x1
-#define DEVICE_FILTER_NPCS_ONLY   0x2
-#define DEVICE_FILTER_NONE        0xFF
-
 class MyScanCallbacks : public BLEAdvertisedDeviceCallbacks {
 public:
 	void reset(void);

@@ -3,11 +3,16 @@ include "common.fbs";
 namespace darknet7;
 
 union STMToESPAny { SetupAP, StopAP, BytesToFromAddress, DisplayMessage, ESPRequest,
-				 	BLEAdvertise, BLEGetDeviceName, BLESetDeviceName,
-					BLEGetInfectionData, BLESetInfectionData, BLEGetCureData, BLESetCureData,
-					BLEScanForDevices, BLEPairWithDevice, BLESendPINConfirmation, 
-					BLEGetConnectedDevices, BLESendDataToDevice, BLEDisconnectFromDevice,
-					BLEDisconnectFromAll}
+				 	BLEAdvertise, 
+					BLEGetDeviceName, BLESetDeviceName,
+					BLEGetExposureData, BLESetExposureData,
+					BLEGetInfectionData, BLESetInfectionData,
+					BLEGetCureData, BLESetCureData,
+					BLEScanForDevices,
+					BLEPairWithDevice, BLESendPINConfirmation,
+					BLEGetConnectedDevices,
+					BLESendDataToDevice,
+					BLEDisconnectFromDevice, BLEDisconnectFromAll}
 
 table SetupAP {
 	ssid:string;
@@ -31,12 +36,12 @@ table BLESetDeviceName {
 	name:string;
 }
 
-table BLEGetExposedData { // get and clear
+table BLEGetExposureData { // get and clear
 
 }
 
-table BLESetExposedData {
-
+table BLESetExposureData {
+	vectors:uint16;
 }
 
 table BLEGetInfectionData {

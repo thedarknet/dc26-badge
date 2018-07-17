@@ -2,13 +2,14 @@
 #include <string.h>
 #include "ble.h"
 #include "scanning.h"
+#include "../common_generated.h"
 #include "../lib/ble/BLEDevice.h"
 
 
 void MyScanCallbacks::reset(void)
 {
 	// reset any old settings from prior scans
-	this->filter = DEVICE_FILTER_NONE;
+	this->filter = darknet7::BLEDeviceFilter_NONE;
 	//this->infections = 0x0;
 	//this->cures = 0x0;
 	// TODO: clear results map

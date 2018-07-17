@@ -58,12 +58,13 @@ public:
 	QueueHandle_t CallbackQueueHandle = nullptr;
 	uint8_t CallbackBuffer[CBACK_MSG_QUEUE_SIZE * CBACK_MSG_ITEM_SIZE];
 
+	// STM to ESP Queue
 	static const int STM_MSG_QUEUE_SIZE = 5;
 	static const int STM_MSG_ITEM_SIZE = sizeof(MCUToMCUTask::Message *);
 	StaticQueue_t STMQueue;
 	QueueHandle_t STMQueueHandle = nullptr;
 	uint8_t fromSTMBuffer[STM_MSG_QUEUE_SIZE*STM_MSG_ITEM_SIZE];
-	
+	QueueHandle_t getQueueHandle() {return STMQueueHandle;}
 
 public: // API
 	void startAdvertising(void);

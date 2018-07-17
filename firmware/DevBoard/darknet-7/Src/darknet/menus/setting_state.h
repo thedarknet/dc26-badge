@@ -10,6 +10,7 @@
 
 #include "darknet7_base_state.h"
 #include "../KeyStore.h"
+#include "../virtual_key_board.h"
 
 class SettingState: public Darknet7BaseState {
 public:
@@ -23,8 +24,10 @@ private:
 	cmdc0de::GUIListData SettingList;
 	cmdc0de::GUIListItemData Items[3];
 	char AgentName[ContactStore::AGENT_NAME_LENGTH];
-	uint8_t InputPos;
 	uint8_t SubState;
+	uint8_t MiscCounter;
+	VirtualKeyBoard VKB;
+	VirtualKeyBoard::InputHandleContext IHC;
 };
 
 

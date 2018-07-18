@@ -30,6 +30,20 @@ For example 0x04 is requesting to read from memory, and 0x05 is requesting to wr
 I2C Slave Address of Eggplant 0x36 - i.e. EGplant, or the best you can do in 7 bits.
 
 
+# I2C ATTiny library weirdness
+
+For reasons I've not figured out, you need to send an initial null byte, before the noun/verb/data, otherwise the ATTiny will fail to read correctly.  So an example with the Arduino wire library:
+
+  Wire.beginTransmission(0x36);
+  // need to send an initial zero, otherwise we miss stuff
+  Wire.write(0);
+  // send noun, verb, data
+  Wire.write(1);
+  Wire.write(3);
+  Wire.write(0);
+  Wire.endTransmission();
+
+
 # ATTiny memory:
 
 0x00 - 0x08		9 bytes - null terminated 8 byte string for badge type			"EGGPLANT"

@@ -16,6 +16,7 @@ public:
 	class InputHandleContext {
 	public:
 		InputHandleContext(char *b, uint8_t s) : Buf(b), Size(s), CurrentPos(0) {}
+		void set(char *b, uint8_t s) { Buf=b; Size=s; CurrentPos=0;}
 		void addChar(char b);
 		void backspace();
 	private:

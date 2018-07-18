@@ -26,7 +26,6 @@ table CommunicationStatusResponse {
 	WifiStatus:WiFiStatus;
 	BLEAdvertise:bool;
 	BLEDevideName:string;
-	BLEDiscoverable:bool;
 }
 
 table ESPSystemInfo {

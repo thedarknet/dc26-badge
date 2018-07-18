@@ -34,6 +34,7 @@
 #include "mcu_to_mcu.h"
 #include "menus/health.h"
 #include "menus/scan.h"
+#include "menus/sao_menu.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::DisplayST7735;
@@ -332,6 +333,12 @@ static MCUInfoState MyMCUInfoState;
 static Tamagotchi MyTamagotchi;
 static Health MyHealth;
 static Scan MyScan;
+static SAO MySAO;
+
+SAO *DarkNet7::getSAOMenuState() {
+	return &MySAO;
+}
+
 
 MenuState *DarkNet7::getDisplayMenuState() {
 	return &MyMenu;

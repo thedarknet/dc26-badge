@@ -30,7 +30,7 @@ class MCUInfoState;
 class Tamagotchi;
 class Health;
 class Scan;
-class VirtualKeyBoard;
+class SAO;
 
 
 class DarkNet7: public cmdc0de::App {
@@ -95,6 +95,7 @@ public:
 	Tamagotchi *getTamagotchiState();
 	Health *getHealthState();
 	Scan *getScanState();
+	SAO *getSAOMenuState();
 public:
 	cmdc0de::DisplayST7735 &getDisplay();
 	const cmdc0de::DisplayST7735 &getDisplay() const;

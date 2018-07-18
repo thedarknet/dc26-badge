@@ -10,6 +10,7 @@
 
 #include "darknet7_base_state.h"
 #include "../mcu_to_mcu.h"
+#include "../virtual_key_board.h"
 
 
 namespace darknet7 {
@@ -30,10 +31,11 @@ protected:
 	virtual cmdc0de::ErrorType onShutdown();
 private:
 	cmdc0de::GUIListData CommSettingList;
-	cmdc0de::GUIListItemData Items[4];
-	char ListBuffer[4][24];
-	INTERNAL_STATE InternalState;
+	cmdc0de::GUIListItemData Items[3];
+	char ListBuffer[3][24];
+	char CurrentDeviceName[13];
 	uint32_t ESPRequestID;
+	INTERNAL_STATE InternalState;
 };
 
 

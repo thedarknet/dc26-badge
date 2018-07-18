@@ -59,6 +59,8 @@ ErrorType MenuState::onInit() {
 	Items[10].text = (const char *) "Scan for NPCs";
 	Items[11].id = 11;
 	Items[11].text = (const char *) "Test Badge";
+	Items[12].id = 12;
+	Items[12].text = (const char *) "Scan: Shitty Addon Badge";
 	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 	DarkNet7::get().getGUI().drawList(&this->MenuList);
 	return ErrorType();

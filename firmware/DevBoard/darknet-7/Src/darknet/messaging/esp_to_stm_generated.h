@@ -314,8 +314,7 @@ struct CommunicationStatusResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers
   enum {
     VT_WIFISTATUS = 4,
     VT_BLEADVERTISE = 6,
-    VT_BLEDEVIDENAME = 8,
-    VT_BLEDISCOVERABLE = 10
+    VT_BLEDEVIDENAME = 8
   };
   WiFiStatus WifiStatus() const {
     return static_cast<WiFiStatus>(GetField<int8_t>(VT_WIFISTATUS, 0));
@@ -326,16 +325,12 @@ struct CommunicationStatusResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers
   const flatbuffers::String *BLEDevideName() const {
     return GetPointer<const flatbuffers::String *>(VT_BLEDEVIDENAME);
   }
-  bool BLEDiscoverable() const {
-    return GetField<uint8_t>(VT_BLEDISCOVERABLE, 0) != 0;
-  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int8_t>(verifier, VT_WIFISTATUS) &&
            VerifyField<uint8_t>(verifier, VT_BLEADVERTISE) &&
            VerifyOffset(verifier, VT_BLEDEVIDENAME) &&
            verifier.Verify(BLEDevideName()) &&
-           VerifyField<uint8_t>(verifier, VT_BLEDISCOVERABLE) &&
            verifier.EndTable();
   }
 };
@@ -351,9 +346,6 @@ struct CommunicationStatusResponseBuilder {
   }
   void add_BLEDevideName(flatbuffers::Offset<flatbuffers::String> BLEDevideName) {
     fbb_.AddOffset(CommunicationStatusResponse::VT_BLEDEVIDENAME, BLEDevideName);
-  }
-  void add_BLEDiscoverable(bool BLEDiscoverable) {
-    fbb_.AddElement<uint8_t>(CommunicationStatusResponse::VT_BLEDISCOVERABLE, static_cast<uint8_t>(BLEDiscoverable), 0);
   }
   explicit CommunicationStatusResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -371,11 +363,9 @@ inline flatbuffers::Offset<CommunicationStatusResponse> CreateCommunicationStatu
     flatbuffers::FlatBufferBuilder &_fbb,
     WiFiStatus WifiStatus = WiFiStatus_AP,
     bool BLEAdvertise = false,
-    flatbuffers::Offset<flatbuffers::String> BLEDevideName = 0,
-    bool BLEDiscoverable = false) {
+    flatbuffers::Offset<flatbuffers::String> BLEDevideName = 0) {
   CommunicationStatusResponseBuilder builder_(_fbb);
   builder_.add_BLEDevideName(BLEDevideName);
-  builder_.add_BLEDiscoverable(BLEDiscoverable);
   builder_.add_BLEAdvertise(BLEAdvertise);
   builder_.add_WifiStatus(WifiStatus);
   return builder_.Finish();
@@ -385,14 +375,12 @@ inline flatbuffers::Offset<CommunicationStatusResponse> CreateCommunicationStatu
     flatbuffers::FlatBufferBuilder &_fbb,
     WiFiStatus WifiStatus = WiFiStatus_AP,
     bool BLEAdvertise = false,
-    const char *BLEDevideName = nullptr,
-    bool BLEDiscoverable = false) {
+    const char *BLEDevideName = nullptr) {
   return darknet7::CreateCommunicationStatusResponse(
       _fbb,
       WifiStatus,
       BLEAdvertise,
-      BLEDevideName ? _fbb.CreateString(BLEDevideName) : 0,
-      BLEDiscoverable);
+      BLEDevideName ? _fbb.CreateString(BLEDevideName) : 0);
 }
 
 struct ESPSystemInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

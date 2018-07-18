@@ -25,14 +25,13 @@ ErrorType TestState::onInit() {
 		Items[i].id = i;
 		Items[i].setShouldScroll();
 	}
-	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-	DarkNet7::get().getGUI().drawList(&ButtonList);
 	return ErrorType();
 }
 
 cmdc0de::StateBase::ReturnStateContext TestState::onRun() {
 	StateBase *nextState = this;
 
+	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 	sprintf(&ListBuffer[0][0], "   UP: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_UP)?DarkNet7::sYES:DarkNet7::sNO);
 	sprintf(&ListBuffer[1][0], " DOWN: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_DOWN)?DarkNet7::sYES:DarkNet7::sNO);
 	sprintf(&ListBuffer[2][0], " LEFT: %s", DarkNet7::get().getButtonInfo().isAnyOfTheseButtonDown(DarkNet7::ButtonInfo::BUTTON_LEFT)?DarkNet7::sYES:DarkNet7::sNO);
@@ -92,6 +91,7 @@ cmdc0de::StateBase::ReturnStateContext TestState::onRun() {
 		HAL_Delay(2000);
 	}
 #endif
+	DarkNet7::get().getGUI().drawList(&ButtonList);
 	return cmdc0de::StateBase::ReturnStateContext(nextState);
 }
 

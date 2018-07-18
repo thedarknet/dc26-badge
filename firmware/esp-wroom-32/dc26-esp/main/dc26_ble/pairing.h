@@ -20,7 +20,7 @@ protected:
 class UartServerCallbacks : public BLEServerCallbacks {
 public:
 	BluetoothTask *pBTTask = nullptr;
-	bool isConnected;
+	bool isConnected = false;
 public:
 	void onConnect(BLEServer* server);
 	void onDisconnect(BLEServer* server);
@@ -35,7 +35,7 @@ public:
 	BLERemoteService *pRemoteService;
 	BLERemoteCharacteristic *pTxChar;
 	BLERemoteCharacteristic *pRxChar;
-	bool connected = false;
+	bool isConnected = false;
 public:
 	void onConnect(BLEClient* client);
 	void afterConnect();

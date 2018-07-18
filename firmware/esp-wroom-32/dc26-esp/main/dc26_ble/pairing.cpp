@@ -12,7 +12,7 @@ const char *PAIR_SVR_TAG = "BTPairingServer";
 void UartClientCallbacks::onConnect(BLEClient* client)
 {
 	ESP_LOGI(PAIR_CLIENT_TAG, "connected to server");
-	connected = true;
+	isConnected = true;
 	pClient = client;
 	vTaskDelay(500 / portTICK_PERIOD_MS);
 }
@@ -48,7 +48,7 @@ void UartClientCallbacks::onDisconnect(BLEClient* client)
 {
 	ESP_LOGI(PAIR_CLIENT_TAG, "disconnected");
 	pBTTask->isActingClient = false;
-	connected = false;
+	isConnected = false;
 }
 
 
@@ -60,11 +60,14 @@ void UartCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 	if (rxValue.length() > 0)
 	{	
 		const char *msgOrig = rxValue.c_str();
+		printf("Message get: %s\n", msgOrig);
+		/*
 		uint32_t len = strlen(msgOrig);
 		char * msg = (char*)malloc(len+1);
 		memcpy(msg, msgOrig, len);
 		msg[len] = '\0';
 		xQueueSendFromISR(CallbackQueueHandle, &msg, NULL);
+		*/
 	}
 }
 

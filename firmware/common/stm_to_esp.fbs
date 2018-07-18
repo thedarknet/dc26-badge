@@ -63,8 +63,7 @@ table BLESendPINConfirmation {
 }
 
 table BLESendDataToDevice {
-	addr:string;
-	data:[ubyte];
+	data:[uint8];
 	length:uint8;
 }
 

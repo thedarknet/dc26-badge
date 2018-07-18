@@ -63,7 +63,8 @@ BLE2902 j2902;
 static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 							uint8_t* pData, size_t length, bool isNotify)
 {
-	xQueueSendFromISR(pBTTask->CallbackQueueHandle, &pBLERemoteCharacteristic, NULL);
+	printf("notify callback: %s\n", pData);
+	//xQueueSendFromISR(pBTTask->CallbackQueueHandle, &pBLERemoteCharacteristic, NULL);
 	// FIXME: send the pointer to the characteristic in the queue
 	// then do a read() of the characteristic
 	// register an onRead callback which sets the characteristic to be
@@ -157,7 +158,7 @@ void BluetoothTask::getInfectionData()
 	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_BLEInfectionData,
 		infect.Union());
 	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-	getMCUToMCU().send(fbb);
+	//getMCUToMCU().send(fbb);
 }
 
 void BluetoothTask::setExposureData(const darknet7::STMToESPRequest* m)
@@ -200,16 +201,9 @@ void BluetoothTask::scanForDevices(const darknet7::STMToESPRequest* m)
 	std::map<std::string, std::string> results = pScanCallbacks->getResults();
 
 	for(const auto &p : results)
-	{
 		printf("Device Found: %s - %s\n", p.first.c_str(), p.second.c_str());
-	}
-	
 	printf("done scanning!\n");
 
-	// TODO: infection code
-	// TODO: cure code
-	// TODO: serialize name:address map into results
-	// TODO: send results back to STM
 	// TODO: return result
 	return;
 }
@@ -222,7 +216,14 @@ void BluetoothTask::pairWithDevice(const darknet7::STMToESPRequest* m)
 	BLEAddress remoteAddr = BLEAddress(addr);
 	this->isActingClient = true;
 	pClient->connect(remoteAddr);
+	
+	if (pClient->isConnected())
+	{
+		iUartClientCallbacks.afterConnect();
+		iUartClientCallbacks.pRxChar->registerForNotify(&notifyCallback);
+	}
 
+	// Send Result to STM
 	darknet7::RESPONSE_SUCCESS result;
 	if (pClient->isConnected())
 		result = darknet7::RESPONSE_SUCCESS_True;
@@ -234,8 +235,7 @@ void BluetoothTask::pairWithDevice(const darknet7::STMToESPRequest* m)
 	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_GenericResponse,
 		infect.Union());
 	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-	getMCUToMCU().send(fbb);
-	
+	//getMCUToMCU().send(fbb);
 }
 
 void BluetoothTask::sendPINConfirmation(const darknet7::STMToESPRequest* m)
@@ -249,20 +249,34 @@ void BluetoothTask::sendPINConfirmation(const darknet7::STMToESPRequest* m)
 	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_GenericResponse,
 		infect.Union());
 	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-	getMCUToMCU().send(fbb);
+	//getMCUToMCU().send(fbb);
 }
 
 void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESendDataToDevice* msg = m->Msg_as_BLESendDataToDevice();
-	std::string addr = msg->addr()->str();
-	uint8_t length = msg->length();
 	const uint8_t* data = msg->data()->Data();
-	(void)addr;
-	(void)length;
-	(void)data;
-	// TODO: see ping/pong from original ble.cpp code
-	// TODO: return result
+	uint8_t length = msg->length();
+	char* buffer = (char*)malloc(length+1);
+	memcpy(buffer, data, length);
+	buffer[length] = '\0';
+	if (isActingClient && iUartClientCallbacks.isConnected)
+	{
+		iUartClientCallbacks.pTxChar->writeValue(buffer);
+	}
+	else if (isActingServer && iUartServerCallbacks.isConnected)
+	{
+		pUartCisoCharacteristic->setValue(buffer);
+		pUartCisoCharacteristic->notify();
+	}
+	free(buffer); 
+	flatbuffers::FlatBufferBuilder fbb;
+	flatbuffers::Offset<darknet7::ESPToSTM> of;
+	auto infect = darknet7::CreateGenericResponse(fbb, darknet7::RESPONSE_SUCCESS_True);
+	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_GenericResponse,
+		infect.Union());
+	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+	//getMCUToMCU().send(fbb);
 }
 
 void BluetoothTask::disconnect()
@@ -275,7 +289,7 @@ void BluetoothTask::disconnect()
 	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_GenericResponse,
 		infect.Union());
 	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-	getMCUToMCU().send(fbb);
+	//getMCUToMCU().send(fbb);
 }
 
 /*
@@ -418,6 +432,8 @@ static void initialize_test(QueueHandle_t queue)
 	m->set(size, 0, data);
 	xQueueSend(queue, &m, (TickType_t) 0);
 	*/
+	
+	// TODO: format a BLESendDataToDevice message for testing
 
 	return;
 }

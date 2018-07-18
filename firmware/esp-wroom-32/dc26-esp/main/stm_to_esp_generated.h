@@ -718,13 +718,9 @@ inline flatbuffers::Offset<BLESendPINConfirmation> CreateBLESendPINConfirmation(
 
 struct BLESendDataToDevice FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_ADDR = 4,
-    VT_DATA = 6,
-    VT_LENGTH = 8
+    VT_DATA = 4,
+    VT_LENGTH = 6
   };
-  const flatbuffers::String *addr() const {
-    return GetPointer<const flatbuffers::String *>(VT_ADDR);
-  }
   const flatbuffers::Vector<uint8_t> *data() const {
     return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_DATA);
   }
@@ -733,8 +729,6 @@ struct BLESendDataToDevice FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_ADDR) &&
-           verifier.Verify(addr()) &&
            VerifyOffset(verifier, VT_DATA) &&
            verifier.Verify(data()) &&
            VerifyField<uint8_t>(verifier, VT_LENGTH) &&
@@ -745,9 +739,6 @@ struct BLESendDataToDevice FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
 struct BLESendDataToDeviceBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_addr(flatbuffers::Offset<flatbuffers::String> addr) {
-    fbb_.AddOffset(BLESendDataToDevice::VT_ADDR, addr);
-  }
   void add_data(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data) {
     fbb_.AddOffset(BLESendDataToDevice::VT_DATA, data);
   }
@@ -768,24 +759,20 @@ struct BLESendDataToDeviceBuilder {
 
 inline flatbuffers::Offset<BLESendDataToDevice> CreateBLESendDataToDevice(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> addr = 0,
     flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data = 0,
     uint8_t length = 0) {
   BLESendDataToDeviceBuilder builder_(_fbb);
   builder_.add_data(data);
-  builder_.add_addr(addr);
   builder_.add_length(length);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<BLESendDataToDevice> CreateBLESendDataToDeviceDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const char *addr = nullptr,
     const std::vector<uint8_t> *data = nullptr,
     uint8_t length = 0) {
   return darknet7::CreateBLESendDataToDevice(
       _fbb,
-      addr ? _fbb.CreateString(addr) : 0,
       data ? _fbb.CreateVector<uint8_t>(*data) : 0,
       length);
 }

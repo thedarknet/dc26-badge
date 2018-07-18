@@ -5,6 +5,10 @@
 #include "pairing.h"
 #include "../lib/ble/BLEDevice.h"
 
+#include "../mcu_to_mcu.h"
+#include "../stm_to_esp_generated.h"
+#include "../esp_to_stm_generated.h"
+
 const char *PAIR_CLIENT_TAG = "BTPairingClient";
 const char *PAIR_SVR_TAG = "BTPairingServer";
 
@@ -14,7 +18,6 @@ void UartClientCallbacks::onConnect(BLEClient* client)
 	ESP_LOGI(PAIR_CLIENT_TAG, "connected to server");
 	isConnected = true;
 	pClient = client;
-	vTaskDelay(500 / portTICK_PERIOD_MS);
 }
 
 void UartClientCallbacks::afterConnect()
@@ -68,6 +71,22 @@ void UartCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 		msg[len] = '\0';
 		xQueueSendFromISR(CallbackQueueHandle, &msg, NULL);
 		*/
+		flatbuffers::FlatBufferBuilder fbb;
+		uint8_t *data = nullptr;
+		MCUToMCUTask::Message* m;
+		flatbuffers::Offset<darknet7::STMToESPRequest> of;
+		flatbuffers::uoffset_t size;
+
+		auto sdata = fbb.CreateString("Poodle");
+		auto sendData = darknet7::CreateBLESendDataToDevice(fbb, sdata);
+		of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice,
+			sendData.Union());
+		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
+		size = fbb.GetSize();
+		data = fbb.GetBufferPointer();
+		m = new MCUToMCUTask::Message();
+		m->set(size, 0, data);
+		xQueueSendFromISR(pBTTask->getQueueHandle(), &m, (TickType_t) 0);
 	}
 }
 

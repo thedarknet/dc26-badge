@@ -718,20 +718,15 @@ inline flatbuffers::Offset<BLESendPINConfirmation> CreateBLESendPINConfirmation(
 
 struct BLESendDataToDevice FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_DATA = 4,
-    VT_LENGTH = 6
+    VT_DATA = 4
   };
-  const flatbuffers::Vector<uint8_t> *data() const {
-    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_DATA);
-  }
-  uint8_t length() const {
-    return GetField<uint8_t>(VT_LENGTH, 0);
+  const flatbuffers::String *data() const {
+    return GetPointer<const flatbuffers::String *>(VT_DATA);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_DATA) &&
            verifier.Verify(data()) &&
-           VerifyField<uint8_t>(verifier, VT_LENGTH) &&
            verifier.EndTable();
   }
 };
@@ -739,11 +734,8 @@ struct BLESendDataToDevice FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table 
 struct BLESendDataToDeviceBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_data(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data) {
+  void add_data(flatbuffers::Offset<flatbuffers::String> data) {
     fbb_.AddOffset(BLESendDataToDevice::VT_DATA, data);
-  }
-  void add_length(uint8_t length) {
-    fbb_.AddElement<uint8_t>(BLESendDataToDevice::VT_LENGTH, length, 0);
   }
   explicit BLESendDataToDeviceBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -759,22 +751,18 @@ struct BLESendDataToDeviceBuilder {
 
 inline flatbuffers::Offset<BLESendDataToDevice> CreateBLESendDataToDevice(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> data = 0,
-    uint8_t length = 0) {
+    flatbuffers::Offset<flatbuffers::String> data = 0) {
   BLESendDataToDeviceBuilder builder_(_fbb);
   builder_.add_data(data);
-  builder_.add_length(length);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<BLESendDataToDevice> CreateBLESendDataToDeviceDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<uint8_t> *data = nullptr,
-    uint8_t length = 0) {
+    const char *data = nullptr) {
   return darknet7::CreateBLESendDataToDevice(
       _fbb,
-      data ? _fbb.CreateVector<uint8_t>(*data) : 0,
-      length);
+      data ? _fbb.CreateString(data) : 0);
 }
 
 struct BLEDisconnect FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

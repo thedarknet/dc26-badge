@@ -64,6 +64,23 @@ static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 							uint8_t* pData, size_t length, bool isNotify)
 {
 	printf("notify callback: %s\n", pData);
+
+	// Echo
+	flatbuffers::FlatBufferBuilder fbb;
+	uint8_t *data = nullptr;
+	MCUToMCUTask::Message* m;
+	flatbuffers::Offset<darknet7::STMToESPRequest> of;
+	flatbuffers::uoffset_t size;
+	auto sdata = fbb.CreateString("Poodle");
+	auto sendData = darknet7::CreateBLESendDataToDevice(fbb, sdata);
+	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice,
+		sendData.Union());
+	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
+	size = fbb.GetSize();
+	data = fbb.GetBufferPointer();
+	m = new MCUToMCUTask::Message();
+	m->set(size, 0, data);
+	xQueueSendFromISR(pBTTask->getQueueHandle(), &m, (TickType_t) 0);
 	//xQueueSendFromISR(pBTTask->CallbackQueueHandle, &pBLERemoteCharacteristic, NULL);
 	// FIXME: send the pointer to the characteristic in the queue
 	// then do a read() of the characteristic
@@ -255,21 +272,26 @@ void BluetoothTask::sendPINConfirmation(const darknet7::STMToESPRequest* m)
 void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESendDataToDevice* msg = m->Msg_as_BLESendDataToDevice();
+	/*
 	const uint8_t* data = msg->data()->Data();
 	uint8_t length = msg->length();
 	char* buffer = (char*)malloc(length+1);
 	memcpy(buffer, data, length);
 	buffer[length] = '\0';
-	if (isActingClient && iUartClientCallbacks.isConnected)
+	*/
+	std::string buffer = msg->data()->str();
+	if (iUartClientCallbacks.isConnected)
 	{
-		iUartClientCallbacks.pTxChar->writeValue(buffer);
+			printf("Client Sending: %s\n", buffer.c_str());
+			iUartClientCallbacks.pTxChar->writeValue(buffer);
 	}
-	else if (isActingServer && iUartServerCallbacks.isConnected)
+	else if (iUartServerCallbacks.isConnected)
 	{
+		printf("Server Sending: %s\n", buffer.c_str());
 		pUartCisoCharacteristic->setValue(buffer);
 		pUartCisoCharacteristic->notify();
 	}
-	free(buffer); 
+	//free(buffer); 
 	flatbuffers::FlatBufferBuilder fbb;
 	flatbuffers::Offset<darknet7::ESPToSTM> of;
 	auto infect = darknet7::CreateGenericResponse(fbb, darknet7::RESPONSE_SUCCESS_True);
@@ -290,6 +312,9 @@ void BluetoothTask::disconnect()
 		infect.Union());
 	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
 	//getMCUToMCU().send(fbb);
+
+	isActingClient = false;
+	isActingServer = false;
 }
 
 /*
@@ -333,6 +358,7 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 			this->sendPINConfirmation(m);
 			break;
 		case darknet7::STMToESPAny_BLESendDataToDevice:
+			vTaskDelay(10000 / portTICK_PERIOD_MS); // TODO: REMOVE
 			this->sendDataToDevice(m);
 			break;
 		case darknet7::STMToESPAny_BLEDisconnect:
@@ -420,6 +446,18 @@ static void initialize_test(QueueHandle_t queue)
 	m = new MCUToMCUTask::Message();
 	m->set(size, 0, data);
 	xQueueSend(queue, &m, (TickType_t) 0);
+	
+	// Send a sample message
+	auto sdata = fbb.CreateString("Poodle");
+	auto sendData = darknet7::CreateBLESendDataToDevice(fbb, sdata);
+	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice,
+		sendData.Union());
+	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
+	size = fbb.GetSize();
+	data = fbb.GetBufferPointer();
+	m = new MCUToMCUTask::Message();
+	m->set(size, 0, data);
+	xQueueSend(queue, &m, (TickType_t) 0);
 
 	// Disconnect from the connected device
 	auto disconnect = darknet7::CreateBLEDisconnect(fbb);
@@ -432,8 +470,6 @@ static void initialize_test(QueueHandle_t queue)
 	m->set(size, 0, data);
 	xQueueSend(queue, &m, (TickType_t) 0);
 	*/
-	
-	// TODO: format a BLESendDataToDevice message for testing
 
 	return;
 }
@@ -452,6 +488,7 @@ bool BluetoothTask::init()
 	pBTTask = this;
 
 	isActingClient = false;
+	isActingServer = false;
 
 	// Setup the queue
 	CallbackQueueHandle = xQueueCreateStatic(CBACK_MSG_QUEUE_SIZE,
@@ -485,6 +522,7 @@ bool BluetoothTask::init()
 	pService = pServer->createService(uartServiceUUID);
 	// setup characteristic for the client to send info
 	UartCosiCallbacks.CallbackQueueHandle = CallbackQueueHandle;
+	UartCosiCallbacks.pBTTask = this;
 	pUartCosiCharacteristic = pService->createCharacteristic(uartCosiUUID, uartCosiCharProps);
 	pUartCosiCharacteristic->setCallbacks(&UartCosiCallbacks);
 	pUartCosiCharacteristic->addDescriptor(&i2902);

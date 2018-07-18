@@ -11,6 +11,7 @@ class BluetoothTask;
 
 class UartCosiCharCallbacks : public BLECharacteristicCallbacks {
 public:
+	BluetoothTask *pBTTask = nullptr;
 	QueueHandle_t CallbackQueueHandle = nullptr;
 public:
 	void onWrite(BLECharacteristic *pCharacteristic);

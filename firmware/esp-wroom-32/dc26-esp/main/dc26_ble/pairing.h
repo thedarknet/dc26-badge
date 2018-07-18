@@ -1,5 +1,5 @@
-#ifndef DC26_BLUETOOTH_PAIRING
-#define DC26_BLUETOOTH_PAIRING
+#ifndef DC26_BLE_PAIRING
+#define DC26_BLE_PAIRING
 
 #include "esp_system.h"
 #include "esp_log.h"
@@ -27,4 +27,21 @@ public:
 protected:
 };
 
-#endif // DC26_BLUETOOTH_PAIRING_SERVER
+
+class UartClientCallbacks : public BLEClientCallbacks {
+public:
+	BluetoothTask *pBTTask;
+	BLEClient *pClient;
+	BLERemoteService *pRemoteService;
+	BLERemoteCharacteristic *pTxChar;
+	BLERemoteCharacteristic *pRxChar;
+	bool connected = false;
+public:
+	void onConnect(BLEClient* client);
+	void afterConnect();
+	void onDisconnect(BLEClient* client);
+protected:
+};
+
+
+#endif // DC26_CONNECTING

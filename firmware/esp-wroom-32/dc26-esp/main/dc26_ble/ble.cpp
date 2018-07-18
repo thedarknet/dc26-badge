@@ -19,8 +19,7 @@
 #include "ble.h"
 #include "ble_serial.h"
 #include "services.h" // UUIDs for all potential services and characteristics
-#include "pairing_server.h"
-#include "pairing_client.h"
+#include "pairing.h"
 #include "scanning.h"
 #include "./security.h"
 
@@ -38,6 +37,7 @@ const char *BluetoothTask::LOGTAG = "BluetoothTask";
 // We need a global reference so that we can access the callback message queue
 // from a static function
 BluetoothTask *pBTTask;
+BLESecurity iSecurity;
 
 //BLEDevice Device;
 UartCosiCharCallbacks UartCosiCallbacks;
@@ -45,7 +45,6 @@ UartServerCallbacks iUartServerCallbacks;
 UartClientCallbacks iUartClientCallbacks;
 BLE2902 i2902;
 BLE2902 j2902;
-
 
 /*
 	notifyCallback:  called when the server sends a notify() for the characteristic
@@ -67,6 +66,11 @@ static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 	// then do a read() of the characteristic
 	// register an onRead callback which sets the characteristic to be
 	// write-able again.
+}
+
+void BluetoothTask::isAdvertising()
+{
+	//TODO: return advertising_enabled
 }
 
 void BluetoothTask::startAdvertising()
@@ -148,9 +152,9 @@ void BluetoothTask::setDeviceName(const darknet7::STMToESPRequest* m)
 
 void BluetoothTask::getExposureData()
 {
-	// TODO: return result
 	uint16_t exposures = pScanCallbacks->getExposures();
 	(void)exposures;
+	// TODO: return result
 }
 
 void BluetoothTask::setExposureData(const darknet7::STMToESPRequest* m)
@@ -214,8 +218,6 @@ void BluetoothTask::scanForDevices(const darknet7::STMToESPRequest* m)
 	
 	printf("done scanning!\n");
 
-	
-
 	// TODO: infection code
 	// TODO: cure code
 	// TODO: serialize name:address map into results
@@ -228,7 +230,10 @@ void BluetoothTask::pairWithDevice(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLEPairWithDevice* msg = m->Msg_as_BLEPairWithDevice();
 	std::string addr = msg->addr()->str();
-	(void) addr;
+	//(void) addr;
+	BLEAddress remoteAddr = BLEAddress(addr);
+	this->isActingClient = true;
+	pClient->connect(remoteAddr);
 	// TODO: m->addr()
 	// TODO: add the address to PairingTask queue and move on
 	// TODO: pairing occurs out-of-band because otherwise we can't respond to
@@ -239,15 +244,8 @@ void BluetoothTask::pairWithDevice(const darknet7::STMToESPRequest* m)
 void BluetoothTask::sendPINConfirmation(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESendPINConfirmation* msg = m->Msg_as_BLESendPINConfirmation();
-	bool confirm = msg->confirm();
-	if (confirm)
-	{
-		// TODO allow
-	}
-	else
-	{
-		// TODO reject
-	}
+	pMySecurity->confirmed = msg->confirm();
+	ESP_LOGI(LOGTAG, "Confirmed Pin");
 	// TODO: return result
 }
 
@@ -270,21 +268,12 @@ void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 	// TODO: return result
 }
 
-void BluetoothTask::disconnectFromDevice(const darknet7::STMToESPRequest* m)
+void BluetoothTask::disconnect()
 {
-	const darknet7::BLEDisconnectFromDevice* msg = m->Msg_as_BLEDisconnectFromDevice();
-	std::string name = msg->name()->str();
-	(void)name;
-	// TODO: name->device map, disconnect
+	if (pClient->isConnected())
+		pClient->disconnect();
 	// TODO: return result
 }
-
-void BluetoothTask::disconnectFromAll()
-{
-	// TODO: for all device in name->device map, disconnect
-	// TODO: return result
-}
-
 
 /*
 	Command Handler:  handle BLE commands sent from the STM device
@@ -296,6 +285,9 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 	auto m = msg->asSTMToESP();
 	switch (m->Msg_type())
 	{
+		case darknet7::STMToESPAny_BLEIsAdvertising:
+			this->isAdvertising();
+			break;
 		case darknet7::STMToESPAny_BLEAdvertise:
 			this->toggleAdvertising(m);
 			break;
@@ -338,11 +330,9 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 		case darknet7::STMToESPAny_BLESendDataToDevice:
 			this->sendDataToDevice(m);
 			break;
-		case darknet7::STMToESPAny_BLEDisconnectFromDevice:
-			this->disconnectFromDevice(m);
-			break;
-		case darknet7::STMToESPAny_BLEDisconnectFromAll:
-			this->disconnectFromAll();
+		case darknet7::STMToESPAny_BLEDisconnect:
+			vTaskDelay(5000 / portTICK_PERIOD_MS); // TODO: REMOVE
+			this->disconnect();
 			break;
 		default :
 			// send failure
@@ -376,9 +366,9 @@ void BluetoothTask::run(void * data)
 			// TODO: check how long since last scan, scan if beyond that time
 			// this is so we periodically attempt to get infected
 			// scan without filtering anything
-			pScanCallbacks->reset();
-			pScan->setActiveScan(true);
-			pScan->start(10);
+			//pScanCallbacks->reset();
+			//pScan->setActiveScan(true);
+			//pScan->start(10);
 		}
 	}
 }
@@ -402,6 +392,7 @@ static void initialize_test(QueueHandle_t queue)
 	m->set(size, 0, data);
 	xQueueSend(queue, &m, (TickType_t) 0);
 
+	/*
 	// Scan for Devices
 	auto scan = darknet7::CreateBLEScanForDevices(fbb, darknet7::BLEDeviceFilter_BADGE);
 	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEScanForDevices,
@@ -412,7 +403,31 @@ static void initialize_test(QueueHandle_t queue)
 	m = new MCUToMCUTask::Message();
 	m->set(size, 0, data);
 	xQueueSend(queue, &m, (TickType_t) 0);
-	
+
+	// Connect to this specific device: 30:ae:a4:42:e9:22
+	auto addr = fbb.CreateString("30:ae:a4:42:e9:22");
+	auto connect = darknet7::CreateBLEPairWithDevice(fbb, addr);
+	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEPairWithDevice,
+		connect.Union());
+	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
+	size = fbb.GetSize();
+	data = fbb.GetBufferPointer();
+	m = new MCUToMCUTask::Message();
+	m->set(size, 0, data);
+	xQueueSend(queue, &m, (TickType_t) 0);
+
+	// Disconnect from the connected device
+	auto disconnect = darknet7::CreateBLEDisconnect(fbb);
+	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEDisconnect,
+		disconnect.Union());
+	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
+	size = fbb.GetSize();
+	data = fbb.GetBufferPointer();
+	m = new MCUToMCUTask::Message();
+	m->set(size, 0, data);
+	xQueueSend(queue, &m, (TickType_t) 0);
+	*/
+
 	return;
 }
 
@@ -428,6 +443,8 @@ bool BluetoothTask::init()
 	// Save a pointer to this globally so we can access the queues
 	// from a static function
 	pBTTask = this;
+
+	isActingClient = false;
 
 	// Setup the queue
 	CallbackQueueHandle = xQueueCreateStatic(CBACK_MSG_QUEUE_SIZE,
@@ -446,11 +463,11 @@ bool BluetoothTask::init()
 	pMySecurity->pBTTask = this;
 	BLEDevice::setSecurityCallbacks(pMySecurity);
 
-	pSecurity = new BLESecurity();
-
+	pSecurity = &iSecurity;
 	pSecurity->setKeySize();
 	pSecurity->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_MITM);
-	pSecurity->setCapability(ESP_IO_CAP_KBDISP);
+	//pSecurity->setCapability(ESP_IO_CAP_KBDISP);
+	pSecurity->setCapability(ESP_IO_CAP_IO);
 	pSecurity->setRespEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
 	pSecurity->setInitEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
 
@@ -486,9 +503,9 @@ bool BluetoothTask::init()
 	//startAdvertising();
 
 	// setup pairing client
-	pPairingClient = BLEDevice::createClient();
+	pClient = BLEDevice::createClient();
 	iUartClientCallbacks.pBTTask = this;
-	pPairingClient->setClientCallbacks(&iUartClientCallbacks);
+	pClient->setClientCallbacks(&iUartClientCallbacks);
 
 	// Setup scanning object and callbacks
 	pScan = BLEDevice::getScan();

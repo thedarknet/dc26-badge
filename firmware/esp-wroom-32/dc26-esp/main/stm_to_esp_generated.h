@@ -14,6 +14,8 @@ struct SetupAP;
 
 struct StopAP;
 
+struct BLEIsAdvertising;
+
 struct BLEAdvertise;
 
 struct BLEGetDeviceName;
@@ -42,9 +44,7 @@ struct BLEGetConnectedDevices;
 
 struct BLESendDataToDevice;
 
-struct BLEDisconnectFromDevice;
-
-struct BLEDisconnectFromAll;
+struct BLEDisconnect;
 
 struct ESPRequest;
 
@@ -57,24 +57,24 @@ enum STMToESPAny {
   STMToESPAny_BytesToFromAddress = 3,
   STMToESPAny_DisplayMessage = 4,
   STMToESPAny_ESPRequest = 5,
-  STMToESPAny_BLEAdvertise = 6,
-  STMToESPAny_BLEGetDeviceName = 7,
-  STMToESPAny_BLESetDeviceName = 8,
-  STMToESPAny_BLEGetExposureData = 9,
-  STMToESPAny_BLESetExposureData = 10,
-  STMToESPAny_BLEGetInfectionData = 11,
-  STMToESPAny_BLESetInfectionData = 12,
-  STMToESPAny_BLEGetCureData = 13,
-  STMToESPAny_BLESetCureData = 14,
-  STMToESPAny_BLEScanForDevices = 15,
-  STMToESPAny_BLEPairWithDevice = 16,
-  STMToESPAny_BLESendPINConfirmation = 17,
-  STMToESPAny_BLEGetConnectedDevices = 18,
-  STMToESPAny_BLESendDataToDevice = 19,
-  STMToESPAny_BLEDisconnectFromDevice = 20,
-  STMToESPAny_BLEDisconnectFromAll = 21,
+  STMToESPAny_BLEIsAdvertising = 6,
+  STMToESPAny_BLEAdvertise = 7,
+  STMToESPAny_BLEGetDeviceName = 8,
+  STMToESPAny_BLESetDeviceName = 9,
+  STMToESPAny_BLEGetExposureData = 10,
+  STMToESPAny_BLESetExposureData = 11,
+  STMToESPAny_BLEGetInfectionData = 12,
+  STMToESPAny_BLESetInfectionData = 13,
+  STMToESPAny_BLEGetCureData = 14,
+  STMToESPAny_BLESetCureData = 15,
+  STMToESPAny_BLEScanForDevices = 16,
+  STMToESPAny_BLEPairWithDevice = 17,
+  STMToESPAny_BLESendPINConfirmation = 18,
+  STMToESPAny_BLEGetConnectedDevices = 19,
+  STMToESPAny_BLESendDataToDevice = 20,
+  STMToESPAny_BLEDisconnect = 21,
   STMToESPAny_MIN = STMToESPAny_NONE,
-  STMToESPAny_MAX = STMToESPAny_BLEDisconnectFromAll
+  STMToESPAny_MAX = STMToESPAny_BLEDisconnect
 };
 
 inline const STMToESPAny (&EnumValuesSTMToESPAny())[22] {
@@ -85,6 +85,7 @@ inline const STMToESPAny (&EnumValuesSTMToESPAny())[22] {
     STMToESPAny_BytesToFromAddress,
     STMToESPAny_DisplayMessage,
     STMToESPAny_ESPRequest,
+    STMToESPAny_BLEIsAdvertising,
     STMToESPAny_BLEAdvertise,
     STMToESPAny_BLEGetDeviceName,
     STMToESPAny_BLESetDeviceName,
@@ -99,8 +100,7 @@ inline const STMToESPAny (&EnumValuesSTMToESPAny())[22] {
     STMToESPAny_BLESendPINConfirmation,
     STMToESPAny_BLEGetConnectedDevices,
     STMToESPAny_BLESendDataToDevice,
-    STMToESPAny_BLEDisconnectFromDevice,
-    STMToESPAny_BLEDisconnectFromAll
+    STMToESPAny_BLEDisconnect
   };
   return values;
 }
@@ -113,6 +113,7 @@ inline const char * const *EnumNamesSTMToESPAny() {
     "BytesToFromAddress",
     "DisplayMessage",
     "ESPRequest",
+    "BLEIsAdvertising",
     "BLEAdvertise",
     "BLEGetDeviceName",
     "BLESetDeviceName",
@@ -127,8 +128,7 @@ inline const char * const *EnumNamesSTMToESPAny() {
     "BLESendPINConfirmation",
     "BLEGetConnectedDevices",
     "BLESendDataToDevice",
-    "BLEDisconnectFromDevice",
-    "BLEDisconnectFromAll",
+    "BLEDisconnect",
     nullptr
   };
   return names;
@@ -161,6 +161,10 @@ template<> struct STMToESPAnyTraits<DisplayMessage> {
 
 template<> struct STMToESPAnyTraits<ESPRequest> {
   static const STMToESPAny enum_value = STMToESPAny_ESPRequest;
+};
+
+template<> struct STMToESPAnyTraits<BLEIsAdvertising> {
+  static const STMToESPAny enum_value = STMToESPAny_BLEIsAdvertising;
 };
 
 template<> struct STMToESPAnyTraits<BLEAdvertise> {
@@ -219,12 +223,8 @@ template<> struct STMToESPAnyTraits<BLESendDataToDevice> {
   static const STMToESPAny enum_value = STMToESPAny_BLESendDataToDevice;
 };
 
-template<> struct STMToESPAnyTraits<BLEDisconnectFromDevice> {
-  static const STMToESPAny enum_value = STMToESPAny_BLEDisconnectFromDevice;
-};
-
-template<> struct STMToESPAnyTraits<BLEDisconnectFromAll> {
-  static const STMToESPAny enum_value = STMToESPAny_BLEDisconnectFromAll;
+template<> struct STMToESPAnyTraits<BLEDisconnect> {
+  static const STMToESPAny enum_value = STMToESPAny_BLEDisconnect;
 };
 
 bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, STMToESPAny type);
@@ -355,6 +355,34 @@ struct StopAPBuilder {
 inline flatbuffers::Offset<StopAP> CreateStopAP(
     flatbuffers::FlatBufferBuilder &_fbb) {
   StopAPBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+struct BLEIsAdvertising FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct BLEIsAdvertisingBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit BLEIsAdvertisingBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BLEIsAdvertisingBuilder &operator=(const BLEIsAdvertisingBuilder &);
+  flatbuffers::Offset<BLEIsAdvertising> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BLEIsAdvertising>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BLEIsAdvertising> CreateBLEIsAdvertising(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  BLEIsAdvertisingBuilder builder_(_fbb);
   return builder_.Finish();
 }
 
@@ -910,80 +938,31 @@ inline flatbuffers::Offset<BLESendDataToDevice> CreateBLESendDataToDeviceDirect(
       length);
 }
 
-struct BLEDisconnectFromDevice FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  enum {
-    VT_NAME = 4
-  };
-  const flatbuffers::String *name() const {
-    return GetPointer<const flatbuffers::String *>(VT_NAME);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_NAME) &&
-           verifier.Verify(name()) &&
-           verifier.EndTable();
-  }
-};
-
-struct BLEDisconnectFromDeviceBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
-    fbb_.AddOffset(BLEDisconnectFromDevice::VT_NAME, name);
-  }
-  explicit BLEDisconnectFromDeviceBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  BLEDisconnectFromDeviceBuilder &operator=(const BLEDisconnectFromDeviceBuilder &);
-  flatbuffers::Offset<BLEDisconnectFromDevice> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<BLEDisconnectFromDevice>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<BLEDisconnectFromDevice> CreateBLEDisconnectFromDevice(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> name = 0) {
-  BLEDisconnectFromDeviceBuilder builder_(_fbb);
-  builder_.add_name(name);
-  return builder_.Finish();
-}
-
-inline flatbuffers::Offset<BLEDisconnectFromDevice> CreateBLEDisconnectFromDeviceDirect(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    const char *name = nullptr) {
-  return darknet7::CreateBLEDisconnectFromDevice(
-      _fbb,
-      name ? _fbb.CreateString(name) : 0);
-}
-
-struct BLEDisconnectFromAll FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+struct BLEDisconnect FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            verifier.EndTable();
   }
 };
 
-struct BLEDisconnectFromAllBuilder {
+struct BLEDisconnectBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  explicit BLEDisconnectFromAllBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit BLEDisconnectBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  BLEDisconnectFromAllBuilder &operator=(const BLEDisconnectFromAllBuilder &);
-  flatbuffers::Offset<BLEDisconnectFromAll> Finish() {
+  BLEDisconnectBuilder &operator=(const BLEDisconnectBuilder &);
+  flatbuffers::Offset<BLEDisconnect> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<BLEDisconnectFromAll>(end);
+    auto o = flatbuffers::Offset<BLEDisconnect>(end);
     return o;
   }
 };
 
-inline flatbuffers::Offset<BLEDisconnectFromAll> CreateBLEDisconnectFromAll(
+inline flatbuffers::Offset<BLEDisconnect> CreateBLEDisconnect(
     flatbuffers::FlatBufferBuilder &_fbb) {
-  BLEDisconnectFromAllBuilder builder_(_fbb);
+  BLEDisconnectBuilder builder_(_fbb);
   return builder_.Finish();
 }
 
@@ -1058,6 +1037,9 @@ struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const ESPRequest *Msg_as_ESPRequest() const {
     return Msg_type() == STMToESPAny_ESPRequest ? static_cast<const ESPRequest *>(Msg()) : nullptr;
   }
+  const BLEIsAdvertising *Msg_as_BLEIsAdvertising() const {
+    return Msg_type() == STMToESPAny_BLEIsAdvertising ? static_cast<const BLEIsAdvertising *>(Msg()) : nullptr;
+  }
   const BLEAdvertise *Msg_as_BLEAdvertise() const {
     return Msg_type() == STMToESPAny_BLEAdvertise ? static_cast<const BLEAdvertise *>(Msg()) : nullptr;
   }
@@ -1100,11 +1082,8 @@ struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const BLESendDataToDevice *Msg_as_BLESendDataToDevice() const {
     return Msg_type() == STMToESPAny_BLESendDataToDevice ? static_cast<const BLESendDataToDevice *>(Msg()) : nullptr;
   }
-  const BLEDisconnectFromDevice *Msg_as_BLEDisconnectFromDevice() const {
-    return Msg_type() == STMToESPAny_BLEDisconnectFromDevice ? static_cast<const BLEDisconnectFromDevice *>(Msg()) : nullptr;
-  }
-  const BLEDisconnectFromAll *Msg_as_BLEDisconnectFromAll() const {
-    return Msg_type() == STMToESPAny_BLEDisconnectFromAll ? static_cast<const BLEDisconnectFromAll *>(Msg()) : nullptr;
+  const BLEDisconnect *Msg_as_BLEDisconnect() const {
+    return Msg_type() == STMToESPAny_BLEDisconnect ? static_cast<const BLEDisconnect *>(Msg()) : nullptr;
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1134,6 +1113,10 @@ template<> inline const DisplayMessage *STMToESPRequest::Msg_as<DisplayMessage>(
 
 template<> inline const ESPRequest *STMToESPRequest::Msg_as<ESPRequest>() const {
   return Msg_as_ESPRequest();
+}
+
+template<> inline const BLEIsAdvertising *STMToESPRequest::Msg_as<BLEIsAdvertising>() const {
+  return Msg_as_BLEIsAdvertising();
 }
 
 template<> inline const BLEAdvertise *STMToESPRequest::Msg_as<BLEAdvertise>() const {
@@ -1192,12 +1175,8 @@ template<> inline const BLESendDataToDevice *STMToESPRequest::Msg_as<BLESendData
   return Msg_as_BLESendDataToDevice();
 }
 
-template<> inline const BLEDisconnectFromDevice *STMToESPRequest::Msg_as<BLEDisconnectFromDevice>() const {
-  return Msg_as_BLEDisconnectFromDevice();
-}
-
-template<> inline const BLEDisconnectFromAll *STMToESPRequest::Msg_as<BLEDisconnectFromAll>() const {
-  return Msg_as_BLEDisconnectFromAll();
+template<> inline const BLEDisconnect *STMToESPRequest::Msg_as<BLEDisconnect>() const {
+  return Msg_as_BLEDisconnect();
 }
 
 struct STMToESPRequestBuilder {
@@ -1261,6 +1240,10 @@ inline bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, 
       auto ptr = reinterpret_cast<const ESPRequest *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case STMToESPAny_BLEIsAdvertising: {
+      auto ptr = reinterpret_cast<const BLEIsAdvertising *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     case STMToESPAny_BLEAdvertise: {
       auto ptr = reinterpret_cast<const BLEAdvertise *>(obj);
       return verifier.VerifyTable(ptr);
@@ -1317,12 +1300,8 @@ inline bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, 
       auto ptr = reinterpret_cast<const BLESendDataToDevice *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case STMToESPAny_BLEDisconnectFromDevice: {
-      auto ptr = reinterpret_cast<const BLEDisconnectFromDevice *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
-    case STMToESPAny_BLEDisconnectFromAll: {
-      auto ptr = reinterpret_cast<const BLEDisconnectFromAll *>(obj);
+    case STMToESPAny_BLEDisconnect: {
+      auto ptr = reinterpret_cast<const BLEDisconnect *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return false;

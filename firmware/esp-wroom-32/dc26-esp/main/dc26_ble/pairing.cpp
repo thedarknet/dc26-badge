@@ -2,11 +2,11 @@
 #include <string.h>
 #include "ble.h"
 #include "services.h"
-#include "pairing_client.h"
-#include "pairing_server.h"
+#include "pairing.h"
 #include "../lib/ble/BLEDevice.h"
 
 const char *PAIR_CLIENT_TAG = "BTPairingClient";
+const char *PAIR_SVR_TAG = "BTPairingServer";
 
 
 void UartClientCallbacks::onConnect(BLEClient* client)
@@ -49,4 +49,35 @@ void UartClientCallbacks::onDisconnect(BLEClient* client)
 	ESP_LOGI(PAIR_CLIENT_TAG, "disconnected");
 	pBTTask->isActingClient = false;
 	connected = false;
+}
+
+
+
+
+void UartCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
+{
+	std::string rxValue = pCharacteristic->getValue();
+	if (rxValue.length() > 0)
+	{	
+		const char *msgOrig = rxValue.c_str();
+		uint32_t len = strlen(msgOrig);
+		char * msg = (char*)malloc(len+1);
+		memcpy(msg, msgOrig, len);
+		msg[len] = '\0';
+		xQueueSendFromISR(CallbackQueueHandle, &msg, NULL);
+	}
+}
+
+void UartServerCallbacks::onConnect(BLEServer* server)
+{
+	ESP_LOGI(PAIR_SVR_TAG, "connection received");
+	isConnected = true;
+	pBTTask->isActingServer = true;
+}
+
+void UartServerCallbacks::onDisconnect(BLEServer* server)
+{
+	ESP_LOGI(PAIR_SVR_TAG, "connection dropped");
+	isConnected = false;
+	pBTTask->isActingServer = false;
 }

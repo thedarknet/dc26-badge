@@ -9,7 +9,9 @@ class MySecurity : public BLESecurityCallbacks
 {
 public:
 	BluetoothTask *pBTTask = nullptr;
-public:
+	bool confirmed = false;
+	bool sent = false; // TODO:REMOVE
+
 	virtual uint32_t onPassKeyRequest();
 	virtual void onPassKeyNotify(uint32_t pass_key);
 	virtual bool onConfirmPIN(uint32_t pass_key);

@@ -5,6 +5,11 @@
 #include "../lib/ble/BLESecurity.h"
 #include "../lib/ble/BLEDevice.h"
 
+// TODO: remove these includes
+#include "../mcu_to_mcu.h"
+#include "../stm_to_esp_generated.h"
+
+
 const char *SECTAG = "SecurityCallbacks";
 
 uint32_t MySecurity::onPassKeyRequest()
@@ -22,10 +27,49 @@ void MySecurity::onPassKeyNotify(uint32_t pass_key)
 
 bool MySecurity::onConfirmPIN(uint32_t pass_key)
 {
+	unsigned int waited = 0;
 	ESP_LOGI(SECTAG, "onConfirmPin: %d", pass_key);
 	// TODO: Send to STM, get back confirmation
-	vTaskDelay(5000 / portTICK_PERIOD_MS);
-	return true;
+	if (pBTTask->isActingClient)
+	{
+		pBTTask->isActingClient = false;
+		return true;
+	}
+
+	this->confirmed = false;
+
+	// FIXME: remove this message when moving to development badge
+	if (!this->sent)
+	{
+		printf("sending PIN confirmation message\n");
+		flatbuffers::FlatBufferBuilder fbb;
+		uint8_t *data = nullptr;
+		MCUToMCUTask::Message* m;
+		flatbuffers::Offset<darknet7::STMToESPRequest> of;
+		flatbuffers::uoffset_t size;
+
+		auto confirm = darknet7::CreateBLESendPINConfirmation(fbb, true);
+		of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendPINConfirmation,
+			confirm.Union());
+		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
+		 size = fbb.GetSize();
+		data = fbb.GetBufferPointer();
+		m = new MCUToMCUTask::Message();
+		m->set(size, 0, data);
+		xQueueSend(pBTTask->getQueueHandle(), &m, (TickType_t) 0);
+		this->sent = true;
+	}
+
+	// TODO: display the number (pass_key) on the screen and send a message to
+	// the STM to confirm the number
+
+	// Wait for the confirmation to come through
+	while ((this->confirmed == false) && (waited < 10))
+	{
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+		waited++;
+	}
+	return this->confirmed;
 }
 
 bool MySecurity::onSecurityRequest()

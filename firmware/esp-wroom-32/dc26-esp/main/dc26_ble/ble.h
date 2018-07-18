@@ -8,22 +8,9 @@
 #include "../lib/Task.h"
 #include "../lib/ble/BLEDevice.h"
 #include "../mcu_to_mcu.h"
-#include "pairing_server.h"
-#include "pairing_client.h"
+#include "pairing.h"
 #include "scanning.h"
 #include "security.h"
-
-enum BTCmd
-{
-	BT_CMD_START_B2B,
-	BT_CMD_STOP_B2B,
-	BT_CMD_SET_B2B_ADV_DATA,
-	BT_CMD_PASSIVE_SCAN,
-	BT_CMD_ACTIVE_SCAN,
-	BT_CMD_PAIR,
-	BT_CMD_ECHO,
-	BT_CMD_UNK,
-};
 
 class BluetoothTask : public Task {
 public:
@@ -31,9 +18,10 @@ public:
 
 	BLEDevice *pDevice;
 	BLEServer *pServer;
-	BLEClient *pPairingClient;
+	BLEClient *pClient;
 	BLEService *pService;
 	BLEScan *pScan;
+	BLEAddress *connectedDevice;
 	BLESecurity *pSecurity;
 	MySecurity *pMySecurity;
 	BLEAdvertising *pAdvertising;
@@ -67,6 +55,7 @@ public:
 	QueueHandle_t getQueueHandle() {return STMQueueHandle;}
 
 public: // API
+	void isAdvertising(void);
 	void startAdvertising(void);
 	void stopAdvertising(void);
 	void toggleAdvertising(const darknet7::STMToESPRequest* m);
@@ -84,8 +73,7 @@ public: // API
 	void sendPINConfirmation(const darknet7::STMToESPRequest* m);
 	void getConnectedDevices();
 	void sendDataToDevice(const darknet7::STMToESPRequest* m);
-	void disconnectFromDevice(const darknet7::STMToESPRequest* m);
-	void disconnectFromAll();
+	void disconnect();
 
 public:
 	BluetoothTask(const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);

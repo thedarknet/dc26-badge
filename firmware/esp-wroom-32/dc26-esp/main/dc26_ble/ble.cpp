@@ -63,29 +63,23 @@ BLE2902 j2902;
 static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 							uint8_t* pData, size_t length, bool isNotify)
 {
-	printf("notify callback: %s\n", pData);
-
-	// Echo
+	//xQueueSendFromISR(pBTTask->CallbackQueueHandle, &pBLERemoteCharacteristic, NULL);
+	printf("Client Received: length %d --- %s\n", length, pData);
 	flatbuffers::FlatBufferBuilder fbb;
-	uint8_t *data = nullptr;
-	MCUToMCUTask::Message* m;
+	uint8_t *bufData = nullptr;
 	flatbuffers::Offset<darknet7::STMToESPRequest> of;
 	flatbuffers::uoffset_t size;
-	auto sdata = fbb.CreateString("Poodle");
+	MCUToMCUTask::Message* m;
+	auto sdata = fbb.CreateString((char *)pData, length);
 	auto sendData = darknet7::CreateBLESendDataToDevice(fbb, sdata);
-	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice,
-		sendData.Union());
+	of = darknet7::CreateSTMToESPRequest(fbb, 0,
+		darknet7::STMToESPAny_BLESendDataToDevice, sendData.Union());
 	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
 	size = fbb.GetSize();
-	data = fbb.GetBufferPointer();
+	bufData = fbb.GetBufferPointer();
 	m = new MCUToMCUTask::Message();
-	m->set(size, 0, data);
-	xQueueSendFromISR(pBTTask->getQueueHandle(), &m, (TickType_t) 0);
-	//xQueueSendFromISR(pBTTask->CallbackQueueHandle, &pBLERemoteCharacteristic, NULL);
-	// FIXME: send the pointer to the characteristic in the queue
-	// then do a read() of the characteristic
-	// register an onRead callback which sets the characteristic to be
-	// write-able again.
+	m->set(size, 0, bufData);
+	xQueueSend(pBTTask->getQueueHandle(), &m, (TickType_t) 0);
 }
 
 void BluetoothTask::getDeviceStatus()
@@ -183,7 +177,7 @@ void BluetoothTask::setExposureData(const darknet7::STMToESPRequest* m)
 	const darknet7::BLESetExposureData* msg = m->Msg_as_BLESetExposureData();
 	uint16_t edata = msg->vectors();
 	(void) edata;
-	this->getInfectionData(); 
+	this->getInfectionData();
 }
 
 void BluetoothTask::setInfectionData(const darknet7::STMToESPRequest* m)
@@ -233,7 +227,7 @@ void BluetoothTask::pairWithDevice(const darknet7::STMToESPRequest* m)
 	BLEAddress remoteAddr = BLEAddress(addr);
 	this->isActingClient = true;
 	pClient->connect(remoteAddr);
-	
+
 	if (pClient->isConnected())
 	{
 		iUartClientCallbacks.afterConnect();
@@ -272,13 +266,8 @@ void BluetoothTask::sendPINConfirmation(const darknet7::STMToESPRequest* m)
 void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESendDataToDevice* msg = m->Msg_as_BLESendDataToDevice();
-	/*
-	const uint8_t* data = msg->data()->Data();
-	uint8_t length = msg->length();
-	char* buffer = (char*)malloc(length+1);
-	memcpy(buffer, data, length);
-	buffer[length] = '\0';
-	*/
+
+	// TODO: Check if null bytes work
 	std::string buffer = msg->data()->str();
 	if (iUartClientCallbacks.isConnected)
 	{
@@ -291,7 +280,6 @@ void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 		pUartCisoCharacteristic->setValue(buffer);
 		pUartCisoCharacteristic->notify();
 	}
-	//free(buffer); 
 	flatbuffers::FlatBufferBuilder fbb;
 	flatbuffers::Offset<darknet7::ESPToSTM> of;
 	auto infect = darknet7::CreateGenericResponse(fbb, darknet7::RESPONSE_SUCCESS_True);
@@ -358,7 +346,7 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 			this->sendPINConfirmation(m);
 			break;
 		case darknet7::STMToESPAny_BLESendDataToDevice:
-			vTaskDelay(10000 / portTICK_PERIOD_MS); // TODO: REMOVE
+			vTaskDelay(500 / portTICK_PERIOD_MS); // TODO: REMOVE
 			this->sendDataToDevice(m);
 			break;
 		case darknet7::STMToESPAny_BLEDisconnect:
@@ -394,6 +382,7 @@ void BluetoothTask::run(void * data)
 		}
 		else
 		{
+
 			// TODO: check how long since last scan, scan if beyond that time
 			// this is so we periodically attempt to get infected
 			// scan without filtering anything
@@ -423,7 +412,6 @@ static void initialize_test(QueueHandle_t queue)
 	m->set(size, 0, data);
 	xQueueSend(queue, &m, (TickType_t) 0);
 
-	/*
 	// Scan for Devices
 	auto scan = darknet7::CreateBLEScanForDevices(fbb, darknet7::BLEDeviceFilter_BADGE);
 	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEScanForDevices,
@@ -446,9 +434,9 @@ static void initialize_test(QueueHandle_t queue)
 	m = new MCUToMCUTask::Message();
 	m->set(size, 0, data);
 	xQueueSend(queue, &m, (TickType_t) 0);
-	
+
 	// Send a sample message
-	auto sdata = fbb.CreateString("Poodle");
+	auto sdata = fbb.CreateString("012345678901234567890");
 	auto sendData = darknet7::CreateBLESendDataToDevice(fbb, sdata);
 	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice,
 		sendData.Union());
@@ -459,6 +447,7 @@ static void initialize_test(QueueHandle_t queue)
 	m->set(size, 0, data);
 	xQueueSend(queue, &m, (TickType_t) 0);
 
+	/*
 	// Disconnect from the connected device
 	auto disconnect = darknet7::CreateBLEDisconnect(fbb);
 	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEDisconnect,
@@ -490,12 +479,6 @@ bool BluetoothTask::init()
 	isActingClient = false;
 	isActingServer = false;
 
-	// Setup the queue
-	CallbackQueueHandle = xQueueCreateStatic(CBACK_MSG_QUEUE_SIZE,
-												CBACK_MSG_ITEM_SIZE,
-												CallbackBuffer,
-												&CallbackQueue);
-
 	STMQueueHandle = xQueueCreateStatic(STM_MSG_QUEUE_SIZE, STM_MSG_ITEM_SIZE,
 										fromSTMBuffer, &STMQueue);
 	initialize_test(STMQueueHandle);
@@ -521,7 +504,6 @@ bool BluetoothTask::init()
 	// Create the UART Service
 	pService = pServer->createService(uartServiceUUID);
 	// setup characteristic for the client to send info
-	UartCosiCallbacks.CallbackQueueHandle = CallbackQueueHandle;
 	UartCosiCallbacks.pBTTask = this;
 	pUartCosiCharacteristic = pService->createCharacteristic(uartCosiUUID, uartCosiCharProps);
 	pUartCosiCharacteristic->setCallbacks(&UartCosiCallbacks);
@@ -564,9 +546,9 @@ bool BluetoothTask::init()
 
 BluetoothTask::BluetoothTask(const std::string &tName, uint16_t stackSize, uint8_t p)
 	: Task(tName, stackSize, p),
-		CallbackQueue(),
-		CallbackQueueHandle(nullptr),
-		CallbackBuffer() {
+		STMQueue(),
+		STMQueueHandle(nullptr),
+		fromSTMBuffer() {
 	ESP_LOGI(LOGTAG, "CREATE\n");
 }
 

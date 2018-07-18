@@ -12,7 +12,8 @@ void setCharacteristicValue(BLEService* pService, BLEUUID* uuid, uint8_t* data, 
 static BLEUUID uartServiceUUID(PAIR_SERVICE_UUID);
 static BLEUUID uartCisoUUID(PAIRING_CISO_UUID);
 static BLEUUID uartCosiUUID(PAIRING_COSI_UUID);
-#define uartCisoCharProps (BLECharacteristic::PROPERTY_NOTIFY)
+#define uartCisoCharProps (BLECharacteristic::PROPERTY_READ | \
+							BLECharacteristic::PROPERTY_NOTIFY)
 #define uartCosiCharProps (BLECharacteristic::PROPERTY_WRITE)
 
 

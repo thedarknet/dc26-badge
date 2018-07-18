@@ -63,21 +63,15 @@ void UartCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 	if (rxValue.length() > 0)
 	{	
 		const char *msgOrig = rxValue.c_str();
-		printf("Message get: %s\n", msgOrig);
-		/*
-		uint32_t len = strlen(msgOrig);
-		char * msg = (char*)malloc(len+1);
-		memcpy(msg, msgOrig, len);
-		msg[len] = '\0';
-		xQueueSendFromISR(CallbackQueueHandle, &msg, NULL);
-		*/
+		printf("Server Recevied: %s\n", msgOrig);
+
+		// TODO: Write to STM
 		flatbuffers::FlatBufferBuilder fbb;
 		uint8_t *data = nullptr;
 		MCUToMCUTask::Message* m;
 		flatbuffers::Offset<darknet7::STMToESPRequest> of;
 		flatbuffers::uoffset_t size;
-
-		auto sdata = fbb.CreateString("Poodle");
+		auto sdata = fbb.CreateString(rxValue);
 		auto sendData = darknet7::CreateBLESendDataToDevice(fbb, sdata);
 		of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice,
 			sendData.Union());

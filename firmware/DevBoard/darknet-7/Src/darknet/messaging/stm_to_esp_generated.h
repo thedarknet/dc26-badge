@@ -14,23 +14,17 @@ struct SetupAP;
 
 struct StopAP;
 
-struct BLEIsAdvertising;
-
-struct BLEAdvertise;
-
-struct BLEGetDeviceName;
-
-struct BLESetDeviceName;
-
-struct BLEGetExposureData;
-
-struct BLESetExposureData;
+struct BLEGetDeviceStatus;
 
 struct BLEGetInfectionData;
 
-struct BLESetInfectionData;
+struct BLEAdvertise;
 
-struct BLEGetCureData;
+struct BLESetDeviceName;
+
+struct BLESetExposureData;
+
+struct BLESetInfectionData;
 
 struct BLESetCureData;
 
@@ -39,8 +33,6 @@ struct BLEScanForDevices;
 struct BLEPairWithDevice;
 
 struct BLESendPINConfirmation;
-
-struct BLEGetConnectedDevices;
 
 struct BLESendDataToDevice;
 
@@ -57,27 +49,23 @@ enum STMToESPAny {
   STMToESPAny_BytesToFromAddress = 3,
   STMToESPAny_DisplayMessage = 4,
   STMToESPAny_ESPRequest = 5,
-  STMToESPAny_BLEIsAdvertising = 6,
-  STMToESPAny_BLEAdvertise = 7,
-  STMToESPAny_BLEGetDeviceName = 8,
+  STMToESPAny_BLEGetDeviceStatus = 6,
+  STMToESPAny_BLEGetInfectionData = 7,
+  STMToESPAny_BLEAdvertise = 8,
   STMToESPAny_BLESetDeviceName = 9,
-  STMToESPAny_BLEGetExposureData = 10,
+  STMToESPAny_BLESetInfectionData = 10,
   STMToESPAny_BLESetExposureData = 11,
-  STMToESPAny_BLEGetInfectionData = 12,
-  STMToESPAny_BLESetInfectionData = 13,
-  STMToESPAny_BLEGetCureData = 14,
-  STMToESPAny_BLESetCureData = 15,
-  STMToESPAny_BLEScanForDevices = 16,
-  STMToESPAny_BLEPairWithDevice = 17,
-  STMToESPAny_BLESendPINConfirmation = 18,
-  STMToESPAny_BLEGetConnectedDevices = 19,
-  STMToESPAny_BLESendDataToDevice = 20,
-  STMToESPAny_BLEDisconnect = 21,
+  STMToESPAny_BLESetCureData = 12,
+  STMToESPAny_BLEScanForDevices = 13,
+  STMToESPAny_BLEPairWithDevice = 14,
+  STMToESPAny_BLESendPINConfirmation = 15,
+  STMToESPAny_BLESendDataToDevice = 16,
+  STMToESPAny_BLEDisconnect = 17,
   STMToESPAny_MIN = STMToESPAny_NONE,
   STMToESPAny_MAX = STMToESPAny_BLEDisconnect
 };
 
-inline const STMToESPAny (&EnumValuesSTMToESPAny())[22] {
+inline const STMToESPAny (&EnumValuesSTMToESPAny())[18] {
   static const STMToESPAny values[] = {
     STMToESPAny_NONE,
     STMToESPAny_SetupAP,
@@ -85,20 +73,16 @@ inline const STMToESPAny (&EnumValuesSTMToESPAny())[22] {
     STMToESPAny_BytesToFromAddress,
     STMToESPAny_DisplayMessage,
     STMToESPAny_ESPRequest,
-    STMToESPAny_BLEIsAdvertising,
-    STMToESPAny_BLEAdvertise,
-    STMToESPAny_BLEGetDeviceName,
-    STMToESPAny_BLESetDeviceName,
-    STMToESPAny_BLEGetExposureData,
-    STMToESPAny_BLESetExposureData,
+    STMToESPAny_BLEGetDeviceStatus,
     STMToESPAny_BLEGetInfectionData,
+    STMToESPAny_BLEAdvertise,
+    STMToESPAny_BLESetDeviceName,
     STMToESPAny_BLESetInfectionData,
-    STMToESPAny_BLEGetCureData,
+    STMToESPAny_BLESetExposureData,
     STMToESPAny_BLESetCureData,
     STMToESPAny_BLEScanForDevices,
     STMToESPAny_BLEPairWithDevice,
     STMToESPAny_BLESendPINConfirmation,
-    STMToESPAny_BLEGetConnectedDevices,
     STMToESPAny_BLESendDataToDevice,
     STMToESPAny_BLEDisconnect
   };
@@ -113,20 +97,16 @@ inline const char * const *EnumNamesSTMToESPAny() {
     "BytesToFromAddress",
     "DisplayMessage",
     "ESPRequest",
-    "BLEIsAdvertising",
-    "BLEAdvertise",
-    "BLEGetDeviceName",
-    "BLESetDeviceName",
-    "BLEGetExposureData",
-    "BLESetExposureData",
+    "BLEGetDeviceStatus",
     "BLEGetInfectionData",
+    "BLEAdvertise",
+    "BLESetDeviceName",
     "BLESetInfectionData",
-    "BLEGetCureData",
+    "BLESetExposureData",
     "BLESetCureData",
     "BLEScanForDevices",
     "BLEPairWithDevice",
     "BLESendPINConfirmation",
-    "BLEGetConnectedDevices",
     "BLESendDataToDevice",
     "BLEDisconnect",
     nullptr
@@ -163,40 +143,28 @@ template<> struct STMToESPAnyTraits<ESPRequest> {
   static const STMToESPAny enum_value = STMToESPAny_ESPRequest;
 };
 
-template<> struct STMToESPAnyTraits<BLEIsAdvertising> {
-  static const STMToESPAny enum_value = STMToESPAny_BLEIsAdvertising;
-};
-
-template<> struct STMToESPAnyTraits<BLEAdvertise> {
-  static const STMToESPAny enum_value = STMToESPAny_BLEAdvertise;
-};
-
-template<> struct STMToESPAnyTraits<BLEGetDeviceName> {
-  static const STMToESPAny enum_value = STMToESPAny_BLEGetDeviceName;
-};
-
-template<> struct STMToESPAnyTraits<BLESetDeviceName> {
-  static const STMToESPAny enum_value = STMToESPAny_BLESetDeviceName;
-};
-
-template<> struct STMToESPAnyTraits<BLEGetExposureData> {
-  static const STMToESPAny enum_value = STMToESPAny_BLEGetExposureData;
-};
-
-template<> struct STMToESPAnyTraits<BLESetExposureData> {
-  static const STMToESPAny enum_value = STMToESPAny_BLESetExposureData;
+template<> struct STMToESPAnyTraits<BLEGetDeviceStatus> {
+  static const STMToESPAny enum_value = STMToESPAny_BLEGetDeviceStatus;
 };
 
 template<> struct STMToESPAnyTraits<BLEGetInfectionData> {
   static const STMToESPAny enum_value = STMToESPAny_BLEGetInfectionData;
 };
 
+template<> struct STMToESPAnyTraits<BLEAdvertise> {
+  static const STMToESPAny enum_value = STMToESPAny_BLEAdvertise;
+};
+
+template<> struct STMToESPAnyTraits<BLESetDeviceName> {
+  static const STMToESPAny enum_value = STMToESPAny_BLESetDeviceName;
+};
+
 template<> struct STMToESPAnyTraits<BLESetInfectionData> {
   static const STMToESPAny enum_value = STMToESPAny_BLESetInfectionData;
 };
 
-template<> struct STMToESPAnyTraits<BLEGetCureData> {
-  static const STMToESPAny enum_value = STMToESPAny_BLEGetCureData;
+template<> struct STMToESPAnyTraits<BLESetExposureData> {
+  static const STMToESPAny enum_value = STMToESPAny_BLESetExposureData;
 };
 
 template<> struct STMToESPAnyTraits<BLESetCureData> {
@@ -213,10 +181,6 @@ template<> struct STMToESPAnyTraits<BLEPairWithDevice> {
 
 template<> struct STMToESPAnyTraits<BLESendPINConfirmation> {
   static const STMToESPAny enum_value = STMToESPAny_BLESendPINConfirmation;
-};
-
-template<> struct STMToESPAnyTraits<BLEGetConnectedDevices> {
-  static const STMToESPAny enum_value = STMToESPAny_BLEGetConnectedDevices;
 };
 
 template<> struct STMToESPAnyTraits<BLESendDataToDevice> {
@@ -358,31 +322,59 @@ inline flatbuffers::Offset<StopAP> CreateStopAP(
   return builder_.Finish();
 }
 
-struct BLEIsAdvertising FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+struct BLEGetDeviceStatus FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            verifier.EndTable();
   }
 };
 
-struct BLEIsAdvertisingBuilder {
+struct BLEGetDeviceStatusBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  explicit BLEIsAdvertisingBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit BLEGetDeviceStatusBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  BLEIsAdvertisingBuilder &operator=(const BLEIsAdvertisingBuilder &);
-  flatbuffers::Offset<BLEIsAdvertising> Finish() {
+  BLEGetDeviceStatusBuilder &operator=(const BLEGetDeviceStatusBuilder &);
+  flatbuffers::Offset<BLEGetDeviceStatus> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<BLEIsAdvertising>(end);
+    auto o = flatbuffers::Offset<BLEGetDeviceStatus>(end);
     return o;
   }
 };
 
-inline flatbuffers::Offset<BLEIsAdvertising> CreateBLEIsAdvertising(
+inline flatbuffers::Offset<BLEGetDeviceStatus> CreateBLEGetDeviceStatus(
     flatbuffers::FlatBufferBuilder &_fbb) {
-  BLEIsAdvertisingBuilder builder_(_fbb);
+  BLEGetDeviceStatusBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+struct BLEGetInfectionData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct BLEGetInfectionDataBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit BLEGetInfectionDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BLEGetInfectionDataBuilder &operator=(const BLEGetInfectionDataBuilder &);
+  flatbuffers::Offset<BLEGetInfectionData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BLEGetInfectionData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BLEGetInfectionData> CreateBLEGetInfectionData(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  BLEGetInfectionDataBuilder builder_(_fbb);
   return builder_.Finish();
 }
 
@@ -423,34 +415,6 @@ inline flatbuffers::Offset<BLEAdvertise> CreateBLEAdvertise(
     bool state = false) {
   BLEAdvertiseBuilder builder_(_fbb);
   builder_.add_state(state);
-  return builder_.Finish();
-}
-
-struct BLEGetDeviceName FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           verifier.EndTable();
-  }
-};
-
-struct BLEGetDeviceNameBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  explicit BLEGetDeviceNameBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  BLEGetDeviceNameBuilder &operator=(const BLEGetDeviceNameBuilder &);
-  flatbuffers::Offset<BLEGetDeviceName> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<BLEGetDeviceName>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<BLEGetDeviceName> CreateBLEGetDeviceName(
-    flatbuffers::FlatBufferBuilder &_fbb) {
-  BLEGetDeviceNameBuilder builder_(_fbb);
   return builder_.Finish();
 }
 
@@ -503,34 +467,6 @@ inline flatbuffers::Offset<BLESetDeviceName> CreateBLESetDeviceNameDirect(
       name ? _fbb.CreateString(name) : 0);
 }
 
-struct BLEGetExposureData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           verifier.EndTable();
-  }
-};
-
-struct BLEGetExposureDataBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  explicit BLEGetExposureDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  BLEGetExposureDataBuilder &operator=(const BLEGetExposureDataBuilder &);
-  flatbuffers::Offset<BLEGetExposureData> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<BLEGetExposureData>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<BLEGetExposureData> CreateBLEGetExposureData(
-    flatbuffers::FlatBufferBuilder &_fbb) {
-  BLEGetExposureDataBuilder builder_(_fbb);
-  return builder_.Finish();
-}
-
 struct BLESetExposureData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_VECTORS = 4
@@ -571,34 +507,6 @@ inline flatbuffers::Offset<BLESetExposureData> CreateBLESetExposureData(
   return builder_.Finish();
 }
 
-struct BLEGetInfectionData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           verifier.EndTable();
-  }
-};
-
-struct BLEGetInfectionDataBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  explicit BLEGetInfectionDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  BLEGetInfectionDataBuilder &operator=(const BLEGetInfectionDataBuilder &);
-  flatbuffers::Offset<BLEGetInfectionData> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<BLEGetInfectionData>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<BLEGetInfectionData> CreateBLEGetInfectionData(
-    flatbuffers::FlatBufferBuilder &_fbb) {
-  BLEGetInfectionDataBuilder builder_(_fbb);
-  return builder_.Finish();
-}
-
 struct BLESetInfectionData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_VECTORS = 4
@@ -636,34 +544,6 @@ inline flatbuffers::Offset<BLESetInfectionData> CreateBLESetInfectionData(
     uint16_t vectors = 0) {
   BLESetInfectionDataBuilder builder_(_fbb);
   builder_.add_vectors(vectors);
-  return builder_.Finish();
-}
-
-struct BLEGetCureData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           verifier.EndTable();
-  }
-};
-
-struct BLEGetCureDataBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  explicit BLEGetCureDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  BLEGetCureDataBuilder &operator=(const BLEGetCureDataBuilder &);
-  flatbuffers::Offset<BLEGetCureData> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<BLEGetCureData>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<BLEGetCureData> CreateBLEGetCureData(
-    flatbuffers::FlatBufferBuilder &_fbb) {
-  BLEGetCureDataBuilder builder_(_fbb);
   return builder_.Finish();
 }
 
@@ -833,34 +713,6 @@ inline flatbuffers::Offset<BLESendPINConfirmation> CreateBLESendPINConfirmation(
     bool confirm = false) {
   BLESendPINConfirmationBuilder builder_(_fbb);
   builder_.add_confirm(confirm);
-  return builder_.Finish();
-}
-
-struct BLEGetConnectedDevices FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           verifier.EndTable();
-  }
-};
-
-struct BLEGetConnectedDevicesBuilder {
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  explicit BLEGetConnectedDevicesBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  BLEGetConnectedDevicesBuilder &operator=(const BLEGetConnectedDevicesBuilder &);
-  flatbuffers::Offset<BLEGetConnectedDevices> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<BLEGetConnectedDevices>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<BLEGetConnectedDevices> CreateBLEGetConnectedDevices(
-    flatbuffers::FlatBufferBuilder &_fbb) {
-  BLEGetConnectedDevicesBuilder builder_(_fbb);
   return builder_.Finish();
 }
 
@@ -1037,32 +889,23 @@ struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const ESPRequest *Msg_as_ESPRequest() const {
     return Msg_type() == STMToESPAny_ESPRequest ? static_cast<const ESPRequest *>(Msg()) : nullptr;
   }
-  const BLEIsAdvertising *Msg_as_BLEIsAdvertising() const {
-    return Msg_type() == STMToESPAny_BLEIsAdvertising ? static_cast<const BLEIsAdvertising *>(Msg()) : nullptr;
-  }
-  const BLEAdvertise *Msg_as_BLEAdvertise() const {
-    return Msg_type() == STMToESPAny_BLEAdvertise ? static_cast<const BLEAdvertise *>(Msg()) : nullptr;
-  }
-  const BLEGetDeviceName *Msg_as_BLEGetDeviceName() const {
-    return Msg_type() == STMToESPAny_BLEGetDeviceName ? static_cast<const BLEGetDeviceName *>(Msg()) : nullptr;
-  }
-  const BLESetDeviceName *Msg_as_BLESetDeviceName() const {
-    return Msg_type() == STMToESPAny_BLESetDeviceName ? static_cast<const BLESetDeviceName *>(Msg()) : nullptr;
-  }
-  const BLEGetExposureData *Msg_as_BLEGetExposureData() const {
-    return Msg_type() == STMToESPAny_BLEGetExposureData ? static_cast<const BLEGetExposureData *>(Msg()) : nullptr;
-  }
-  const BLESetExposureData *Msg_as_BLESetExposureData() const {
-    return Msg_type() == STMToESPAny_BLESetExposureData ? static_cast<const BLESetExposureData *>(Msg()) : nullptr;
+  const BLEGetDeviceStatus *Msg_as_BLEGetDeviceStatus() const {
+    return Msg_type() == STMToESPAny_BLEGetDeviceStatus ? static_cast<const BLEGetDeviceStatus *>(Msg()) : nullptr;
   }
   const BLEGetInfectionData *Msg_as_BLEGetInfectionData() const {
     return Msg_type() == STMToESPAny_BLEGetInfectionData ? static_cast<const BLEGetInfectionData *>(Msg()) : nullptr;
   }
+  const BLEAdvertise *Msg_as_BLEAdvertise() const {
+    return Msg_type() == STMToESPAny_BLEAdvertise ? static_cast<const BLEAdvertise *>(Msg()) : nullptr;
+  }
+  const BLESetDeviceName *Msg_as_BLESetDeviceName() const {
+    return Msg_type() == STMToESPAny_BLESetDeviceName ? static_cast<const BLESetDeviceName *>(Msg()) : nullptr;
+  }
   const BLESetInfectionData *Msg_as_BLESetInfectionData() const {
     return Msg_type() == STMToESPAny_BLESetInfectionData ? static_cast<const BLESetInfectionData *>(Msg()) : nullptr;
   }
-  const BLEGetCureData *Msg_as_BLEGetCureData() const {
-    return Msg_type() == STMToESPAny_BLEGetCureData ? static_cast<const BLEGetCureData *>(Msg()) : nullptr;
+  const BLESetExposureData *Msg_as_BLESetExposureData() const {
+    return Msg_type() == STMToESPAny_BLESetExposureData ? static_cast<const BLESetExposureData *>(Msg()) : nullptr;
   }
   const BLESetCureData *Msg_as_BLESetCureData() const {
     return Msg_type() == STMToESPAny_BLESetCureData ? static_cast<const BLESetCureData *>(Msg()) : nullptr;
@@ -1075,9 +918,6 @@ struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const BLESendPINConfirmation *Msg_as_BLESendPINConfirmation() const {
     return Msg_type() == STMToESPAny_BLESendPINConfirmation ? static_cast<const BLESendPINConfirmation *>(Msg()) : nullptr;
-  }
-  const BLEGetConnectedDevices *Msg_as_BLEGetConnectedDevices() const {
-    return Msg_type() == STMToESPAny_BLEGetConnectedDevices ? static_cast<const BLEGetConnectedDevices *>(Msg()) : nullptr;
   }
   const BLESendDataToDevice *Msg_as_BLESendDataToDevice() const {
     return Msg_type() == STMToESPAny_BLESendDataToDevice ? static_cast<const BLESendDataToDevice *>(Msg()) : nullptr;
@@ -1115,40 +955,28 @@ template<> inline const ESPRequest *STMToESPRequest::Msg_as<ESPRequest>() const 
   return Msg_as_ESPRequest();
 }
 
-template<> inline const BLEIsAdvertising *STMToESPRequest::Msg_as<BLEIsAdvertising>() const {
-  return Msg_as_BLEIsAdvertising();
-}
-
-template<> inline const BLEAdvertise *STMToESPRequest::Msg_as<BLEAdvertise>() const {
-  return Msg_as_BLEAdvertise();
-}
-
-template<> inline const BLEGetDeviceName *STMToESPRequest::Msg_as<BLEGetDeviceName>() const {
-  return Msg_as_BLEGetDeviceName();
-}
-
-template<> inline const BLESetDeviceName *STMToESPRequest::Msg_as<BLESetDeviceName>() const {
-  return Msg_as_BLESetDeviceName();
-}
-
-template<> inline const BLEGetExposureData *STMToESPRequest::Msg_as<BLEGetExposureData>() const {
-  return Msg_as_BLEGetExposureData();
-}
-
-template<> inline const BLESetExposureData *STMToESPRequest::Msg_as<BLESetExposureData>() const {
-  return Msg_as_BLESetExposureData();
+template<> inline const BLEGetDeviceStatus *STMToESPRequest::Msg_as<BLEGetDeviceStatus>() const {
+  return Msg_as_BLEGetDeviceStatus();
 }
 
 template<> inline const BLEGetInfectionData *STMToESPRequest::Msg_as<BLEGetInfectionData>() const {
   return Msg_as_BLEGetInfectionData();
 }
 
+template<> inline const BLEAdvertise *STMToESPRequest::Msg_as<BLEAdvertise>() const {
+  return Msg_as_BLEAdvertise();
+}
+
+template<> inline const BLESetDeviceName *STMToESPRequest::Msg_as<BLESetDeviceName>() const {
+  return Msg_as_BLESetDeviceName();
+}
+
 template<> inline const BLESetInfectionData *STMToESPRequest::Msg_as<BLESetInfectionData>() const {
   return Msg_as_BLESetInfectionData();
 }
 
-template<> inline const BLEGetCureData *STMToESPRequest::Msg_as<BLEGetCureData>() const {
-  return Msg_as_BLEGetCureData();
+template<> inline const BLESetExposureData *STMToESPRequest::Msg_as<BLESetExposureData>() const {
+  return Msg_as_BLESetExposureData();
 }
 
 template<> inline const BLESetCureData *STMToESPRequest::Msg_as<BLESetCureData>() const {
@@ -1165,10 +993,6 @@ template<> inline const BLEPairWithDevice *STMToESPRequest::Msg_as<BLEPairWithDe
 
 template<> inline const BLESendPINConfirmation *STMToESPRequest::Msg_as<BLESendPINConfirmation>() const {
   return Msg_as_BLESendPINConfirmation();
-}
-
-template<> inline const BLEGetConnectedDevices *STMToESPRequest::Msg_as<BLEGetConnectedDevices>() const {
-  return Msg_as_BLEGetConnectedDevices();
 }
 
 template<> inline const BLESendDataToDevice *STMToESPRequest::Msg_as<BLESendDataToDevice>() const {
@@ -1240,40 +1064,28 @@ inline bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, 
       auto ptr = reinterpret_cast<const ESPRequest *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case STMToESPAny_BLEIsAdvertising: {
-      auto ptr = reinterpret_cast<const BLEIsAdvertising *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
-    case STMToESPAny_BLEAdvertise: {
-      auto ptr = reinterpret_cast<const BLEAdvertise *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
-    case STMToESPAny_BLEGetDeviceName: {
-      auto ptr = reinterpret_cast<const BLEGetDeviceName *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
-    case STMToESPAny_BLESetDeviceName: {
-      auto ptr = reinterpret_cast<const BLESetDeviceName *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
-    case STMToESPAny_BLEGetExposureData: {
-      auto ptr = reinterpret_cast<const BLEGetExposureData *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
-    case STMToESPAny_BLESetExposureData: {
-      auto ptr = reinterpret_cast<const BLESetExposureData *>(obj);
+    case STMToESPAny_BLEGetDeviceStatus: {
+      auto ptr = reinterpret_cast<const BLEGetDeviceStatus *>(obj);
       return verifier.VerifyTable(ptr);
     }
     case STMToESPAny_BLEGetInfectionData: {
       auto ptr = reinterpret_cast<const BLEGetInfectionData *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case STMToESPAny_BLEAdvertise: {
+      auto ptr = reinterpret_cast<const BLEAdvertise *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case STMToESPAny_BLESetDeviceName: {
+      auto ptr = reinterpret_cast<const BLESetDeviceName *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     case STMToESPAny_BLESetInfectionData: {
       auto ptr = reinterpret_cast<const BLESetInfectionData *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case STMToESPAny_BLEGetCureData: {
-      auto ptr = reinterpret_cast<const BLEGetCureData *>(obj);
+    case STMToESPAny_BLESetExposureData: {
+      auto ptr = reinterpret_cast<const BLESetExposureData *>(obj);
       return verifier.VerifyTable(ptr);
     }
     case STMToESPAny_BLESetCureData: {
@@ -1290,10 +1102,6 @@ inline bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, 
     }
     case STMToESPAny_BLESendPINConfirmation: {
       auto ptr = reinterpret_cast<const BLESendPINConfirmation *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
-    case STMToESPAny_BLEGetConnectedDevices: {
-      auto ptr = reinterpret_cast<const BLEGetConnectedDevices *>(obj);
       return verifier.VerifyTable(ptr);
     }
     case STMToESPAny_BLESendDataToDevice: {

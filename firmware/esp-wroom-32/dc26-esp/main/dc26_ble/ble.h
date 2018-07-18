@@ -55,23 +55,17 @@ public:
 	QueueHandle_t getQueueHandle() {return STMQueueHandle;}
 
 public: // API
-	void isAdvertising(void);
-	void startAdvertising(void);
-	void stopAdvertising(void);
+	void getDeviceStatus(void);
+	void getInfectionData(void);
 	void toggleAdvertising(const darknet7::STMToESPRequest* m);
 	void setDeviceType(uint8_t devtype);
-	void getDeviceName(void);
 	void setDeviceName(const darknet7::STMToESPRequest* m);
-	void getExposureData(void);
 	void setExposureData(const darknet7::STMToESPRequest* m);
-	void getInfectionData();
 	void setInfectionData(const darknet7::STMToESPRequest* m);
-	void getCureData();
 	void setCureData(const darknet7::STMToESPRequest* m);
 	void scanForDevices(const darknet7::STMToESPRequest* m);
 	void pairWithDevice(const darknet7::STMToESPRequest* m);
 	void sendPINConfirmation(const darknet7::STMToESPRequest* m);
-	void getConnectedDevices();
 	void sendDataToDevice(const darknet7::STMToESPRequest* m);
 	void disconnect();
 
@@ -82,6 +76,8 @@ public:
 	virtual void run(void *data);
 	virtual ~BluetoothTask();
 protected:
+	void startAdvertising(void);
+	void stopAdvertising(void);
 	void refreshAdvertisementData(void);
 };
 

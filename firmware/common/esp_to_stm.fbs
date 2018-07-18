@@ -4,7 +4,7 @@ namespace darknet7;
 
 enum RESPONSE_SUCCESS : byte { False = 0, True = 1 }
 
-union ESPToSTMAny { GenericResponse, ESPSystemInfo }
+union ESPToSTMAny { GenericResponse, ESPSystemInfo, BLEInfectionData}
 
 table GenericResponse {
 	successful:RESPONSE_SUCCESS;
@@ -18,6 +18,12 @@ table Badges {
 
 table BadgesInArea {
 	BadgeList:[Badges];
+}
+
+table BLEInfectionData {
+	infections:uint16;
+	exposures:uint16;
+	cures:uint16;
 }
 
 table ESPSystemInfo {

@@ -16,6 +16,8 @@ struct Badges;
 
 struct BadgesInArea;
 
+struct BLEInfectionData;
+
 struct ESPSystemInfo;
 
 struct ESPToSTM;
@@ -53,15 +55,17 @@ enum ESPToSTMAny {
   ESPToSTMAny_NONE = 0,
   ESPToSTMAny_GenericResponse = 1,
   ESPToSTMAny_ESPSystemInfo = 2,
+  ESPToSTMAny_BLEInfectionData = 3,
   ESPToSTMAny_MIN = ESPToSTMAny_NONE,
-  ESPToSTMAny_MAX = ESPToSTMAny_ESPSystemInfo
+  ESPToSTMAny_MAX = ESPToSTMAny_BLEInfectionData
 };
 
-inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[3] {
+inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[4] {
   static const ESPToSTMAny values[] = {
     ESPToSTMAny_NONE,
     ESPToSTMAny_GenericResponse,
-    ESPToSTMAny_ESPSystemInfo
+    ESPToSTMAny_ESPSystemInfo,
+    ESPToSTMAny_BLEInfectionData
   };
   return values;
 }
@@ -71,6 +75,7 @@ inline const char * const *EnumNamesESPToSTMAny() {
     "NONE",
     "GenericResponse",
     "ESPSystemInfo",
+    "BLEInfectionData",
     nullptr
   };
   return names;
@@ -91,6 +96,10 @@ template<> struct ESPToSTMAnyTraits<GenericResponse> {
 
 template<> struct ESPToSTMAnyTraits<ESPSystemInfo> {
   static const ESPToSTMAny enum_value = ESPToSTMAny_ESPSystemInfo;
+};
+
+template<> struct ESPToSTMAnyTraits<BLEInfectionData> {
+  static const ESPToSTMAny enum_value = ESPToSTMAny_BLEInfectionData;
 };
 
 bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, ESPToSTMAny type);
@@ -269,6 +278,66 @@ inline flatbuffers::Offset<BadgesInArea> CreateBadgesInAreaDirect(
       BadgeList ? _fbb.CreateVector<flatbuffers::Offset<Badges>>(*BadgeList) : 0);
 }
 
+struct BLEInfectionData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_INFECTIONS = 4,
+    VT_EXPOSURES = 6,
+    VT_CURES = 8
+  };
+  uint16_t infections() const {
+    return GetField<uint16_t>(VT_INFECTIONS, 0);
+  }
+  uint16_t exposures() const {
+    return GetField<uint16_t>(VT_EXPOSURES, 0);
+  }
+  uint16_t cures() const {
+    return GetField<uint16_t>(VT_CURES, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_INFECTIONS) &&
+           VerifyField<uint16_t>(verifier, VT_EXPOSURES) &&
+           VerifyField<uint16_t>(verifier, VT_CURES) &&
+           verifier.EndTable();
+  }
+};
+
+struct BLEInfectionDataBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_infections(uint16_t infections) {
+    fbb_.AddElement<uint16_t>(BLEInfectionData::VT_INFECTIONS, infections, 0);
+  }
+  void add_exposures(uint16_t exposures) {
+    fbb_.AddElement<uint16_t>(BLEInfectionData::VT_EXPOSURES, exposures, 0);
+  }
+  void add_cures(uint16_t cures) {
+    fbb_.AddElement<uint16_t>(BLEInfectionData::VT_CURES, cures, 0);
+  }
+  explicit BLEInfectionDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BLEInfectionDataBuilder &operator=(const BLEInfectionDataBuilder &);
+  flatbuffers::Offset<BLEInfectionData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BLEInfectionData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BLEInfectionData> CreateBLEInfectionData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t infections = 0,
+    uint16_t exposures = 0,
+    uint16_t cures = 0) {
+  BLEInfectionDataBuilder builder_(_fbb);
+  builder_.add_cures(cures);
+  builder_.add_exposures(exposures);
+  builder_.add_infections(infections);
+  return builder_.Finish();
+}
+
 struct ESPSystemInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_HEAPSIZE = 4,
@@ -412,6 +481,9 @@ struct ESPToSTM FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const ESPSystemInfo *Msg_as_ESPSystemInfo() const {
     return Msg_type() == ESPToSTMAny_ESPSystemInfo ? static_cast<const ESPSystemInfo *>(Msg()) : nullptr;
   }
+  const BLEInfectionData *Msg_as_BLEInfectionData() const {
+    return Msg_type() == ESPToSTMAny_BLEInfectionData ? static_cast<const BLEInfectionData *>(Msg()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_MSGINSTANCEID) &&
@@ -428,6 +500,10 @@ template<> inline const GenericResponse *ESPToSTM::Msg_as<GenericResponse>() con
 
 template<> inline const ESPSystemInfo *ESPToSTM::Msg_as<ESPSystemInfo>() const {
   return Msg_as_ESPSystemInfo();
+}
+
+template<> inline const BLEInfectionData *ESPToSTM::Msg_as<BLEInfectionData>() const {
+  return Msg_as_BLEInfectionData();
 }
 
 struct ESPToSTMBuilder {
@@ -477,6 +553,10 @@ inline bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, 
     }
     case ESPToSTMAny_ESPSystemInfo: {
       auto ptr = reinterpret_cast<const ESPSystemInfo *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ESPToSTMAny_BLEInfectionData: {
+      auto ptr = reinterpret_cast<const BLEInfectionData *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return false;

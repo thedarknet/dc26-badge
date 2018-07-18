@@ -436,7 +436,7 @@ static void initialize_test(QueueHandle_t queue)
 	xQueueSend(queue, &m, (TickType_t) 0);
 
 	// Send a sample message
-	auto sdata = fbb.CreateString("012345678901234567890");
+	auto sdata = fbb.CreateString("012345678901234567890123456");
 	auto sendData = darknet7::CreateBLESendDataToDevice(fbb, sdata);
 	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice,
 		sendData.Union());
@@ -484,6 +484,7 @@ bool BluetoothTask::init()
 	initialize_test(STMQueueHandle);
 
 	BLEDevice::init("DCDN BLE Device");
+	BLEDevice::setMTU(43);
 
 	BLEDevice::setEncryptionLevel(ESP_BLE_SEC_ENCRYPT);
 	pMySecurity = new MySecurity();

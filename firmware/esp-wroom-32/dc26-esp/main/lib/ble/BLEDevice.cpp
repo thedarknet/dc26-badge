@@ -98,7 +98,7 @@ uint16_t   BLEDevice::m_localMTU = 23;
 
 	switch(event) {
 		case ESP_GATTS_CONNECT_EVT: {
-			BLEDevice::m_localMTU = 23;
+			BLEDevice::m_localMTU = 43;
 #ifdef CONFIG_BLE_SMP_ENABLE   // Check that BLE SMP (security) is configured in make menuconfig
 			if(BLEDevice::m_securityLevel){
 				esp_ble_set_encryption(param->connect.remote_bda, BLEDevice::m_securityLevel);
@@ -109,7 +109,7 @@ uint16_t   BLEDevice::m_localMTU = 23;
 
 		case ESP_GATTS_MTU_EVT: {
 			BLEDevice::m_localMTU = param->mtu.mtu;
-	        ESP_LOGD(LOG_TAG, "ESP_GATTS_MTU_EVT, MTU %d", BLEDevice::m_localMTU);
+	        ESP_LOGI(LOG_TAG, "ESP_GATTS_MTU_EVT, MTU %d", BLEDevice::m_localMTU);
 	        break;
 		}
 		default: {

@@ -75,8 +75,7 @@ StateBase::ReturnStateContext MCUInfoState::onRun() {
 	switch(InternalState) {
 	case FETCHING_DATA:
 		if(this->getTimesRunCalledSinceLastReset()>200) {
-			nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),
-					(const char *)"No info from ESP",2000);
+			nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(), DarkNet7::NO_DATA_FROM_ESP,2000);
 		}
 		break;
 	case DISPLAY_DATA:

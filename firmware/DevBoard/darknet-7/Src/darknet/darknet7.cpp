@@ -56,6 +56,7 @@ static const uint8_t EndContactSector = 3;
 
 const char *DarkNet7::sYES="Yes";
 const char *DarkNet7::sNO="No";
+const char *DarkNet7::NO_DATA_FROM_ESP = "No data returned from ESP, try resetting ESP.";
 
 
 

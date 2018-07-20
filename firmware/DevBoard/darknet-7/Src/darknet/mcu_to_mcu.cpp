@@ -184,6 +184,11 @@ void MCUToMCU::process() {
 			this->getBus().emitSignal(this,mevt);
 			}
 			break;
+		case darknet7::ESPToSTMAny_CommunicationStatusResponse: {
+			MSGEvent<darknet7::CommunicationStatusResponse> mevt(msg->Msg_as_CommunicationStatusResponse(),msg->msgInstanceID());
+			this->getBus().emitSignal(this,mevt);
+			}
+			break;
 		default:
 			break;
 		}

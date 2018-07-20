@@ -37,6 +37,7 @@ class DarkNet7: public cmdc0de::App {
 public:
 	static const char *sYES;
 	static const char *sNO;
+	static const char *NO_DATA_FROM_ESP;
 
 	#define START_LANDSCAPE
 	#ifdef START_LANDSCAPE
@@ -79,8 +80,7 @@ public:
 		uint8_t LastButtonState;
 	};
 public:
-	cmdc0de::DisplayMessageState *getDisplayMessageState(cmdc0de::StateBase *bm, const char *message,
-			uint16_t timeToDisplay);
+	cmdc0de::DisplayMessageState *getDisplayMessageState(cmdc0de::StateBase *bm, const char *message, uint16_t timeToDisplay);
 	MenuState *getDisplayMenuState();
 	TestState *getTestState();
 	SendMsgState *getSendMsgState();

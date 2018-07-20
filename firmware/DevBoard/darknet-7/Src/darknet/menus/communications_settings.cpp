@@ -11,6 +11,7 @@
 #include "../messaging/stm_to_esp_generated.h"
 #include "../messaging/esp_to_stm_generated.h"
 #include "gui_list_processor.h"
+#include "menu_state.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::RGBColor;
@@ -137,16 +138,18 @@ private:
 	darknet7::WifiMode SecurityType;
 	VirtualKeyBoard::InputHandleContext IHC;
 	cmdc0de::GUIListData WifiSettingList;
-	cmdc0de::GUIListItemData Items[4];
-	char ListBuffer[4][33];
+	cmdc0de::GUIListItemData Items[5];
+	char ListBuffer[5][33];
 	uint16_t WorkingItem;
+	darknet7::WiFiStatus CurrentWiFiStatus;
 	static const uint16_t NO_WORKING_TIME = 0xFFFF;
 public:
 	//WiFi() : Darknet7BaseState(), VKB(), SSID(), Password(), SecurityType(darknet7::WifiMode_OPEN), IHC(&SSID[0],sizeof(SSID)) { //, ListBuffer() {
 	WiFi() : Darknet7BaseState(), VKB(), SSID(), Password(), SecurityType(darknet7::WifiMode_OPEN), IHC(0,0)
-		, WifiSettingList("WiFi Settings:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0])))
-		, ListBuffer(), WorkingItem(NO_WORKING_TIME) {
+		, WifiSettingList("WiFi Settings:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, 90, 0, (sizeof(Items) / sizeof(Items[0])))
+		, ListBuffer(), WorkingItem(NO_WORKING_TIME), CurrentWiFiStatus(darknet7::WiFiStatus_DOWN) {
 	}
+	void setWifiStatus(darknet7::WiFiStatus c) {CurrentWiFiStatus = c;}
 	virtual ~WiFi() {}
 protected:
 	virtual cmdc0de::ErrorType onInit() {
@@ -164,33 +167,59 @@ protected:
 	virtual cmdc0de::StateBase::ReturnStateContext onRun() {
 		StateBase *nextState = this;
 		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-		sprintf(&ListBuffer[0][0],"AP Type: %s", darknet7::EnumNameWifiMode(SecurityType));
-		if(SecurityType!=darknet7::WifiMode_OPEN ) {
-			sprintf(&ListBuffer[1][0],"SSID: %s", &SSID[0]);
-			sprintf(&ListBuffer[2][0],"Password: %s", &Password[0]);
+		sprintf(&ListBuffer[0][0],"AP Status: %s", darknet7::EnumNameWiFiStatus(CurrentWiFiStatus));
+		if(CurrentWiFiStatus==darknet7::WiFiStatus_DOWN) {
+			ListBuffer[1][0] = '\0';
+			ListBuffer[2][0] = '\0';
+			ListBuffer[3][0] = '\0';
+		} else {
+			sprintf(&ListBuffer[1][0],"AP Type: %s", darknet7::EnumNameWifiMode(SecurityType));
+			sprintf(&ListBuffer[2][0],"SSID: %s", &SSID[0]);
+			if(SecurityType==darknet7::WifiMode_OPEN ) {
+				ListBuffer[3][0] = '\0';
+			} else {
+				sprintf(&ListBuffer[3][0],"Password: %s", &Password[0]);
+			}
 		}
-		strcpy(&ListBuffer[3][0],"Submit");
+		strcpy(&ListBuffer[4][0],"Submit");
 
 		if(WorkingItem==NO_WORKING_TIME) {
 			if (!GUIListProcessor::process(&WifiSettingList,(sizeof(Items) / sizeof(Items[0])))) {
 				if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
-					WorkingItem = WifiSettingList.selectedItem;
+					if(CurrentWiFiStatus!=darknet7::WiFiStatus_DOWN) {
+						WorkingItem = WifiSettingList.selectedItem;
+					} else if (WifiSettingList.selectedItem==4) {
+						WorkingItem = WifiSettingList.selectedItem;
+					}
 					switch(WorkingItem) {
+					case 0:
+						//do nothing
+						break;
 					case 1:
-						IHC.set(&SSID[0],sizeof(SSID));
-						VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,60,RGBColor::WHITE,	RGBColor::BLACK, RGBColor::BLUE,'_');
 						break;
 					case 2:
-						IHC.set(&Password[0],sizeof(Password));
-						VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,60,RGBColor::WHITE,	RGBColor::BLACK, RGBColor::BLUE,'_');
+						IHC.set(&SSID[0],sizeof(SSID));
+						VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,120,RGBColor::WHITE,	RGBColor::BLACK, RGBColor::BLUE,'_');
 						break;
 					case 3:
+						IHC.set(&Password[0],sizeof(Password));
+						VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,120,RGBColor::WHITE,	RGBColor::BLACK, RGBColor::BLUE,'_');
+						break;
+					case 4:
 					{
 						flatbuffers::FlatBufferBuilder fbb;
-						auto r = darknet7::CreateSetupAPDirect(fbb,&SSID[0],&Password[0],SecurityType);
-						auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::get().nextSeq(),darknet7::STMToESPAny_BLESetDeviceName,r.Union());
+						flatbuffers::Offset<void> msgOffset;
+						if(CurrentWiFiStatus==darknet7::WiFiStatus_DOWN) {
+							auto r = darknet7::CreateStopAP(fbb);
+							msgOffset = r.Union();
+						} else {
+							auto r = darknet7::CreateSetupAPDirect(fbb,&SSID[0],&Password[0],SecurityType);
+							msgOffset = r.Union();
+						}
+						auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::get().nextSeq(),darknet7::STMToESPAny_BLESetDeviceName,msgOffset);
 						darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
 						MCUToMCU::get().send(fbb);
+						nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getCommunicationSettingState(),(const char *)"Updating ESP",2000);
 					}
 						break;
 					}
@@ -201,34 +230,60 @@ protected:
 		} else {
 			switch(WorkingItem) {
 			case 0:
+			case 1:
 			{
 				if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_UP)) {
-					uint32_t s = (uint32_t)(SecurityType);
-					++s;
-					s = s%darknet7::WifiMode_MAX;
-					SecurityType = (darknet7::WifiMode)s;
-				} else if (DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
-					if(SecurityType==darknet7::WifiMode_MIN) {
-						SecurityType = darknet7::WifiMode_MAX;
+					uint32_t s;
+					if(WorkingItem==0) {
+						s = (uint32_t)(CurrentWiFiStatus);
+						++s;
+						s = s%darknet7::WiFiStatus_MAX;
+						CurrentWiFiStatus = (darknet7::WiFiStatus)s;
 					} else {
-						uint32_t s = (uint32_t)(SecurityType);
-						--s;
+						s = (uint32_t)(SecurityType);
+						++s;
+						s = s%darknet7::WifiMode_MAX;
 						SecurityType = (darknet7::WifiMode)s;
 					}
-				} else if (DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID
+				} else if (DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
+					if(WorkingItem==0) {
+						if(CurrentWiFiStatus==darknet7::WiFiStatus_MIN) {
+							CurrentWiFiStatus = darknet7::WiFiStatus_MAX;
+						} else {
+							uint32_t s = (uint32_t)(CurrentWiFiStatus);
+							--s;
+							CurrentWiFiStatus = (darknet7::WiFiStatus)s;
+						}
+					} else {
+						if(SecurityType==darknet7::WifiMode_MIN) {
+							SecurityType = darknet7::WifiMode_MAX;
+						} else {
+							uint32_t s = (uint32_t)(SecurityType);
+							--s;
+							SecurityType = (darknet7::WifiMode)s;
+						}
+					}
+				} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID
 																					| DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
 					WorkingItem = NO_WORKING_TIME;
 				}
 			}
 			break;
-			case 1:
-				VKB.process();
-				break;
 			case 2:
 				VKB.process();
+				if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+					WorkingItem = NO_WORKING_TIME;
+				}
+				break;
+			case 3:
+				VKB.process();
+				if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+					WorkingItem = NO_WORKING_TIME;
+				}
 				break;
 			}
 		}
+		DarkNet7::get().getGUI().drawList(&WifiSettingList);
 		return ReturnStateContext(nextState);
 	}
 
@@ -241,7 +296,7 @@ static WiFi WiFiMenu;
 
 CommunicationSettingState::CommunicationSettingState() : Darknet7BaseState()
 	, CommSettingList("Comm Info:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0])))
-	, Items(), ListBuffer(), CurrentDeviceName(), ESPRequestID(0), InternalState(NONE) {
+	, Items(), ListBuffer(), CurrentDeviceName(), ESPRequestID(0), InternalState(NONE), CurrentWifiStatus(darknet7::WiFiStatus_DOWN) {
 
 }
 
@@ -254,7 +309,8 @@ void CommunicationSettingState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7:
 		for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++) {
 			Items[i].text = &ListBuffer[i][0];
 		}
-		sprintf(&ListBuffer[0][0], "Wifi Status: %s", EnumNameWiFiStatus(mevt->InnerMsg->WifiStatus()));
+		CurrentWifiStatus = mevt->InnerMsg->WifiStatus();
+		sprintf(&ListBuffer[0][0], "Wifi Status: %s", EnumNameWiFiStatus(CurrentWifiStatus));
 		sprintf(&ListBuffer[1][0], "BLE Advertise: %s", mevt->InnerMsg->BLEAdvertise()?DarkNet7::sYES:DarkNet7::sNO);
 		sprintf(&ListBuffer[2][0], "BLE DeviceName: %s", mevt->InnerMsg->BLEDevideName()->c_str());
 		strcpy(&CurrentDeviceName[0],mevt->InnerMsg->BLEDevideName()->c_str());
@@ -286,20 +342,29 @@ ErrorType CommunicationSettingState::onInit() {
 
 StateBase::ReturnStateContext CommunicationSettingState::onRun() {
 	StateBase *nextState = this;
-	if (!GUIListProcessor::process(&CommSettingList,(sizeof(Items) / sizeof(Items[0])))) {
-		if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1 | DarkNet7::ButtonInfo::BUTTON_MID)) {
-			DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-			switch(CommSettingList.selectedItem) {
-			case 0:
-				nextState = &WiFiMenu;
-				break;
-			case 1:
-				nextState = &BLEAdvertise_Menu;
-				break;
-			case 2:
-				BLESetName_Menu.setCurrentNamePtr(&CurrentDeviceName[0]);
-				nextState = &BLESetName_Menu;
-				break;
+	if(InternalState==FETCHING_DATA) {
+		if(this->getTimesRunCalledSinceLastReset()>200) {
+			const MSGEvent<darknet7::CommunicationStatusResponse> *mevt=0;
+			MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
+			nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),DarkNet7::get().NO_DATA_FROM_ESP,2000);
+		}
+	} else {
+		if (!GUIListProcessor::process(&CommSettingList,(sizeof(Items) / sizeof(Items[0])))) {
+			if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1 | DarkNet7::ButtonInfo::BUTTON_MID)) {
+				DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+				switch(CommSettingList.selectedItem) {
+				case 0:
+					WiFiMenu.setWifiStatus(CurrentWifiStatus);
+					nextState = &WiFiMenu;
+					break;
+				case 1:
+					nextState = &BLEAdvertise_Menu;
+					break;
+				case 2:
+					BLESetName_Menu.setCurrentNamePtr(&CurrentDeviceName[0]);
+					nextState = &BLESetName_Menu;
+					break;
+				}
 			}
 		}
 	}

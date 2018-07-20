@@ -36,6 +36,7 @@ private:
 	char CurrentDeviceName[13];
 	uint32_t ESPRequestID;
 	INTERNAL_STATE InternalState;
+	darknet7::WiFiStatus CurrentWifiStatus;
 };
 
 

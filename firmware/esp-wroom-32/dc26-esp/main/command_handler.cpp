@@ -41,8 +41,6 @@ void CmdHandlerTask::run(void *data) {
 			case darknet7::STMToESPAny_SetupAP:
 				break;
 			case darknet7::STMToESPAny_ESPRequest: {
-				//switch (msg->Msg_as_ESPRequest()->requestType()) {
-				//	case darknet7::ESPRequestType_SYSTEM_INFO: {
 						ESP_LOGI(LOGTAG, "processing system info");
 						flatbuffers::FlatBufferBuilder fbb;
 						System::logSystemInfo();
@@ -61,8 +59,20 @@ void CmdHandlerTask::run(void *data) {
 						getMCUToMCU().send(fbb);
 					}
 					break;
-				//	default:
-				//	break;
+			case darknet7::STMToESPAny_CommunicationStatusRequest: {
+						ESP_LOGI(LOGTAG, "processing system info");
+						flatbuffers::FlatBufferBuilder fbb;
+						//TODO FINISH
+						auto s = darknet7::CreateCommunicationStatusResponseDirect(
+										 fbb, darknet7::WiFiStatus_DOWN,
+									false, (const char *)"test");	 
+						flatbuffers::Offset<darknet7::ESPToSTM> of =
+								darknet7::CreateESPToSTM(fbb, msg->msgInstanceID(),
+										darknet7::ESPToSTMAny_CommunicationStatusResponse, s.Union());
+						darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+						getMCUToMCU().send(fbb);
+					}
+					break;
 			default:
 				break;
 			}

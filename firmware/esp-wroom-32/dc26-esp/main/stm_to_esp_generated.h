@@ -14,11 +14,17 @@ struct SetupAP;
 
 struct StopAP;
 
+struct CommunicationStatusRequest;
+
 struct BLEAdvertise;
 
 struct BLEGetDeviceName;
 
 struct BLESetDeviceName;
+
+struct BLEGetExposedData;
+
+struct BLESetExposedData;
 
 struct BLEGetInfectionData;
 
@@ -53,25 +59,26 @@ enum STMToESPAny {
   STMToESPAny_BytesToFromAddress = 3,
   STMToESPAny_DisplayMessage = 4,
   STMToESPAny_ESPRequest = 5,
-  STMToESPAny_BLEAdvertise = 6,
-  STMToESPAny_BLEGetDeviceName = 7,
-  STMToESPAny_BLESetDeviceName = 8,
-  STMToESPAny_BLEGetInfectionData = 9,
-  STMToESPAny_BLESetInfectionData = 10,
-  STMToESPAny_BLEGetCureData = 11,
-  STMToESPAny_BLESetCureData = 12,
-  STMToESPAny_BLEScanForDevices = 13,
-  STMToESPAny_BLEPairWithDevice = 14,
-  STMToESPAny_BLESendPINConfirmation = 15,
-  STMToESPAny_BLEGetConnectedDevices = 16,
-  STMToESPAny_BLESendDataToDevice = 17,
-  STMToESPAny_BLEDisconnectFromDevice = 18,
-  STMToESPAny_BLEDisconnectFromAll = 19,
+  STMToESPAny_CommunicationStatusRequest = 6,
+  STMToESPAny_BLEAdvertise = 7,
+  STMToESPAny_BLEGetDeviceName = 8,
+  STMToESPAny_BLESetDeviceName = 9,
+  STMToESPAny_BLEGetInfectionData = 10,
+  STMToESPAny_BLESetInfectionData = 11,
+  STMToESPAny_BLEGetCureData = 12,
+  STMToESPAny_BLESetCureData = 13,
+  STMToESPAny_BLEScanForDevices = 14,
+  STMToESPAny_BLEPairWithDevice = 15,
+  STMToESPAny_BLESendPINConfirmation = 16,
+  STMToESPAny_BLEGetConnectedDevices = 17,
+  STMToESPAny_BLESendDataToDevice = 18,
+  STMToESPAny_BLEDisconnectFromDevice = 19,
+  STMToESPAny_BLEDisconnectFromAll = 20,
   STMToESPAny_MIN = STMToESPAny_NONE,
   STMToESPAny_MAX = STMToESPAny_BLEDisconnectFromAll
 };
 
-inline const STMToESPAny (&EnumValuesSTMToESPAny())[20] {
+inline const STMToESPAny (&EnumValuesSTMToESPAny())[21] {
   static const STMToESPAny values[] = {
     STMToESPAny_NONE,
     STMToESPAny_SetupAP,
@@ -79,6 +86,7 @@ inline const STMToESPAny (&EnumValuesSTMToESPAny())[20] {
     STMToESPAny_BytesToFromAddress,
     STMToESPAny_DisplayMessage,
     STMToESPAny_ESPRequest,
+    STMToESPAny_CommunicationStatusRequest,
     STMToESPAny_BLEAdvertise,
     STMToESPAny_BLEGetDeviceName,
     STMToESPAny_BLESetDeviceName,
@@ -105,6 +113,7 @@ inline const char * const *EnumNamesSTMToESPAny() {
     "BytesToFromAddress",
     "DisplayMessage",
     "ESPRequest",
+    "CommunicationStatusRequest",
     "BLEAdvertise",
     "BLEGetDeviceName",
     "BLESetDeviceName",
@@ -151,6 +160,10 @@ template<> struct STMToESPAnyTraits<DisplayMessage> {
 
 template<> struct STMToESPAnyTraits<ESPRequest> {
   static const STMToESPAny enum_value = STMToESPAny_ESPRequest;
+};
+
+template<> struct STMToESPAnyTraits<CommunicationStatusRequest> {
+  static const STMToESPAny enum_value = STMToESPAny_CommunicationStatusRequest;
 };
 
 template<> struct STMToESPAnyTraits<BLEAdvertise> {
@@ -340,6 +353,34 @@ inline flatbuffers::Offset<StopAP> CreateStopAP(
   return builder_.Finish();
 }
 
+struct CommunicationStatusRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct CommunicationStatusRequestBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit CommunicationStatusRequestBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  CommunicationStatusRequestBuilder &operator=(const CommunicationStatusRequestBuilder &);
+  flatbuffers::Offset<CommunicationStatusRequest> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<CommunicationStatusRequest>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<CommunicationStatusRequest> CreateCommunicationStatusRequest(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  CommunicationStatusRequestBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
 struct BLEAdvertise FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_STATE = 4
@@ -455,6 +496,62 @@ inline flatbuffers::Offset<BLESetDeviceName> CreateBLESetDeviceNameDirect(
   return darknet7::CreateBLESetDeviceName(
       _fbb,
       name ? _fbb.CreateString(name) : 0);
+}
+
+struct BLEGetExposedData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct BLEGetExposedDataBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit BLEGetExposedDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BLEGetExposedDataBuilder &operator=(const BLEGetExposedDataBuilder &);
+  flatbuffers::Offset<BLEGetExposedData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BLEGetExposedData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BLEGetExposedData> CreateBLEGetExposedData(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  BLEGetExposedDataBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+struct BLESetExposedData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct BLESetExposedDataBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit BLESetExposedDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BLESetExposedDataBuilder &operator=(const BLESetExposedDataBuilder &);
+  flatbuffers::Offset<BLESetExposedData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BLESetExposedData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BLESetExposedData> CreateBLESetExposedData(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  BLESetExposedDataBuilder builder_(_fbb);
+  return builder_.Finish();
 }
 
 struct BLEGetInfectionData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -972,6 +1069,9 @@ struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const ESPRequest *Msg_as_ESPRequest() const {
     return Msg_type() == STMToESPAny_ESPRequest ? static_cast<const ESPRequest *>(Msg()) : nullptr;
   }
+  const CommunicationStatusRequest *Msg_as_CommunicationStatusRequest() const {
+    return Msg_type() == STMToESPAny_CommunicationStatusRequest ? static_cast<const CommunicationStatusRequest *>(Msg()) : nullptr;
+  }
   const BLEAdvertise *Msg_as_BLEAdvertise() const {
     return Msg_type() == STMToESPAny_BLEAdvertise ? static_cast<const BLEAdvertise *>(Msg()) : nullptr;
   }
@@ -1042,6 +1142,10 @@ template<> inline const DisplayMessage *STMToESPRequest::Msg_as<DisplayMessage>(
 
 template<> inline const ESPRequest *STMToESPRequest::Msg_as<ESPRequest>() const {
   return Msg_as_ESPRequest();
+}
+
+template<> inline const CommunicationStatusRequest *STMToESPRequest::Msg_as<CommunicationStatusRequest>() const {
+  return Msg_as_CommunicationStatusRequest();
 }
 
 template<> inline const BLEAdvertise *STMToESPRequest::Msg_as<BLEAdvertise>() const {
@@ -1159,6 +1263,10 @@ inline bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, 
     }
     case STMToESPAny_ESPRequest: {
       auto ptr = reinterpret_cast<const ESPRequest *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case STMToESPAny_CommunicationStatusRequest: {
+      auto ptr = reinterpret_cast<const CommunicationStatusRequest *>(obj);
       return verifier.VerifyTable(ptr);
     }
     case STMToESPAny_BLEAdvertise: {

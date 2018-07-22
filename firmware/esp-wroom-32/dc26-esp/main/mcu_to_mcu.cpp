@@ -122,9 +122,9 @@ void MCUToMCUTask::processMessage(const uint8_t *data, uint32_t size) {
 	if(m->read(data,size)) {
 		auto msg = m->asSTMToESP();
 		ESP_LOGI(LOGTAG, "MsgType %d", msg->Msg_type());
+		//ESP_LOGI(LOGTAG, darknet7::EnumNamesSTMToESPAny(msg->Msg_type()));
 		switch (msg->Msg_type()) {
 		case darknet7::STMToESPAny_SetupAP:
-			break;
 		case darknet7::STMToESPAny_CommunicationStatusRequest:
 		case darknet7::STMToESPAny_ESPRequest:
 			ESP_LOGI(LOGTAG, "sending to cmd handler");

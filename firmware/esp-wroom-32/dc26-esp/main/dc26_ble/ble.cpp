@@ -315,9 +315,9 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 	auto m = msg->asSTMToESP();
 	switch (m->Msg_type())
 	{
-		case darknet7::STMToESPAny_BLEGetDeviceStatus:
-			this->getDeviceStatus();
-			break;
+		//case darknet7::STMToESPAny_BLEGetDeviceStatus:
+		//	this->getDeviceStatus();
+		//	break;
 		case darknet7::STMToESPAny_BLEAdvertise:
 			this->toggleAdvertising(m);
 			break;

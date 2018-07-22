@@ -10,6 +10,7 @@
 
 class MyScanCallbacks : public BLEAdvertisedDeviceCallbacks {
 public:
+	uint16_t exposures;
 	void reset(void);
 	uint16_t getExposures(void);
 	uint16_t getCures(void);
@@ -18,7 +19,6 @@ public:
 	void onResult(BLEAdvertisedDevice advertisedDevice);
 private:
 	uint8_t filter;
-	uint16_t exposures;
 	uint16_t cures;
 	std::map<std::string,std::string> results; // TODO: type should be map
 	void filterBadges(BLEAdvertisedDevice device);

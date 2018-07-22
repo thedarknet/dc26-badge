@@ -5,6 +5,7 @@
 #include "lib/net/HttpServer.h"
 #include "mcu_to_mcu.h"
 #include "dc26.h"
+#include "dc26_ble/ble.h"
 
 static HttpServer Port80WebServer;
 
@@ -130,6 +131,12 @@ void CmdHandlerTask::run(void *data) {
 						ESP_LOGI(LOGTAG, "processing system info");
 						flatbuffers::FlatBufferBuilder fbb;
 						//TODO FINISH
+
+						// TODO: Use these
+						BluetoothTask& bttask = getBLETask();
+						std::string blename = bttask.adv_name; 
+						bool advertising = bttask.advertising_enabled;
+
 						auto s = darknet7::CreateCommunicationStatusResponseDirect(
 										 fbb, darknet7::WiFiStatus_DOWN,
 									false, (const char *)"test");	 

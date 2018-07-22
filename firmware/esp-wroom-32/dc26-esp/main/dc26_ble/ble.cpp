@@ -63,7 +63,6 @@ BLE2902 j2902;
 static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 							uint8_t* pData, size_t length, bool isNotify)
 {
-	//xQueueSendFromISR(pBTTask->CallbackQueueHandle, &pBLERemoteCharacteristic, NULL);
 	printf("Client Received: length %d --- %s\n", length, pData);
 	flatbuffers::FlatBufferBuilder fbb;
 	uint8_t *bufData = nullptr;
@@ -80,11 +79,19 @@ static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 	m = new MCUToMCUTask::Message();
 	m->set(size, 0, bufData);
 	xQueueSend(pBTTask->getQueueHandle(), &m, (TickType_t) 0);
+	// TODO: actually send it back to the STM
 }
 
-void BluetoothTask::getDeviceStatus()
+static void sendGenericResponse(bool result)
 {
-	//TODO: return advertising_enabled
+	darknet7::RESPONSE_SUCCESS res = result ? darknet7::RESPONSE_SUCCESS_True : darknet7::RESPONSE_SUCCESS_False;
+	flatbuffers::FlatBufferBuilder fbb;
+	flatbuffers::Offset<darknet7::ESPToSTM> of;
+	auto infect = darknet7::CreateGenericResponse(fbb, res);
+	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_GenericResponse,
+		infect.Union());
+	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+	getMCUToMCU().send(fbb);
 }
 
 void BluetoothTask::startAdvertising()
@@ -115,7 +122,7 @@ void BluetoothTask::toggleAdvertising(const darknet7::STMToESPRequest* m)
 		this->startAdvertising();
 	else
 		this->stopAdvertising();
-	this->getDeviceStatus();
+	sendGenericResponse(true);
 	return;
 }
 
@@ -147,6 +154,7 @@ void BluetoothTask::setDeviceType(uint8_t devtype)
 {
 	// third byte of the adv_menufacturer device is the device type
 	this->adv_manufacturer[2] = (char)devtype;
+	sendGenericResponse(true);
 }
 
 
@@ -155,7 +163,7 @@ void BluetoothTask::setDeviceName(const darknet7::STMToESPRequest* m)
 	const darknet7::BLESetDeviceName* devName = m->Msg_as_BLESetDeviceName();
 	this->adv_name = devName->name()->str();
 	this->refreshAdvertisementData();
-	this->getDeviceStatus();
+	sendGenericResponse(true);
 }
 
 void BluetoothTask::getInfectionData()
@@ -169,15 +177,15 @@ void BluetoothTask::getInfectionData()
 	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_BLEInfectionData,
 		infect.Union());
 	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-	//getMCUToMCU().send(fbb);
+	getMCUToMCU().send(fbb);
 }
 
 void BluetoothTask::setExposureData(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESetExposureData* msg = m->Msg_as_BLESetExposureData();
 	uint16_t edata = msg->vectors();
-	(void) edata;
-	this->getInfectionData();
+	pScanCallbacks->exposures = edata;
+	sendGenericResponse(true);
 }
 
 void BluetoothTask::setInfectionData(const darknet7::STMToESPRequest* m)
@@ -187,7 +195,7 @@ void BluetoothTask::setInfectionData(const darknet7::STMToESPRequest* m)
 	this->adv_manufacturer[3] = (char)((idata >> 8) & 0xFF);
 	this->adv_manufacturer[4] = (char)(idata & 0xFF);
 	this->refreshAdvertisementData();
-	this->getInfectionData();
+	sendGenericResponse(true);
 }
 
 void BluetoothTask::setCureData(const darknet7::STMToESPRequest* m)
@@ -197,7 +205,7 @@ void BluetoothTask::setCureData(const darknet7::STMToESPRequest* m)
 	this->adv_manufacturer[5] = (char)((cdata >> 8) & 0xFF);
 	this->adv_manufacturer[6] = (char)(cdata & 0xFF);
 	this->refreshAdvertisementData();
-	this->getInfectionData();
+	sendGenericResponse(true);
 }
 
 void BluetoothTask::scanForDevices(const darknet7::STMToESPRequest* m)
@@ -223,7 +231,6 @@ void BluetoothTask::pairWithDevice(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLEPairWithDevice* msg = m->Msg_as_BLEPairWithDevice();
 	std::string addr = msg->addr()->str();
-	//(void) addr;
 	BLEAddress remoteAddr = BLEAddress(addr);
 	this->isActingClient = true;
 	pClient->connect(remoteAddr);
@@ -234,19 +241,7 @@ void BluetoothTask::pairWithDevice(const darknet7::STMToESPRequest* m)
 		iUartClientCallbacks.pRxChar->registerForNotify(&notifyCallback);
 	}
 
-	// Send Result to STM
-	darknet7::RESPONSE_SUCCESS result;
-	if (pClient->isConnected())
-		result = darknet7::RESPONSE_SUCCESS_True;
-	else
-		result = darknet7::RESPONSE_SUCCESS_False;
-	flatbuffers::FlatBufferBuilder fbb;
-	flatbuffers::Offset<darknet7::ESPToSTM> of;
-	auto infect = darknet7::CreateGenericResponse(fbb, result);
-	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_GenericResponse,
-		infect.Union());
-	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-	//getMCUToMCU().send(fbb);
+	sendGenericResponse(pClient->isConnected());
 }
 
 void BluetoothTask::sendPINConfirmation(const darknet7::STMToESPRequest* m)
@@ -254,55 +249,40 @@ void BluetoothTask::sendPINConfirmation(const darknet7::STMToESPRequest* m)
 	const darknet7::BLESendPINConfirmation* msg = m->Msg_as_BLESendPINConfirmation();
 	pMySecurity->confirmed = msg->confirm();
 	ESP_LOGI(LOGTAG, "Confirmed Pin");
-	flatbuffers::FlatBufferBuilder fbb;
-	flatbuffers::Offset<darknet7::ESPToSTM> of;
-	auto infect = darknet7::CreateGenericResponse(fbb, darknet7::RESPONSE_SUCCESS_True);
-	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_GenericResponse,
-		infect.Union());
-	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-	//getMCUToMCU().send(fbb);
+	sendGenericResponse(true);
 }
 
 void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESendDataToDevice* msg = m->Msg_as_BLESendDataToDevice();
-
+	bool sent = false;
 	// TODO: Check if null bytes work
 	std::string buffer = msg->data()->str();
 	if (iUartClientCallbacks.isConnected)
 	{
-			printf("Client Sending: %s\n", buffer.c_str());
-			iUartClientCallbacks.pTxChar->writeValue(buffer);
+		printf("Client Sending: %s\n", buffer.c_str());
+		iUartClientCallbacks.pTxChar->writeValue(buffer);
+		sent = true;
 	}
 	else if (iUartServerCallbacks.isConnected)
 	{
 		printf("Server Sending: %s\n", buffer.c_str());
 		pUartCisoCharacteristic->setValue(buffer);
 		pUartCisoCharacteristic->notify();
+		sent = true;
 	}
-	flatbuffers::FlatBufferBuilder fbb;
-	flatbuffers::Offset<darknet7::ESPToSTM> of;
-	auto infect = darknet7::CreateGenericResponse(fbb, darknet7::RESPONSE_SUCCESS_True);
-	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_GenericResponse,
-		infect.Union());
-	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-	//getMCUToMCU().send(fbb);
+	
+	sendGenericResponse(sent);
 }
 
 void BluetoothTask::disconnect()
 {
 	if (pClient->isConnected())
 		pClient->disconnect();
-	flatbuffers::FlatBufferBuilder fbb;
-	flatbuffers::Offset<darknet7::ESPToSTM> of;
-	auto infect = darknet7::CreateGenericResponse(fbb, darknet7::RESPONSE_SUCCESS_True);
-	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_GenericResponse,
-		infect.Union());
-	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-	//getMCUToMCU().send(fbb);
 
 	isActingClient = false;
 	isActingServer = false;
+	sendGenericResponse(true);
 }
 
 /*
@@ -315,9 +295,6 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 	auto m = msg->asSTMToESP();
 	switch (m->Msg_type())
 	{
-		//case darknet7::STMToESPAny_BLEGetDeviceStatus:
-		//	this->getDeviceStatus();
-		//	break;
 		case darknet7::STMToESPAny_BLEAdvertise:
 			this->toggleAdvertising(m);
 			break;
@@ -346,11 +323,9 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 			this->sendPINConfirmation(m);
 			break;
 		case darknet7::STMToESPAny_BLESendDataToDevice:
-			vTaskDelay(500 / portTICK_PERIOD_MS); // TODO: REMOVE
 			this->sendDataToDevice(m);
 			break;
 		case darknet7::STMToESPAny_BLEDisconnect:
-			vTaskDelay(5000 / portTICK_PERIOD_MS); // TODO: REMOVE
 			this->disconnect();
 			break;
 		default :
@@ -393,6 +368,7 @@ void BluetoothTask::run(void * data)
 	}
 }
 
+/*
 static void initialize_test(QueueHandle_t queue)
 {
 	flatbuffers::FlatBufferBuilder fbb;
@@ -447,7 +423,6 @@ static void initialize_test(QueueHandle_t queue)
 	m->set(size, 0, data);
 	xQueueSend(queue, &m, (TickType_t) 0);
 
-	/*
 	// Disconnect from the connected device
 	auto disconnect = darknet7::CreateBLEDisconnect(fbb);
 	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEDisconnect,
@@ -458,22 +433,14 @@ static void initialize_test(QueueHandle_t queue)
 	m = new MCUToMCUTask::Message();
 	m->set(size, 0, data);
 	xQueueSend(queue, &m, (TickType_t) 0);
-	*/
-
 	return;
 }
+*/
 
 bool BluetoothTask::init()
 {
 	ESP_LOGI(LOGTAG, "INIT");
 
-	// TODO: Setup pairing task with its own queue, for out-of-band command
-	// handling by the connection logic
-	// this is required to be able to cancel a connection request and to handle
-	// pin confirmation input
-
-	// Save a pointer to this globally so we can access the queues
-	// from a static function
 	pBTTask = this;
 
 	isActingClient = false;
@@ -481,7 +448,7 @@ bool BluetoothTask::init()
 
 	STMQueueHandle = xQueueCreateStatic(STM_MSG_QUEUE_SIZE, STM_MSG_ITEM_SIZE,
 										fromSTMBuffer, &STMQueue);
-	initialize_test(STMQueueHandle);
+	//initialize_test(STMQueueHandle);
 
 	BLEDevice::init("DCDN BLE Device");
 	BLEDevice::setMTU(43);

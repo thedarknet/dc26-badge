@@ -2,8 +2,54 @@
 #include "stm_to_esp_generated.h"
 #include "esp_to_stm_generated.h"
 #include "lib/System.h"
+#include "lib/net/HttpServer.h"
 #include "mcu_to_mcu.h"
 #include "dc26.h"
+
+static HttpServer Port80WebServer;
+
+class MyWiFiEventHandler: public WiFiEventHandler {
+public:
+	const char *logTag = "MyWiFiEventHandler";
+public:
+	virtual esp_err_t staGotIp(system_event_sta_got_ip_t event_sta_got_ip) {
+		ESP_LOGD(logTag, "MyWiFiEventHandler(Class): staGotIp");
+		return ESP_OK;
+	}
+	virtual esp_err_t apStart() {
+		ESP_LOGI(logTag, "MyWiFiEventHandler(Class): apStart starting web server");
+		Port80WebServer.start(80,false);
+		return ESP_OK;
+	}
+	virtual esp_err_t apStop() {
+		ESP_LOGI(logTag, "MyWiFiEventHandler(Class): apStop stopping web server");
+		Port80WebServer.stop();
+		return ESP_OK;
+	}
+	virtual esp_err_t wifiReady() {
+		ESP_LOGI(logTag, "MyWiFiEventHandler(Class): wifi ready");
+		return ESP_OK;
+	}
+	virtual esp_err_t staConnected(system_event_sta_connected_t info) {
+		return ESP_OK;
+	}
+	virtual esp_err_t staDisconnected(system_event_sta_disconnected_t info) {
+		return ESP_OK;
+	}
+	virtual esp_err_t staScanDone(system_event_sta_scan_done_t info) {
+		return ESP_OK;
+	}
+	virtual esp_err_t staAuthChange(system_event_sta_authmode_change_t info) {
+		return ESP_OK;
+	}
+	virtual esp_err_t staStart() {
+		return ESP_OK;
+	}
+	virtual esp_err_t staStop() {
+		return ESP_OK;
+	}
+};
+
 
 const char *CmdHandlerTask::LOGTAG = "CmdHandlerTask";
 static StaticQueue_t InCommingQueue;
@@ -23,11 +69,17 @@ bool CmdHandlerTask::init() {
 	if (InCommingQueueHandle == nullptr) {
 		ESP_LOGI(LOGTAG, "Failed creating incomming queue");
 	}
+	WiFiEventHandler *handler = new MyWiFiEventHandler();
+	wifi.setWifiEventHandler(handler);
 	return true;
 }
 
 CmdHandlerTask::~CmdHandlerTask() {
 }
+
+std::string ssid = "dc26";
+std::string passwd = "1234567890";
+wifi_auth_mode_t ap_mode = WIFI_AUTH_WPA_WPA2_PSK;
 
 void CmdHandlerTask::run(void *data) {
 	ESP_LOGI(LOGTAG, "CmdHandler Task started");
@@ -38,7 +90,22 @@ void CmdHandlerTask::run(void *data) {
 			const darknet7::STMToESPRequest *msg = m->asSTMToESP();
 			ESP_LOGI(LOGTAG, "message type is: %d", msg->Msg_type());
 			switch (msg->Msg_type()) {
-			case darknet7::STMToESPAny_SetupAP:
+			case darknet7::STMToESPAny_SetupAP: {
+				wifi_config_t wifi_config;
+				bool isHidden = false;
+				uint8_t max_con = 4;
+				uint16_t beacon_interval = 1000;
+				wifi.initWiFiConfig(wifi_config, ssid, passwd, WIFI_AUTH_WPA2_PSK, isHidden, max_con, beacon_interval);
+				tcpip_adapter_ip_info_t ipInfo;
+				wifi.initAdapterIp(ipInfo);
+				dhcps_lease_t l;
+				wifi.initDHCPSLeaseInfo(l);
+				wifi.wifi_start_access_point(wifi_config,ipInfo,l);
+															}
+				break;
+			case darknet7::STMToESPAny_StopAP: {
+					wifi.stopWiFi();
+				}
 				break;
 			case darknet7::STMToESPAny_ESPRequest: {
 						ESP_LOGI(LOGTAG, "processing system info");

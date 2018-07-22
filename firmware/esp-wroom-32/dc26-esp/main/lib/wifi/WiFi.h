@@ -1,3 +1,6 @@
+#ifndef WIFI_H
+#define WIFI_H
+
 #include <esp_log.h>
 #include <errno.h>
 #include <esp_event.h>
@@ -17,6 +20,7 @@ public:
 	WIFI();
 	~WIFI();
 public:
+	wifi_mode_t getMode();
 	void initWiFiConfig(wifi_config_t &wifi_config, const std::string &ssid); 
 	void initWiFiConfig(wifi_config_t &wifi_config, const std::string &ssid, const std::string &passwd, wifi_auth_mode_t authMode, bool isHidden, uint8_t max_con, uint16_t beacon_interval);
 	void initAdapterIp(tcpip_adapter_ip_info_t &ipInfo);
@@ -32,3 +36,4 @@ protected:
 	WiFiEventHandler*   mpWifiEventHandler;
 };
 
+#endif

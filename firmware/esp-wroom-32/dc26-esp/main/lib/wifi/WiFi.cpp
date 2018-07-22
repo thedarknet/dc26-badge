@@ -104,7 +104,7 @@ void WIFI::wifi_start_access_point(wifi_config_t &wifi_config, tcpip_adapter_ip_
 	wifi_init_config_t wifi_init_config = WIFI_INIT_CONFIG_DEFAULT();
 	esp_wifi_init(&wifi_init_config);
 	esp_wifi_set_storage(WIFI_STORAGE_RAM);
-	esp_wifi_set_mode(WIFI_MODE_AP);
+	esp_wifi_set_mode(WIFI_MODE_APSTA);
 	esp_wifi_set_config(WIFI_IF_AP, &wifi_config);
 	esp_wifi_start();
 

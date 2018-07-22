@@ -77,9 +77,24 @@ bool CmdHandlerTask::init() {
 CmdHandlerTask::~CmdHandlerTask() {
 }
 
-std::string ssid = "dc26";
-std::string passwd = "1234567890";
 wifi_auth_mode_t ap_mode = WIFI_AUTH_WPA_WPA2_PSK;
+
+wifi_auth_mode_t convertAuthMode(darknet7::WifiMode m) {
+	switch(m) {
+	case darknet7::WifiMode_OPEN:
+		return WIFI_AUTH_OPEN;
+		break;
+	case darknet7::WifiMode_WPA2:
+		return WIFI_AUTH_WPA2_PSK;
+		break;
+	case darknet7::WifiMode_WPA:
+		return WIFI_AUTH_WPA_WPA2_PSK;
+		break;
+	default:
+		return WIFI_AUTH_OPEN;
+		break;
+	}
+}
 
 void CmdHandlerTask::run(void *data) {
 	ESP_LOGI(LOGTAG, "CmdHandler Task started");
@@ -95,13 +110,17 @@ void CmdHandlerTask::run(void *data) {
 				bool isHidden = false;
 				uint8_t max_con = 4;
 				uint16_t beacon_interval = 1000;
-				wifi.initWiFiConfig(wifi_config, ssid, passwd, WIFI_AUTH_WPA2_PSK, isHidden, max_con, beacon_interval);
+				const darknet7::SetupAP *sap = msg->Msg_as_SetupAP();
+				wifi_auth_mode_t auth_mode = convertAuthMode(sap->mode());
+				wifi.initWiFiConfig(wifi_config, sap->ssid()->c_str(), 
+									 sap->passwd()->c_str(), 
+									 auth_mode, isHidden, max_con, beacon_interval);
 				tcpip_adapter_ip_info_t ipInfo;
 				wifi.initAdapterIp(ipInfo);
 				dhcps_lease_t l;
 				wifi.initDHCPSLeaseInfo(l);
 				wifi.wifi_start_access_point(wifi_config,ipInfo,l);
-															}
+				}
 				break;
 			case darknet7::STMToESPAny_StopAP: {
 					wifi.stopWiFi();

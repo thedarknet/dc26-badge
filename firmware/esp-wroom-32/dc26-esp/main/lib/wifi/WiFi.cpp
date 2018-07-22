@@ -84,6 +84,15 @@ void WIFI::initDHCPSLeaseInfo(dhcps_lease_t &l, const std::string &start_ip, con
 		inet_pton(AF_INET, end_ip.c_str(), &l.end_ip);
 }
 
+wifi_mode_t WIFI::getMode() {
+	wifi_mode_t mode;
+	esp_err_t err = esp_wifi_get_mode(&mode);
+	if(err==ESP_OK) {
+		return mode;
+	}
+	return WIFI_MODE_NULL;
+}
+
 /**
  * Creates a new Wifi-AP on ESP32
  * */

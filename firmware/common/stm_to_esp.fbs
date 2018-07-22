@@ -2,8 +2,8 @@ include "common.fbs";
 
 namespace darknet7;
 
-union STMToESPAny { SetupAP, StopAP, BytesToFromAddress, DisplayMessage, ESPRequest,
-				 	BLEGetDeviceStatus, BLEGetInfectionData,
+union STMToESPAny { SetupAP, StopAP, BytesToFromAddress, DisplayMessage, ESPRequest, CommunicationStatusRequest,
+				 	BLEGetInfectionData,
 					BLEAdvertise, 
 					BLESetDeviceName,
 					BLESetInfectionData, BLESetExposureData, BLESetCureData,
@@ -11,7 +11,6 @@ union STMToESPAny { SetupAP, StopAP, BytesToFromAddress, DisplayMessage, ESPRequ
 					BLEPairWithDevice, BLESendPINConfirmation,
 					BLESendDataToDevice,
 					BLEDisconnect}
-
 table SetupAP {
 	ssid:string;
 	passwd:string;
@@ -22,16 +21,15 @@ table StopAP {
 	
 }
 
-table BLEGetDeviceStatus {
-
-}
-
-table BLEGetInfectionData {
-
+table CommunicationStatusRequest {
 }
 
 table BLEAdvertise {
 	state:bool;
+}
+
+table BLEGetInfectionData {
+
 }
 
 table BLESetDeviceName {

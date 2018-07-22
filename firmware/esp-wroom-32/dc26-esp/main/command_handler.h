@@ -6,6 +6,7 @@
 #include "lib/Task.h"
 #include "freertos/queue.h"
 #include "mcu_to_mcu.h"
+#include "lib/wifi/WiFi.h"
 
 class CmdHandlerTask : public Task {
 public:
@@ -21,6 +22,7 @@ public:
 	virtual ~CmdHandlerTask();
 protected:
 	QueueHandle_t InCommingQueueHandle = nullptr;
+	WIFI wifi;
 private:
 };
 

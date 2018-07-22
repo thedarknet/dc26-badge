@@ -34,6 +34,7 @@
 #include "mcu_to_mcu.h"
 #include "menus/health.h"
 #include "menus/scan.h"
+#include "menus/sao_menu.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::DisplayST7735;
@@ -52,6 +53,11 @@ static const uint8_t SettingSector = 1;
 static const uint32_t SettingOffset = 128;
 static const uint8_t StartContactSector = 2;
 static const uint8_t EndContactSector = 3;
+
+const char *DarkNet7::sYES="Yes";
+const char *DarkNet7::sNO="No";
+const char *DarkNet7::NO_DATA_FROM_ESP = "No data returned from ESP, try resetting ESP.";
+
 
 
 DarkNet7 *DarkNet7::mSelf = 0;
@@ -328,6 +334,12 @@ static MCUInfoState MyMCUInfoState;
 static Tamagotchi MyTamagotchi;
 static Health MyHealth;
 static Scan MyScan;
+static SAO MySAO;
+
+SAO *DarkNet7::getSAOMenuState() {
+	return &MySAO;
+}
+
 
 MenuState *DarkNet7::getDisplayMenuState() {
 	return &MyMenu;

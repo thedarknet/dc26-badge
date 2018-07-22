@@ -4,7 +4,7 @@ namespace darknet7;
 
 enum RESPONSE_SUCCESS : byte { False = 0, True = 1 }
 
-union ESPToSTMAny { GenericResponse, ESPSystemInfo, BLEInfectionData}
+union ESPToSTMAny { GenericResponse, ESPSystemInfo, BLEInfectionData, CommunicationStatusResponse }
 
 table GenericResponse {
 	successful:RESPONSE_SUCCESS;
@@ -24,6 +24,14 @@ table BLEInfectionData {
 	infections:uint16;
 	exposures:uint16;
 	cures:uint16;
+}
+
+enum WiFiStatus : byte { AP = 0, AP_STA = 1, DOWN = 2}
+
+table CommunicationStatusResponse {
+	WifiStatus:WiFiStatus;
+	BLEAdvertise:bool;
+	BLEDeviceName:string;
 }
 
 table ESPSystemInfo {

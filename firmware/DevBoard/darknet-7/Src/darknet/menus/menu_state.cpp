@@ -13,6 +13,7 @@
 #include "tamagotchi.h"
 #include "health.h"
 #include "scan.h"
+#include "gui_list_processor.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::StateBase;
@@ -58,6 +59,8 @@ ErrorType MenuState::onInit() {
 	Items[10].text = (const char *) "Scan for NPCs";
 	Items[11].id = 11;
 	Items[11].text = (const char *) "Test Badge";
+	Items[12].id = 12;
+	Items[12].text = (const char *) "Scan: Shitty Addon Badge";
 	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 	DarkNet7::get().getGUI().drawList(&this->MenuList);
 	return ErrorType();
@@ -65,21 +68,8 @@ ErrorType MenuState::onInit() {
 
 cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 	StateBase *nextState = this;
-	if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_UP)) {
-		if (MenuList.selectedItem == 0) {
-			MenuList.selectedItem = sizeof(Items) / sizeof(Items[0]) - 1;
-		} else {
-			MenuList.selectedItem--;
-		}
-	} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
-		if (MenuList.selectedItem == (sizeof(Items) / sizeof(Items[0]) - 1)) {
-			MenuList.selectedItem = 0;
-		} else {
-			MenuList.selectedItem++;
-		}
-	} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_LEFT)) {
-		MenuList.selectedItem = 0;
-	} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1 | DarkNet7::ButtonInfo::BUTTON_MID)) {
+	if (!GUIListProcessor::process(&MenuList,(sizeof(Items) / sizeof(Items[0])))) {
+		if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1 | DarkNet7::ButtonInfo::BUTTON_MID)) {
 		switch (MenuList.selectedItem) {
 			case 0:
 				nextState = DarkNet7::get().getSettingState();
@@ -124,6 +114,7 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 				nextState = DarkNet7::get().getTestState();
 				break;
 
+			}
 		}
 	}
 	if (DarkNet7::get().getButtonInfo().wasAnyButtonReleased()) {

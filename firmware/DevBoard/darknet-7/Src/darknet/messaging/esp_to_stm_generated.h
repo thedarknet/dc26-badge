@@ -18,6 +18,8 @@ struct BadgesInArea;
 
 struct BLEInfectionData;
 
+struct CommunicationStatusResponse;
+
 struct ESPSystemInfo;
 
 struct ESPToSTM;
@@ -56,16 +58,18 @@ enum ESPToSTMAny {
   ESPToSTMAny_GenericResponse = 1,
   ESPToSTMAny_ESPSystemInfo = 2,
   ESPToSTMAny_BLEInfectionData = 3,
+  ESPToSTMAny_CommunicationStatusResponse = 4,
   ESPToSTMAny_MIN = ESPToSTMAny_NONE,
-  ESPToSTMAny_MAX = ESPToSTMAny_BLEInfectionData
+  ESPToSTMAny_MAX = ESPToSTMAny_CommunicationStatusResponse
 };
 
-inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[4] {
+inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[5] {
   static const ESPToSTMAny values[] = {
     ESPToSTMAny_NONE,
     ESPToSTMAny_GenericResponse,
     ESPToSTMAny_ESPSystemInfo,
-    ESPToSTMAny_BLEInfectionData
+    ESPToSTMAny_BLEInfectionData,
+    ESPToSTMAny_CommunicationStatusResponse
   };
   return values;
 }
@@ -76,6 +80,7 @@ inline const char * const *EnumNamesESPToSTMAny() {
     "GenericResponse",
     "ESPSystemInfo",
     "BLEInfectionData",
+    "CommunicationStatusResponse",
     nullptr
   };
   return names;
@@ -102,8 +107,44 @@ template<> struct ESPToSTMAnyTraits<BLEInfectionData> {
   static const ESPToSTMAny enum_value = ESPToSTMAny_BLEInfectionData;
 };
 
+template<> struct ESPToSTMAnyTraits<CommunicationStatusResponse> {
+  static const ESPToSTMAny enum_value = ESPToSTMAny_CommunicationStatusResponse;
+};
+
 bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, ESPToSTMAny type);
 bool VerifyESPToSTMAnyVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types);
+
+enum WiFiStatus {
+  WiFiStatus_AP = 0,
+  WiFiStatus_AP_STA = 1,
+  WiFiStatus_DOWN = 2,
+  WiFiStatus_MIN = WiFiStatus_AP,
+  WiFiStatus_MAX = WiFiStatus_DOWN
+};
+
+inline const WiFiStatus (&EnumValuesWiFiStatus())[3] {
+  static const WiFiStatus values[] = {
+    WiFiStatus_AP,
+    WiFiStatus_AP_STA,
+    WiFiStatus_DOWN
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesWiFiStatus() {
+  static const char * const names[] = {
+    "AP",
+    "AP_STA",
+    "DOWN",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameWiFiStatus(WiFiStatus e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesWiFiStatus()[index];
+}
 
 struct GenericResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
@@ -338,6 +379,79 @@ inline flatbuffers::Offset<BLEInfectionData> CreateBLEInfectionData(
   return builder_.Finish();
 }
 
+struct CommunicationStatusResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_WIFISTATUS = 4,
+    VT_BLEADVERTISE = 6,
+    VT_BLEDEVICENAME = 8
+  };
+  WiFiStatus WifiStatus() const {
+    return static_cast<WiFiStatus>(GetField<int8_t>(VT_WIFISTATUS, 0));
+  }
+  bool BLEAdvertise() const {
+    return GetField<uint8_t>(VT_BLEADVERTISE, 0) != 0;
+  }
+  const flatbuffers::String *BLEDeviceName() const {
+    return GetPointer<const flatbuffers::String *>(VT_BLEDEVICENAME);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_WIFISTATUS) &&
+           VerifyField<uint8_t>(verifier, VT_BLEADVERTISE) &&
+           VerifyOffset(verifier, VT_BLEDEVICENAME) &&
+           verifier.Verify(BLEDeviceName()) &&
+           verifier.EndTable();
+  }
+};
+
+struct CommunicationStatusResponseBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_WifiStatus(WiFiStatus WifiStatus) {
+    fbb_.AddElement<int8_t>(CommunicationStatusResponse::VT_WIFISTATUS, static_cast<int8_t>(WifiStatus), 0);
+  }
+  void add_BLEAdvertise(bool BLEAdvertise) {
+    fbb_.AddElement<uint8_t>(CommunicationStatusResponse::VT_BLEADVERTISE, static_cast<uint8_t>(BLEAdvertise), 0);
+  }
+  void add_BLEDeviceName(flatbuffers::Offset<flatbuffers::String> BLEDeviceName) {
+    fbb_.AddOffset(CommunicationStatusResponse::VT_BLEDEVICENAME, BLEDeviceName);
+  }
+  explicit CommunicationStatusResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  CommunicationStatusResponseBuilder &operator=(const CommunicationStatusResponseBuilder &);
+  flatbuffers::Offset<CommunicationStatusResponse> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<CommunicationStatusResponse>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<CommunicationStatusResponse> CreateCommunicationStatusResponse(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    WiFiStatus WifiStatus = WiFiStatus_AP,
+    bool BLEAdvertise = false,
+    flatbuffers::Offset<flatbuffers::String> BLEDeviceName = 0) {
+  CommunicationStatusResponseBuilder builder_(_fbb);
+  builder_.add_BLEDeviceName(BLEDeviceName);
+  builder_.add_BLEAdvertise(BLEAdvertise);
+  builder_.add_WifiStatus(WifiStatus);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<CommunicationStatusResponse> CreateCommunicationStatusResponseDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    WiFiStatus WifiStatus = WiFiStatus_AP,
+    bool BLEAdvertise = false,
+    const char *BLEDeviceName = nullptr) {
+  return darknet7::CreateCommunicationStatusResponse(
+      _fbb,
+      WifiStatus,
+      BLEAdvertise,
+      BLEDeviceName ? _fbb.CreateString(BLEDeviceName) : 0);
+}
+
 struct ESPSystemInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_HEAPSIZE = 4,
@@ -484,6 +598,9 @@ struct ESPToSTM FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const BLEInfectionData *Msg_as_BLEInfectionData() const {
     return Msg_type() == ESPToSTMAny_BLEInfectionData ? static_cast<const BLEInfectionData *>(Msg()) : nullptr;
   }
+  const CommunicationStatusResponse *Msg_as_CommunicationStatusResponse() const {
+    return Msg_type() == ESPToSTMAny_CommunicationStatusResponse ? static_cast<const CommunicationStatusResponse *>(Msg()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_MSGINSTANCEID) &&
@@ -504,6 +621,10 @@ template<> inline const ESPSystemInfo *ESPToSTM::Msg_as<ESPSystemInfo>() const {
 
 template<> inline const BLEInfectionData *ESPToSTM::Msg_as<BLEInfectionData>() const {
   return Msg_as_BLEInfectionData();
+}
+
+template<> inline const CommunicationStatusResponse *ESPToSTM::Msg_as<CommunicationStatusResponse>() const {
+  return Msg_as_CommunicationStatusResponse();
 }
 
 struct ESPToSTMBuilder {
@@ -557,6 +678,10 @@ inline bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, 
     }
     case ESPToSTMAny_BLEInfectionData: {
       auto ptr = reinterpret_cast<const BLEInfectionData *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ESPToSTMAny_CommunicationStatusResponse: {
+      auto ptr = reinterpret_cast<const CommunicationStatusResponse *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return false;

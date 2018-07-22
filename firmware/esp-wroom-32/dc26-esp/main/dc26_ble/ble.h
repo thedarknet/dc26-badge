@@ -48,7 +48,6 @@ public:
 	QueueHandle_t getQueueHandle() {return STMQueueHandle;}
 
 public: // API
-	void getDeviceStatus(void);
 	void getInfectionData(void);
 	void toggleAdvertising(const darknet7::STMToESPRequest* m);
 	void setDeviceType(uint8_t devtype);

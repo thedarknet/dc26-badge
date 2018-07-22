@@ -9,9 +9,10 @@
 #define MAIN_DC26_H_
 
 class MCUToMCUTask;
+class BluetoothTask;
 
 MCUToMCUTask &getMCUToMCU();
-
+BluetoothTask &getBLETask();
 
 
 #endif /* MAIN_DC26_H_ */

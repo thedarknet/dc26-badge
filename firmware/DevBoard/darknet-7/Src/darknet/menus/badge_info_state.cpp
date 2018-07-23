@@ -15,7 +15,7 @@ using cmdc0de::ErrorType;
 using cmdc0de::StateBase;
 
 BadgeInfoState::BadgeInfoState() :
-		Darknet7BaseState(), BadgeInfoList("Badge Info:", Items, 0, 0, 128, 160,
+		Darknet7BaseState(), BadgeInfoList("Badge Info:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT,
 				0, (sizeof(Items) / sizeof(Items[0]))), RegCode() {
 
 	memset(&RegCode, 0, sizeof(RegCode));

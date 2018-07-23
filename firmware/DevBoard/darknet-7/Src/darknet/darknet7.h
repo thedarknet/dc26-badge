@@ -27,7 +27,7 @@ class GameOfLife;
 class CommunicationSettingState;
 class BadgeInfoState;
 class MCUInfoState;
-class Tamagotchi;
+//class Tamagotchi;
 class Health;
 class Scan;
 class SAO;
@@ -92,7 +92,7 @@ public:
 	CommunicationSettingState *getCommunicationSettingState();
 	BadgeInfoState * getBadgeInfoState();
 	MCUInfoState *getMCUInfoState();
-	Tamagotchi *getTamagotchiState();
+	//Tamagotchi *getTamagotchiState();
 	Health *getHealthState();
 	Scan *getScanState();
 	SAO *getSAOMenuState();

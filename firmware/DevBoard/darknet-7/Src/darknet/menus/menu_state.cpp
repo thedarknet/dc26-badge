@@ -14,6 +14,7 @@
 #include "health.h"
 #include "scan.h"
 #include "gui_list_processor.h"
+#include "sao_menu.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::StateBase;
@@ -50,17 +51,15 @@ ErrorType MenuState::onInit() {
 	Items[6].id = 6;
 	Items[6].text = (const char *) "ESP Info";
 	Items[7].id = 7;
-	Items[7].text = (const char *) "Tamagotchi";
+	Items[7].text = (const char *) "Communications Settings";
 	Items[8].id = 8;
-	Items[8].text = (const char *) "Communications Settings";
+	Items[8].text = (const char *) "Health";
 	Items[9].id = 9;
-	Items[9].text = (const char *) "Health";
+	Items[9].text = (const char *) "Scan for NPCs";
 	Items[10].id = 10;
-	Items[10].text = (const char *) "Scan for NPCs";
+	Items[10].text = (const char *) "Test Badge";
 	Items[11].id = 11;
-	Items[11].text = (const char *) "Test Badge";
-	Items[12].id = 12;
-	Items[12].text = (const char *) "Scan: Shitty Addon Badge";
+	Items[11].text = (const char *) "Scan: Shitty Addon Badge";
 	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 	DarkNet7::get().getGUI().drawList(&this->MenuList);
 	return ErrorType();
@@ -69,7 +68,7 @@ ErrorType MenuState::onInit() {
 cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 	StateBase *nextState = this;
 	if (!GUIListProcessor::process(&MenuList,(sizeof(Items) / sizeof(Items[0])))) {
-		if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1 | DarkNet7::ButtonInfo::BUTTON_MID)) {
+		if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
 		switch (MenuList.selectedItem) {
 			case 0:
 				nextState = DarkNet7::get().getSettingState();
@@ -98,20 +97,20 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 				nextState = DarkNet7::get().getMCUInfoState();
 				break;
 			case 7:
-				nextState = DarkNet7::get().getTamagotchiState();
-				break;
-			case 8:
 				nextState = DarkNet7::get().getCommunicationSettingState();
 				break;
-			case 9:
+			case 8:
 				nextState = DarkNet7::get().getHealthState();
 				break;
-			case 10:
+			case 9:
 				DarkNet7::get().getScanState()->setNPCOnly(true);
 				nextState = DarkNet7::get().getScanState();
 				break;
-			case 11:
+			case 10:
 				nextState = DarkNet7::get().getTestState();
+				break;
+			case 11:
+				nextState = DarkNet7::get().getSAOMenuState();
 				break;
 
 			}

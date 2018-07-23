@@ -84,6 +84,7 @@ static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 
 static void sendGenericResponse(bool result)
 {
+	/*
 	darknet7::RESPONSE_SUCCESS res = result ? darknet7::RESPONSE_SUCCESS_True : darknet7::RESPONSE_SUCCESS_False;
 	flatbuffers::FlatBufferBuilder fbb;
 	flatbuffers::Offset<darknet7::ESPToSTM> of;
@@ -92,6 +93,8 @@ static void sendGenericResponse(bool result)
 		infect.Union());
 	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
 	getMCUToMCU().send(fbb);
+	*/
+	return;
 }
 
 void BluetoothTask::startAdvertising()

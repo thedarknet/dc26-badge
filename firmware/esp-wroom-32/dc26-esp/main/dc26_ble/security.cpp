@@ -6,10 +6,10 @@
 #include "../lib/ble/BLEDevice.h"
 #include "../lib/ssd1306.h"
 
-// TODO: remove these includes
+#include "../dc26.h"
 #include "../mcu_to_mcu.h"
 #include "../stm_to_esp_generated.h"
-
+#include "../display_handler.h"
 
 const char *SECTAG = "SecurityCallbacks";
 
@@ -30,45 +30,19 @@ void MySecurity::onPassKeyNotify(uint32_t pass_key)
 bool MySecurity::onConfirmPIN(uint32_t pass_key)
 {
 	unsigned int waited = 0;
-	char pass_str[11];
-	memset(&pass_str, '0', 11);
-	sprintf(pass_str, "%u", pass_key);
+	DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
+	memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
 
-	ESP_LOGI(SECTAG, "onConfirmPin: %s", pass_str);
-	SSD1306_Puts(pass_str, &Font_7x10, 1);
-	// TODO: Send to STM, get back confirmation
+	sprintf(dmsg->Msg, "%u", pass_key);
+	ESP_LOGI(SECTAG, "onConfirmPin: %s", dmsg->Msg);
+	xQueueSendFromISR(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
+	
 	if (pBTTask->isActingClient)
-	{
-		pBTTask->isActingClient = false;
 		return true;
-	}
 
 	this->confirmed = false;
 
-	// FIXME: remove this message when moving to development badge
-	if (!this->sent)
-	{
-		printf("sending PIN confirmation message\n");
-		flatbuffers::FlatBufferBuilder fbb;
-		uint8_t *data = nullptr;
-		MCUToMCUTask::Message* m;
-		flatbuffers::Offset<darknet7::STMToESPRequest> of;
-		flatbuffers::uoffset_t size;
-
-		auto confirm = darknet7::CreateBLESendPINConfirmation(fbb, true);
-		of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendPINConfirmation,
-			confirm.Union());
-		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
-		 size = fbb.GetSize();
-		data = fbb.GetBufferPointer();
-		m = new MCUToMCUTask::Message();
-		m->set(size, 0, data);
-		xQueueSend(pBTTask->getQueueHandle(), &m, (TickType_t) 0);
-		this->sent = true;
-	}
-
-	// TODO: display the number (pass_key) on the screen and send a message to
-	// the STM to confirm the number
+	// TODO: Send to STM, get back confirmation
 
 	// Wait for the confirmation to come through
 	while ((this->confirmed == false) && (waited < 10))

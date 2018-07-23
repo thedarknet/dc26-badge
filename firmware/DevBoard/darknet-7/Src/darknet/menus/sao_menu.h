@@ -16,6 +16,8 @@
 
 class SAO: public Darknet7BaseState {
 public:
+	enum INTERNAL_STATE {NONE, DISPLAY_SCANNING, SCANNING, INTERACTING };
+	static const uint16_t NOADDRESS = 0xFFFF;
 	SAO();
 	virtual ~SAO();
 protected:
@@ -23,7 +25,8 @@ protected:
 	virtual cmdc0de::StateBase::ReturnStateContext onRun();
 	virtual cmdc0de::ErrorType onShutdown();
 private:
-
+	INTERNAL_STATE InternalState;
+	uint16_t Address;
 };
 
 

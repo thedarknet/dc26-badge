@@ -9,13 +9,15 @@
 
 #include "sao_menu.h"
 #include "../darknet7.h"
+#include "menu_state.h"
+#include <i2c.h>
 
 using cmdc0de::RGBColor;
 using cmdc0de::ErrorType;
 using cmdc0de::StateBase;
 
 
-SAO::SAO() : Darknet7BaseState()  {
+SAO::SAO() : Darknet7BaseState(), InternalState(NONE), Address(NOADDRESS) {
 
 }
 
@@ -25,70 +27,47 @@ SAO::~SAO()
 }
 
 ErrorType SAO::onInit() {
-	//check I2C for addresses
-	//if eggplant ...
-	/*
-	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
-	sprintf(&ListBuffer[0][0], "Name: %s", DarkNet7::get().getContacts().getSettings().getAgentName());
-	sprintf(&ListBuffer[1][0], "Num contacts: %u", DarkNet7::get().getContacts().getSettings().getNumContacts());
-	sprintf(&ListBuffer[2][0], "REG: %s", getRegCode(DarkNet7::get().getContacts()));
-	sprintf(&ListBuffer[3][0], "UID: %u", DarkNet7::get().getContacts().getMyInfo().getUniqueID());
-	uint8_t *pCP = DarkNet7::get().getContacts().getMyInfo().getCompressedPublicKey();
-	sprintf(&ListBuffer[4][0],
-			"PK: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-			pCP[0], pCP[1], pCP[2], pCP[3], pCP[4], pCP[5], pCP[6], pCP[7], pCP[8], pCP[9], pCP[10], pCP[11],
-			pCP[12],
-			pCP[13], pCP[14], pCP[15], pCP[16], pCP[17], pCP[18], pCP[19], pCP[20], pCP[21], pCP[22], pCP[23],
-			pCP[24]);
-	sprintf(&ListBuffer[5][0], "DEVID: %lu", HAL_GetDEVID());
-	sprintf(&ListBuffer[6][0], "REVID: %lu", HAL_GetREVID());
-	sprintf(&ListBuffer[7][0], "HAL Version: %lu", HAL_GetHalVersion());
-	sprintf(&ListBuffer[8][0], "SVer: %s", VERSION);
-
-	for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++) {
-		Items[i].text = &ListBuffer[i][0];
-		Items[i].id = i;
-		Items[i].setShouldScroll();
-	}
 	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-	DarkNet7::get().getGUI().drawList(&BadgeInfoList);
-	*/
+	InternalState = DISPLAY_SCANNING;
+	Address = NOADDRESS;
 	return ErrorType();
-
 }
 
 StateBase::ReturnStateContext SAO::onRun() {
-
 	StateBase *nextState = this;
-	/*
-	uint8_t key = rc.getKB().getLastKeyReleased();
-	switch (key) {
-		case QKeyboard::UP: {
-			if (BadgeInfoList.selectedItem == 0) {
-				BadgeInfoList.selectedItem = sizeof(Items) / sizeof(Items[0]) - 1;
-			} else {
-				BadgeInfoList.selectedItem--;
-			}
-			break;
+	if(InternalState==DISPLAY_SCANNING) {
+		DarkNet7::get().getDisplay().drawString(0,20,(const char *)"Starting I2C scan");
+		InternalState = SCANNING;
+	} else if(InternalState==SCANNING) {
+		HAL_StatusTypeDef result;
+		for (uint8_t i=1; i<128; i++) {
+		  /*
+		   * the HAL wants a left aligned i2c address
+		   * &hi2c1 is the handle
+		   * (uint16_t)(i<<1) is the i2c address left aligned
+		   * retries 2
+		   * timeout 2
+		   */
+		  result = HAL_I2C_IsDeviceReady(&hi2c3, (uint16_t)(i<<1), 2, 2);
+		  if (result == HAL_OK) {
+			  Address = (uint16_t)(i<<1);
+		  }
 		}
-		case QKeyboard::DOWN: {
-			if (BadgeInfoList.selectedItem == (sizeof(Items) / sizeof(Items[0]) - 1)) {
-				BadgeInfoList.selectedItem = 0;
-			} else {
-				BadgeInfoList.selectedItem++;
-			}
-			break;
+		InternalState = INTERACTING;
+	} else {
+		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+		if(Address==NOADDRESS) {
+			DarkNet7::get().getDisplay().drawString(0,20,(const char *)"No Shitty Add on Badge found!",RGBColor::RED, RGBColor::BLACK, 1, true);
+		} else {
+			char buf[24];
+			DarkNet7::get().getDisplay().drawString(0,20,(const char *)"Shitty Add on Badge found!", RGBColor::BLUE, RGBColor::BLACK, 1, true);
+			sprintf(&buf[0],"Address: %d", (int)Address);
+			DarkNet7::get().getDisplay().drawString(0,30,&buf[0]);
 		}
-		case QKeyboard::ENTER:
-			case QKeyboard::BACK:
-			nextState = StateFactory::getMenuState();
-			break;
+		if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+			nextState =DarkNet7::get().getDisplayMenuState();
+		}
 	}
-	if (rc.getKB().wasKeyReleased()
-			|| (Items[BadgeInfoList.selectedItem].shouldScroll() && getTimesRunCalledSinceLastReset() % 5 == 0)) {
-		rc.getGUI().drawList(&BadgeInfoList);
-	}
-	*/
 	return ReturnStateContext(nextState);
 }
 

@@ -18,8 +18,8 @@ protected:
 private:
 	static const uint32_t EXIT_COUNT = 20;
 	cmdc0de::GUIListData ButtonList;
-	cmdc0de::GUIListItemData Items[7];
-	char ListBuffer[7][24]; //height then width
-	uint32_t TimesFireHasBeenHeld;
+	cmdc0de::GUIListItemData Items[8];
+	char ListBuffer[8][24]; //height then width
+	uint32_t TimesMidHasBeenHeld;
 };
 #endif

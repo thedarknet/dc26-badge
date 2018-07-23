@@ -100,23 +100,22 @@ bool DarkNet7::ButtonInfo::wasAnyButtonReleased() {
 void DarkNet7::ButtonInfo::processButtons() {
 	LastButtonState = ButtonState;
 	ButtonState = 0;
-	if (HAL_GPIO_ReadPin(MID_BUTTON1_GPIO_Port, MID_BUTTON1_Pin)
-			== GPIO_PIN_RESET) {
+	if (HAL_GPIO_ReadPin(MID_BUTTON1_GPIO_Port, MID_BUTTON1_Pin) == GPIO_PIN_RESET) {
 		ButtonState|=BUTTON_MID;
-	} else if (HAL_GPIO_ReadPin(BUTTON_RIGHT_GPIO_Port, BUTTON_RIGHT_Pin)
-			== GPIO_PIN_RESET) {
+	}
+	if (HAL_GPIO_ReadPin(BUTTON_RIGHT_GPIO_Port, BUTTON_RIGHT_Pin) == GPIO_PIN_RESET) {
 		ButtonState|=BUTTON_RIGHT;
-	} else if (HAL_GPIO_ReadPin(BUTTON_LEFT_GPIO_Port, BUTTON_LEFT_Pin)
-			== GPIO_PIN_RESET) {
+	}
+	if (HAL_GPIO_ReadPin(BUTTON_LEFT_GPIO_Port, BUTTON_LEFT_Pin) == GPIO_PIN_RESET) {
 		ButtonState|=BUTTON_LEFT;
-	} else if (HAL_GPIO_ReadPin(BUTTON_UP_GPIO_Port, BUTTON_UP_Pin)
-			== GPIO_PIN_RESET) {
+	}
+	if (HAL_GPIO_ReadPin(BUTTON_UP_GPIO_Port, BUTTON_UP_Pin) == GPIO_PIN_RESET) {
 		ButtonState|=BUTTON_UP;
-	} else if (HAL_GPIO_ReadPin(BUTTON_DOWN_GPIO_Port, BUTTON_DOWN_Pin)
-			== GPIO_PIN_RESET) {
+	}
+	if (HAL_GPIO_ReadPin(BUTTON_DOWN_GPIO_Port, BUTTON_DOWN_Pin) == GPIO_PIN_RESET) {
 		ButtonState|=BUTTON_DOWN;
-	} else if (HAL_GPIO_ReadPin(BUTTON_FIRE1_GPIO_Port, BUTTON_FIRE1_Pin)
-			== GPIO_PIN_RESET) {
+	}
+	if (HAL_GPIO_ReadPin(BUTTON_FIRE1_GPIO_Port, BUTTON_FIRE1_Pin) == GPIO_PIN_RESET) {
 		ButtonState|=BUTTON_FIRE1;
 	}
 }
@@ -188,7 +187,7 @@ ErrorType DarkNet7::onInit() {
 		DrawList.ItemsCount++;
 		Display.setTextColor(cmdc0de::RGBColor::WHITE);
 	}
-#if 1
+#if 0
 	HAL_GPIO_WritePin(SIMPLE_LED1_GPIO_Port, SIMPLE_LED1_Pin, GPIO_PIN_SET);
 	//HAL_GPIO_WritePin(SIMPLE_LED2_GPIO_Port, SIMPLE_LED2_Pin, GPIO_PIN_SET);
 #endif
@@ -197,8 +196,7 @@ ErrorType DarkNet7::onInit() {
 	Display.swap();
 	Display.fillScreen(cmdc0de::RGBColor::BLACK);
 	Display.swap();
-	Display.fillRec(30, 10, 80, 40, cmdc0de::RGBColor(0, 255, 0));
-	Display.swap();
+
 #if DEBUG_WHY_CANT_CHANGE_ROTATION
 	//Display.setRotation(cmdc0de::DisplayDevice::LANDSCAPE_TOP_LEFT,true);
 	Display.fillScreen(cmdc0de::RGBColor::BLACK);
@@ -209,25 +207,6 @@ ErrorType DarkNet7::onInit() {
 	Display.swap();
 #endif
 
-	uint16_t r = 0, g = 0, b = 0;
-	uint16_t y = 0;
-	while (y < Display.getHeight()) {
-		for (uint32_t i = 0; i < Display.getWidth(); i++) {
-			Display.drawPixel(i, y, cmdc0de::RGBColor(r, g, b));
-			if (r == 0xFF && g == 0xFF && b == 0xFF) {
-				r = g = b = 0;
-			} else if (r == 0xFF && g == 0xFF) {
-				++b;
-			} else if (r == 0xFF) {
-				++g;
-			} else {
-				++r;
-			}
-		}
-		++y;
-	}
-	Display.swap();
-	HAL_Delay(500);
 	setCurrentState(getDisplayMenuState());
 
 #define TEST_SD_CARD
@@ -244,7 +223,7 @@ ErrorType DarkNet7::onInit() {
 	}
 #endif
 
-#if 1
+#if 0
 	 flatbuffers::FlatBufferBuilder fbb;
 	 auto setup = darknet7::CreateSetupAPDirect(fbb,"test","test",darknet7::WifiMode_WPA2);
 	 flatbuffers::Offset<darknet7::STMToESPRequest> of = darknet7::CreateSTMToESPRequest(fbb,1U,darknet7::STMToESPAny_SetupAP,setup.Union());
@@ -331,7 +310,7 @@ static GameOfLife MyGameOfLife;
 static CommunicationSettingState MyCommunicationSettings;
 static BadgeInfoState MyBadgeInfoState;
 static MCUInfoState MyMCUInfoState;
-static Tamagotchi MyTamagotchi;
+//static Tamagotchi MyTamagotchi;
 static Health MyHealth;
 static Scan MyScan;
 static SAO MySAO;
@@ -385,9 +364,9 @@ MCUInfoState *DarkNet7::getMCUInfoState() {
 	return &MyMCUInfoState;
 }
 
-Tamagotchi *DarkNet7::getTamagotchiState() {
-	return &MyTamagotchi;
-}
+//Tamagotchi *DarkNet7::getTamagotchiState() {
+//	return &MyTamagotchi;
+//}
 
 Health *DarkNet7::getHealthState() {
 	return &MyHealth;

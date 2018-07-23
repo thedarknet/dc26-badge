@@ -1,0 +1,5 @@
+flash erase_sector 0 57 63
+flash write_bank 0 /home/cmdc0de/dev/defcon/defcon25-badge/software/BadgeGen/keys/9a21 0x1FFD4
+
+dump_image /home/cmdc0de/dev/defcon/defcon25-badge/software/BadgeGen/keys/BADGE.stm 0x8001FFD4 0x1e
+#dump_image /home/cmdc0de/dev/defcon/defcon24/BadgeGen/keys/BADGE.stm-all 0x800FFD4 0x1800

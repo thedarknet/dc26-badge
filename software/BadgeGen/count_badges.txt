@@ -1,0 +1,3 @@
+cat badge-out.txt | grep "Device UID is" | awk '{print $4}' | uniq | wc -l
+387
+

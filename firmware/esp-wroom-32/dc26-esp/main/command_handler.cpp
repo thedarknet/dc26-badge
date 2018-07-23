@@ -12,6 +12,7 @@ static HttpServer Port80WebServer;
 class MyWiFiEventHandler: public WiFiEventHandler {
 public:
 	const char *logTag = "MyWiFiEventHandler";
+	MyWiFiEventHandler() : APStarted(false) {}
 public:
 	virtual esp_err_t staGotIp(system_event_sta_got_ip_t event_sta_got_ip) {
 		ESP_LOGD(logTag, "MyWiFiEventHandler(Class): staGotIp");
@@ -20,11 +21,13 @@ public:
 	virtual esp_err_t apStart() {
 		ESP_LOGI(logTag, "MyWiFiEventHandler(Class): apStart starting web server");
 		Port80WebServer.start(80,false);
+		APStarted = true;
 		return ESP_OK;
 	}
 	virtual esp_err_t apStop() {
 		ESP_LOGI(logTag, "MyWiFiEventHandler(Class): apStop stopping web server");
 		Port80WebServer.stop();
+		APStarted = false;
 		return ESP_OK;
 	}
 	virtual esp_err_t wifiReady() {
@@ -49,6 +52,9 @@ public:
 	virtual esp_err_t staStop() {
 		return ESP_OK;
 	}
+	bool isAPStarted() {return APStarted;}
+private:
+	bool APStarted;
 };
 
 
@@ -124,6 +130,7 @@ void CmdHandlerTask::run(void *data) {
 				}
 				break;
 			case darknet7::STMToESPAny_StopAP: {
+					Port80WebServer.stop();
 					wifi.stopWiFi();
 				}
 				break;
@@ -149,16 +156,15 @@ void CmdHandlerTask::run(void *data) {
 			case darknet7::STMToESPAny_CommunicationStatusRequest: {
 						ESP_LOGI(LOGTAG, "processing system info");
 						flatbuffers::FlatBufferBuilder fbb;
-						//TODO FINISH
-
-						// TODO: Use these
 						BluetoothTask& bttask = getBLETask();
-						std::string blename = bttask.adv_name; 
-						bool advertising = bttask.advertising_enabled;
-
+						darknet7::WiFiStatus status = darknet7::WiFiStatus_DOWN;
+						MyWiFiEventHandler *eh = (MyWiFiEventHandler*)wifi.getWifiEventHandler();
+						if(eh && eh->isAPStarted()) {
+							status = darknet7::WiFiStatus_AP_STA;
+						}
 						auto s = darknet7::CreateCommunicationStatusResponseDirect(
-										 fbb, darknet7::WiFiStatus_DOWN,
-									false, (const char *)"test");	 
+										 fbb, status, bttask.advertising_enabled, 
+										 bttask.adv_name.c_str());	 
 						flatbuffers::Offset<darknet7::ESPToSTM> of =
 								darknet7::CreateESPToSTM(fbb, msg->msgInstanceID(),
 										darknet7::ESPToSTMAny_CommunicationStatusResponse, s.Union());

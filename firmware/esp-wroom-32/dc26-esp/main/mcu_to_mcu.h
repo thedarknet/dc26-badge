@@ -55,7 +55,7 @@ public:
 public:
 	MCUToMCUTask(CmdHandlerTask *pch, const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);
 	bool init(gpio_num_t tx, gpio_num_t rx, uint16_t rxBufSize);
-	void processMessage(const uint8_t *data, uint32_t size);
+	bool processMessage(const uint8_t *data, uint32_t size);
 	uint16_t getBufferSize() {return BufSize;}
 	void send(const flatbuffers::FlatBufferBuilder &fbb);
 public:

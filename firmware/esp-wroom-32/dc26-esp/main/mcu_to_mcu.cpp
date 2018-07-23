@@ -118,7 +118,7 @@ void MCUToMCUTask::send(const flatbuffers::FlatBufferBuilder &fbb) {
 }
 
 
-void MCUToMCUTask::processMessage(const uint8_t *data, uint32_t size) {
+bool MCUToMCUTask::processMessage(const uint8_t *data, uint32_t size) {
 	ESP_LOGI(LOGTAG, "Process Message");
 	Message *m = new Message();
 	if(m->read(data,size)) {
@@ -126,6 +126,7 @@ void MCUToMCUTask::processMessage(const uint8_t *data, uint32_t size) {
 		ESP_LOGI(LOGTAG, "MsgType %d", msg->Msg_type());
 		//ESP_LOGI(LOGTAG, darknet7::EnumNamesSTMToESPAny(msg->Msg_type()));
 		switch (msg->Msg_type()) {
+		case darknet7::STMToESPAny_StopAP:
 		case darknet7::STMToESPAny_SetupAP:
 		case darknet7::STMToESPAny_CommunicationStatusRequest:
 		case darknet7::STMToESPAny_ESPRequest:
@@ -150,8 +151,10 @@ void MCUToMCUTask::processMessage(const uint8_t *data, uint32_t size) {
 		default:
 			break;
 		}
+		return true;
 	} else {
 		delete m;
+		return false;
 	}
 }
 
@@ -160,15 +163,23 @@ void MCUToMCUTask::run(void *data) {
 	uart_event_t event;
 	uint8_t dataBuf[MAX_MESSAGE_SIZE * 2] = {0};
 	size_t receivePtr = 0;
+	bool GotBreak = false;
 	while (1) {
 		//Waiting for UART event.
 		if (xQueueReceive(uart0_queue, (void * )&event, (portTickType )portMAX_DELAY)) {
 			switch (event.type) {
 			//Event of UART receiving data
-			case UART_DATA:
+			case UART_DATA: 
 				ESP_LOGI(LOGTAG, "[UART DATA]: %d", event.size);
 				receivePtr+=uart_read_bytes(UART_NUM_1, &dataBuf[0], sizeof(dataBuf), 100);
 				ESP_LOG_BUFFER_HEX(LOGTAG, &dataBuf[0], receivePtr);
+				if(receivePtr>ENVELOP_HEADER && GotBreak) {
+					if(processMessage(&dataBuf[0],receivePtr)) {
+						receivePtr = 0;
+						bzero(&dataBuf[0],sizeof(dataBuf));
+					}
+				}
+				GotBreak = false;
 				break;
 				//Event of HW FIFO overflow detected
 			case UART_FIFO_OVF:
@@ -177,26 +188,32 @@ void MCUToMCUTask::run(void *data) {
 				// If fifo overflow happened, you should consider adding flow control for your application.
 				uart_flush_input (UART_NUM_1);
 				xQueueReset(uart0_queue);
+				GotBreak = false;
 				break;
 				//Event of UART RX break detected
 			case UART_BREAK:
 				ESP_LOGI(LOGTAG, "uart rx break");
 				receivePtr+=uart_read_bytes(UART_NUM_1, &dataBuf[0], sizeof(dataBuf), 100);
 				ESP_LOG_BUFFER_HEX(LOGTAG, &dataBuf[0], receivePtr);
+				GotBreak = true;
 				if(receivePtr>ENVELOP_HEADER) {
-					processMessage(&dataBuf[0],receivePtr);
-					receivePtr = 0;
-					bzero(&dataBuf[0],sizeof(dataBuf));
+					if(processMessage(&dataBuf[0],receivePtr)) {
+						receivePtr = 0;
+						GotBreak = false;
+						bzero(&dataBuf[0],sizeof(dataBuf));
+					}
 				}
 				break;
 				//Event of UART parity check error
 			case UART_PARITY_ERR:
 				ESP_LOGI(LOGTAG, "uart parity error");
+				GotBreak = false;
 				xQueueReset(uart0_queue);
 				break;
 				//Event of UART frame error
 			case UART_FRAME_ERR:
 				ESP_LOGI(LOGTAG, "uart frame error");
+				GotBreak = false;
 				xQueueReset(uart0_queue);
 				break;
 				//UART_PATTERN_DET

@@ -495,7 +495,7 @@ bool BluetoothTask::init()
 	// setup the advertising data
 	this->setDeviceType(darknet7::BLEDeviceFilter_BADGE);
 	this->refreshAdvertisementData();
-	//startAdvertising();
+	this->startAdvertising();
 
 	// setup pairing client
 	pClient = BLEDevice::createClient();

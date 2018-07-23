@@ -4,6 +4,7 @@
 #include "security.h"
 #include "../lib/ble/BLESecurity.h"
 #include "../lib/ble/BLEDevice.h"
+#include "../lib/ssd1306.h"
 
 // TODO: remove these includes
 #include "../mcu_to_mcu.h"
@@ -25,10 +26,16 @@ void MySecurity::onPassKeyNotify(uint32_t pass_key)
 	return;
 }
 
+
 bool MySecurity::onConfirmPIN(uint32_t pass_key)
 {
 	unsigned int waited = 0;
-	ESP_LOGI(SECTAG, "onConfirmPin: %d", pass_key);
+	char pass_str[11];
+	memset(&pass_str, '0', 11);
+	sprintf(pass_str, "%u", pass_key);
+
+	ESP_LOGI(SECTAG, "onConfirmPin: %s", pass_str);
+	SSD1306_Puts(pass_str, &Font_7x10, 1);
 	// TODO: Send to STM, get back confirmation
 	if (pBTTask->isActingClient)
 	{

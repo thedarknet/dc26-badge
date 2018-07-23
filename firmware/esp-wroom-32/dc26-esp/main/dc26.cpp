@@ -6,14 +6,13 @@
 #include "soc/uart_struct.h"
 #include "string.h"
 #include "lib/System.h"
-#include "lib/i2c.hpp"
-#include "lib/ssd1306.h"
 #include "lib/wifi/WiFi.h"
 #include "stm_to_esp_generated.h"
 #include "esp_to_stm_generated.h"
 #include "lib/FATFS_VFS.h"
 #include "mcu_to_mcu.h"
 #include "command_handler.h"
+#include "display_handler.h"
 
 #include "dc26_ble/ble.h"
 
@@ -28,10 +27,10 @@ extern "C" {
 
 FATFS_VFS *FatFS = new FATFS_VFS("/spiflash", "storage");
 static xQueueHandle gpio_evt_queue = NULL;
-ESP32_I2CMaster I2cDisplay(GPIO_NUM_19,GPIO_NUM_18,1000000, I2C_NUM_0, 1024, 1024);
 CmdHandlerTask CmdTask("CmdTask");
 BluetoothTask BTTask("BluetoothTask");
 MCUToMCUTask ProcToProc(&CmdTask, "ProcToProc");
+DisplayTask ESPDisplayTask("Display");
 
 MCUToMCUTask &getMCUToMCU() {
 	return ProcToProc;
@@ -93,20 +92,13 @@ void init() {
 	initButton();
 }
 
-static char tag[] = "main";
-
 void app_main()
 {
 	nvs_flash_erase(); // FIXME:  Remove this
 	nvs_flash_init();
-	if(SSD1306_Init(&I2cDisplay)>0) {
-		ESP_LOGI(tag,"display init successful");
-		SSD1306_DrawFilledRectangle(0,0,64,32,SSD1306_COLOR_WHITE);
-		SSD1306_UpdateScreen();
-	} else {
-		ESP_LOGI(tag,"display init UN-successful");
-	}
 	init();
+	ESPDisplayTask.init();
+	ESPDisplayTask.start();
 	ProcToProc.init(TXD_PIN,RXD_PIN,RX_BUF_SIZE);
 	ProcToProc.start();
 	CmdTask.init();

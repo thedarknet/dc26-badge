@@ -12,17 +12,21 @@
 bool GUIListProcessor::process(cmdc0de::GUIListData *pl, uint16_t itemCount) {
 	bool bHandled = false;
 	if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_UP)) {
-		if (pl->selectedItem == 0) {
-			pl->selectedItem = itemCount - 1;
-		} else {
-			pl->selectedItem--;
-		}
+		do {
+			if (pl->selectedItem == 0) {
+				pl->selectedItem = itemCount - 1;
+			} else {
+				pl->selectedItem--;
+			}
+		} while(!pl->items[pl->selectedItem].text || pl->items[pl->selectedItem].text[0]=='\0');
 	} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
-		if (pl->selectedItem == itemCount - 1) {
-			pl->selectedItem = 0;
-		} else {
-			pl->selectedItem++;
-		}
+		do {
+			if (pl->selectedItem == itemCount - 1) {
+				pl->selectedItem = 0;
+			} else {
+				pl->selectedItem++;
+			}
+		} while(!pl->items[pl->selectedItem].text || pl->items[pl->selectedItem].text[0]=='\0');
 	} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_LEFT)) {
 		pl->selectedItem = 0;
 	}

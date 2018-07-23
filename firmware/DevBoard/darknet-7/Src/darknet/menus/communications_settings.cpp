@@ -35,34 +35,30 @@ public:
 protected:
 	virtual cmdc0de::ErrorType onInit() {
 		memset(&NewDeviceName[0],0,sizeof(NewDeviceName));
-		VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,60,RGBColor::WHITE, RGBColor::BLACK,
+		VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,80,RGBColor::WHITE, RGBColor::BLACK,
 				RGBColor::BLUE,'_');
 		return ErrorType();
 	}
 
 	virtual cmdc0de::StateBase::ReturnStateContext onRun() {
 		StateBase *nextState = this;
-			DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 
-			VKB.process();
+		VKB.process();
 
-			DarkNet7::get().getDisplay().drawString(0,10,(const char *)"Current Name: ");
-			DarkNet7::get().getDisplay().drawString(0,20,CurrentDeviceName);
-			DarkNet7::get().getDisplay().drawString(0,40,(const char *)"Mid button finishes");
-			if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
-				flatbuffers::FlatBufferBuilder fbb;
-				auto r = darknet7::CreateBLESetDeviceNameDirect(fbb,&NewDeviceName[0]);
-				//RequestID = DarkNet7::get().nextSeq();
-				auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::get().nextSeq(),darknet7::STMToESPAny_BLESetDeviceName,r.Union());
-				darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
-				//send BLE set device name
-				//switch state to communication setting which will send a request for communication settings
-				//
-				MCUToMCU::get().send(fbb);
-				//const MSGEvent<darknet7::CommunicationStatusResponse> *si = 0;
-				//MCUToMCU::get().getBus().addListener(this,si,&MCUToMCU::get());
-				nextState = DarkNet7::get().getCommunicationSettingState();
-			}
+		DarkNet7::get().getDisplay().drawString(0,10,(const char *)"Current Name: ");
+		DarkNet7::get().getDisplay().drawString(0,20, CurrentDeviceName);
+		DarkNet7::get().getDisplay().drawString(0,30, (const char *)"New Name:");
+		DarkNet7::get().getDisplay().drawString(0,40, &NewDeviceName[0]);
+		DarkNet7::get().getDisplay().drawString(0,60,(const char *)"Mid button finishes");
+		if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+			flatbuffers::FlatBufferBuilder fbb;
+			auto r = darknet7::CreateBLESetDeviceNameDirect(fbb,&NewDeviceName[0]);
+			auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::get().nextSeq(),darknet7::STMToESPAny_BLESetDeviceName,r.Union());
+			darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
+			MCUToMCU::get().send(fbb);
+			nextState = DarkNet7::get().getCommunicationSettingState();
+		}
 		return ReturnStateContext(nextState);
 	}
 
@@ -109,15 +105,17 @@ protected:
 		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 		DarkNet7::get().getGUI().drawList(&BLEList);
 
-		if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
-			flatbuffers::FlatBufferBuilder fbb;
-			if(Type==AD) {
-				auto r = darknet7::CreateBLEAdvertise(fbb,BLEList.selectedItem);
-				auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::get().nextSeq(),darknet7::STMToESPAny_BLEAdvertise,r.Union());
-				darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
+		if (!GUIListProcessor::process(&BLEList,(sizeof(Items) / sizeof(Items[0])))) {
+			if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+				flatbuffers::FlatBufferBuilder fbb;
+				if(Type==AD) {
+					auto r = darknet7::CreateBLEAdvertise(fbb,!BLEList.selectedItem);
+					auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::get().nextSeq(),darknet7::STMToESPAny_BLEAdvertise,r.Union());
+					darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
+				}
+				MCUToMCU::get().send(fbb);
+				nextState = DarkNet7::get().getCommunicationSettingState();
 			}
-			MCUToMCU::get().send(fbb);
-			nextState = DarkNet7::get().getCommunicationSettingState();
 		}
 		return ReturnStateContext(nextState);
 	}
@@ -144,9 +142,8 @@ private:
 	darknet7::WiFiStatus CurrentWiFiStatus;
 	static const uint16_t NO_WORKING_TIME = 0xFFFF;
 public:
-	//WiFi() : Darknet7BaseState(), VKB(), SSID(), Password(), SecurityType(darknet7::WifiMode_OPEN), IHC(&SSID[0],sizeof(SSID)) { //, ListBuffer() {
 	WiFi() : Darknet7BaseState(), VKB(), SSID(), Password(), SecurityType(darknet7::WifiMode_OPEN), IHC(0,0)
-		, WifiSettingList("WiFi Settings:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, 90, 0, (sizeof(Items) / sizeof(Items[0])))
+		, WifiSettingList("WiFi Settings:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, 70, 0, (sizeof(Items) / sizeof(Items[0])))
 		, ListBuffer(), WorkingItem(NO_WORKING_TIME), CurrentWiFiStatus(darknet7::WiFiStatus_DOWN) {
 	}
 	void setWifiStatus(darknet7::WiFiStatus c) {CurrentWiFiStatus = c;}
@@ -161,6 +158,7 @@ protected:
 			Items[i].text = &ListBuffer[i][0];
 			Items[i].setShouldScroll();
 		}
+		WorkingItem = NO_WORKING_TIME;
 		return ErrorType();
 	}
 
@@ -186,11 +184,8 @@ protected:
 		if(WorkingItem==NO_WORKING_TIME) {
 			if (!GUIListProcessor::process(&WifiSettingList,(sizeof(Items) / sizeof(Items[0])))) {
 				if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
-					if(CurrentWiFiStatus!=darknet7::WiFiStatus_DOWN) {
-						WorkingItem = WifiSettingList.selectedItem;
-					} else if (WifiSettingList.selectedItem==4) {
-						WorkingItem = WifiSettingList.selectedItem;
-					}
+					WorkingItem = WifiSettingList.selectedItem;
+
 					switch(WorkingItem) {
 					case 0:
 						//do nothing
@@ -199,28 +194,33 @@ protected:
 						break;
 					case 2:
 						IHC.set(&SSID[0],sizeof(SSID));
-						VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,120,RGBColor::WHITE,	RGBColor::BLACK, RGBColor::BLUE,'_');
+						VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,100,RGBColor::WHITE,	RGBColor::BLACK, RGBColor::BLUE,'_');
 						break;
 					case 3:
 						IHC.set(&Password[0],sizeof(Password));
-						VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,120,RGBColor::WHITE,	RGBColor::BLACK, RGBColor::BLUE,'_');
+						VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,100,RGBColor::WHITE,	RGBColor::BLACK, RGBColor::BLUE,'_');
 						break;
-					case 4:
-					{
-						flatbuffers::FlatBufferBuilder fbb;
-						flatbuffers::Offset<void> msgOffset;
-						if(CurrentWiFiStatus==darknet7::WiFiStatus_DOWN) {
-							auto r = darknet7::CreateStopAP(fbb);
-							msgOffset = r.Union();
-						} else {
-							auto r = darknet7::CreateSetupAPDirect(fbb,&SSID[0],&Password[0],SecurityType);
-							msgOffset = r.Union();
+					case 4: {
+							if(SSID[0]!='\0' || CurrentWiFiStatus==darknet7::WiFiStatus_DOWN) {
+								flatbuffers::FlatBufferBuilder fbb;
+								flatbuffers::Offset<void> msgOffset;
+								darknet7::STMToESPAny Msg_type = darknet7::STMToESPAny_StopAP;
+								if(CurrentWiFiStatus==darknet7::WiFiStatus_DOWN) {
+									auto r = darknet7::CreateStopAP(fbb);
+									msgOffset = r.Union();
+								} else {
+									auto r = darknet7::CreateSetupAPDirect(fbb,&SSID[0],&Password[0],SecurityType);
+									msgOffset = r.Union();
+									Msg_type = darknet7::STMToESPAny_SetupAP;
+								}
+								auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::get().nextSeq(),Msg_type,msgOffset);
+								darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
+								MCUToMCU::get().send(fbb);
+								nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getCommunicationSettingState(),(const char *)"Updating ESP",5000);
+							} else {
+								DarkNet7::get().getDisplay().drawString(0,80,(const char *)"SID Can't be blank");
+							}
 						}
-						auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::get().nextSeq(),darknet7::STMToESPAny_BLESetDeviceName,msgOffset);
-						darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
-						MCUToMCU::get().send(fbb);
-						nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getCommunicationSettingState(),(const char *)"Updating ESP",2000);
-					}
 						break;
 					}
 				} else if ( DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
@@ -230,38 +230,27 @@ protected:
 		} else {
 			switch(WorkingItem) {
 			case 0:
+				if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_UP | DarkNet7::ButtonInfo::BUTTON_DOWN)) {
+					if(CurrentWiFiStatus==darknet7::WiFiStatus_DOWN) CurrentWiFiStatus = darknet7::WiFiStatus_AP_STA;
+					else CurrentWiFiStatus = darknet7::WiFiStatus_DOWN;
+				} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID | DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+					WorkingItem = NO_WORKING_TIME;
+				}
+				break;
 			case 1:
 			{
 				if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_UP)) {
-					uint32_t s;
-					if(WorkingItem==0) {
-						s = (uint32_t)(CurrentWiFiStatus);
-						++s;
-						s = s%darknet7::WiFiStatus_MAX;
-						CurrentWiFiStatus = (darknet7::WiFiStatus)s;
-					} else {
-						s = (uint32_t)(SecurityType);
-						++s;
-						s = s%darknet7::WifiMode_MAX;
-						SecurityType = (darknet7::WifiMode)s;
-					}
+					uint32_t s = (uint32_t)(SecurityType);
+					++s;
+					s = s%darknet7::WifiMode_MAX;
+					SecurityType = (darknet7::WifiMode)s;
 				} else if (DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
-					if(WorkingItem==0) {
-						if(CurrentWiFiStatus==darknet7::WiFiStatus_MIN) {
-							CurrentWiFiStatus = darknet7::WiFiStatus_MAX;
-						} else {
-							uint32_t s = (uint32_t)(CurrentWiFiStatus);
-							--s;
-							CurrentWiFiStatus = (darknet7::WiFiStatus)s;
-						}
+					if(SecurityType==darknet7::WifiMode_MIN) {
+						SecurityType = darknet7::WifiMode_MAX;
 					} else {
-						if(SecurityType==darknet7::WifiMode_MIN) {
-							SecurityType = darknet7::WifiMode_MAX;
-						} else {
-							uint32_t s = (uint32_t)(SecurityType);
-							--s;
-							SecurityType = (darknet7::WifiMode)s;
-						}
+						uint32_t s = (uint32_t)(SecurityType);
+						--s;
+						SecurityType = (darknet7::WifiMode)s;
 					}
 				} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID
 																					| DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
@@ -288,6 +277,7 @@ protected:
 	}
 
 	virtual cmdc0de::ErrorType onShutdown() {
+		WifiSettingList.selectedItem=0;
 		return ErrorType();
 	}
 };
@@ -350,7 +340,7 @@ StateBase::ReturnStateContext CommunicationSettingState::onRun() {
 		}
 	} else {
 		if (!GUIListProcessor::process(&CommSettingList,(sizeof(Items) / sizeof(Items[0])))) {
-			if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1 | DarkNet7::ButtonInfo::BUTTON_MID)) {
+			if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
 				DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 				switch(CommSettingList.selectedItem) {
 				case 0:
@@ -365,8 +355,11 @@ StateBase::ReturnStateContext CommunicationSettingState::onRun() {
 					nextState = &BLESetName_Menu;
 					break;
 				}
+			} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+				nextState = DarkNet7::get().getDisplayMenuState();
 			}
 		}
+		DarkNet7::get().getGUI().drawList(&CommSettingList);
 	}
 	return ReturnStateContext(nextState);
 }

@@ -10,9 +10,10 @@
 
 class MCUToMCUTask;
 class BluetoothTask;
+class DisplayTask;
 
 MCUToMCUTask &getMCUToMCU();
 BluetoothTask &getBLETask();
-
+DisplayTask &getDisplayTask();
 
 #endif /* MAIN_DC26_H_ */

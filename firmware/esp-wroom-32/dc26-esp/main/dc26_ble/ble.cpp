@@ -64,6 +64,8 @@ static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 							uint8_t* pData, size_t length, bool isNotify)
 {
 	printf("Client Received: length %d --- %s\n", length, pData);
+
+	/*
 	flatbuffers::FlatBufferBuilder fbb;
 	uint8_t *bufData = nullptr;
 	flatbuffers::Offset<darknet7::STMToESPRequest> of;
@@ -79,11 +81,13 @@ static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 	m = new MCUToMCUTask::Message();
 	m->set(size, 0, bufData);
 	xQueueSend(pBTTask->getQueueHandle(), &m, (TickType_t) 0);
+	*/
 	// TODO: actually send it back to the STM
 }
 
 static void sendGenericResponse(bool result)
 {
+	/*
 	darknet7::RESPONSE_SUCCESS res = result ? darknet7::RESPONSE_SUCCESS_True : darknet7::RESPONSE_SUCCESS_False;
 	flatbuffers::FlatBufferBuilder fbb;
 	flatbuffers::Offset<darknet7::ESPToSTM> of;
@@ -92,6 +96,8 @@ static void sendGenericResponse(bool result)
 		infect.Union());
 	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
 	getMCUToMCU().send(fbb);
+	*/
+	return;
 }
 
 void BluetoothTask::startAdvertising()

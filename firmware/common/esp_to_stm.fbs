@@ -4,11 +4,21 @@ namespace darknet7;
 
 enum RESPONSE_SUCCESS : byte { False = 0, True = 1 }
 
-union ESPToSTMAny { GenericResponse, ESPSystemInfo, BLEInfectionData, CommunicationStatusResponse }
+union ESPToSTMAny { GenericResponse, ESPSystemInfo, BLEInfectionData, CommunicationStatusResponse,
+				WiFiScanResults }
 
 table GenericResponse {
 	successful:RESPONSE_SUCCESS;
 	message:string;
+}
+
+table WiFiScanResult {
+	ssid:string;
+	authMode:WifiMode;
+}
+
+table WiFiScanResults {
+	APs:[WiFiScanResult];
 }
 
 table Badges {

@@ -12,6 +12,10 @@ namespace darknet7 {
 
 struct GenericResponse;
 
+struct WiFiScanResult;
+
+struct WiFiScanResults;
+
 struct Badges;
 
 struct BadgesInArea;
@@ -59,17 +63,19 @@ enum ESPToSTMAny {
   ESPToSTMAny_ESPSystemInfo = 2,
   ESPToSTMAny_BLEInfectionData = 3,
   ESPToSTMAny_CommunicationStatusResponse = 4,
+  ESPToSTMAny_WiFiScanResults = 5,
   ESPToSTMAny_MIN = ESPToSTMAny_NONE,
-  ESPToSTMAny_MAX = ESPToSTMAny_CommunicationStatusResponse
+  ESPToSTMAny_MAX = ESPToSTMAny_WiFiScanResults
 };
 
-inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[5] {
+inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[6] {
   static const ESPToSTMAny values[] = {
     ESPToSTMAny_NONE,
     ESPToSTMAny_GenericResponse,
     ESPToSTMAny_ESPSystemInfo,
     ESPToSTMAny_BLEInfectionData,
-    ESPToSTMAny_CommunicationStatusResponse
+    ESPToSTMAny_CommunicationStatusResponse,
+    ESPToSTMAny_WiFiScanResults
   };
   return values;
 }
@@ -81,6 +87,7 @@ inline const char * const *EnumNamesESPToSTMAny() {
     "ESPSystemInfo",
     "BLEInfectionData",
     "CommunicationStatusResponse",
+    "WiFiScanResults",
     nullptr
   };
   return names;
@@ -109,6 +116,10 @@ template<> struct ESPToSTMAnyTraits<BLEInfectionData> {
 
 template<> struct ESPToSTMAnyTraits<CommunicationStatusResponse> {
   static const ESPToSTMAny enum_value = ESPToSTMAny_CommunicationStatusResponse;
+};
+
+template<> struct ESPToSTMAnyTraits<WiFiScanResults> {
+  static const ESPToSTMAny enum_value = ESPToSTMAny_WiFiScanResults;
 };
 
 bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, ESPToSTMAny type);
@@ -205,6 +216,117 @@ inline flatbuffers::Offset<GenericResponse> CreateGenericResponseDirect(
       _fbb,
       successful,
       message ? _fbb.CreateString(message) : 0);
+}
+
+struct WiFiScanResult FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_SSID = 4,
+    VT_AUTHMODE = 6
+  };
+  const flatbuffers::String *ssid() const {
+    return GetPointer<const flatbuffers::String *>(VT_SSID);
+  }
+  WifiMode authMode() const {
+    return static_cast<WifiMode>(GetField<int8_t>(VT_AUTHMODE, 0));
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_SSID) &&
+           verifier.Verify(ssid()) &&
+           VerifyField<int8_t>(verifier, VT_AUTHMODE) &&
+           verifier.EndTable();
+  }
+};
+
+struct WiFiScanResultBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_ssid(flatbuffers::Offset<flatbuffers::String> ssid) {
+    fbb_.AddOffset(WiFiScanResult::VT_SSID, ssid);
+  }
+  void add_authMode(WifiMode authMode) {
+    fbb_.AddElement<int8_t>(WiFiScanResult::VT_AUTHMODE, static_cast<int8_t>(authMode), 0);
+  }
+  explicit WiFiScanResultBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  WiFiScanResultBuilder &operator=(const WiFiScanResultBuilder &);
+  flatbuffers::Offset<WiFiScanResult> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<WiFiScanResult>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<WiFiScanResult> CreateWiFiScanResult(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> ssid = 0,
+    WifiMode authMode = WifiMode_UNKNOWN) {
+  WiFiScanResultBuilder builder_(_fbb);
+  builder_.add_ssid(ssid);
+  builder_.add_authMode(authMode);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<WiFiScanResult> CreateWiFiScanResultDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *ssid = nullptr,
+    WifiMode authMode = WifiMode_UNKNOWN) {
+  return darknet7::CreateWiFiScanResult(
+      _fbb,
+      ssid ? _fbb.CreateString(ssid) : 0,
+      authMode);
+}
+
+struct WiFiScanResults FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_APS = 4
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<WiFiScanResult>> *APs() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<WiFiScanResult>> *>(VT_APS);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_APS) &&
+           verifier.Verify(APs()) &&
+           verifier.VerifyVectorOfTables(APs()) &&
+           verifier.EndTable();
+  }
+};
+
+struct WiFiScanResultsBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_APs(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WiFiScanResult>>> APs) {
+    fbb_.AddOffset(WiFiScanResults::VT_APS, APs);
+  }
+  explicit WiFiScanResultsBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  WiFiScanResultsBuilder &operator=(const WiFiScanResultsBuilder &);
+  flatbuffers::Offset<WiFiScanResults> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<WiFiScanResults>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<WiFiScanResults> CreateWiFiScanResults(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<WiFiScanResult>>> APs = 0) {
+  WiFiScanResultsBuilder builder_(_fbb);
+  builder_.add_APs(APs);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<WiFiScanResults> CreateWiFiScanResultsDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<WiFiScanResult>> *APs = nullptr) {
+  return darknet7::CreateWiFiScanResults(
+      _fbb,
+      APs ? _fbb.CreateVector<flatbuffers::Offset<WiFiScanResult>>(*APs) : 0);
 }
 
 struct Badges FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -601,6 +723,9 @@ struct ESPToSTM FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const CommunicationStatusResponse *Msg_as_CommunicationStatusResponse() const {
     return Msg_type() == ESPToSTMAny_CommunicationStatusResponse ? static_cast<const CommunicationStatusResponse *>(Msg()) : nullptr;
   }
+  const WiFiScanResults *Msg_as_WiFiScanResults() const {
+    return Msg_type() == ESPToSTMAny_WiFiScanResults ? static_cast<const WiFiScanResults *>(Msg()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_MSGINSTANCEID) &&
@@ -625,6 +750,10 @@ template<> inline const BLEInfectionData *ESPToSTM::Msg_as<BLEInfectionData>() c
 
 template<> inline const CommunicationStatusResponse *ESPToSTM::Msg_as<CommunicationStatusResponse>() const {
   return Msg_as_CommunicationStatusResponse();
+}
+
+template<> inline const WiFiScanResults *ESPToSTM::Msg_as<WiFiScanResults>() const {
+  return Msg_as_WiFiScanResults();
 }
 
 struct ESPToSTMBuilder {
@@ -682,6 +811,10 @@ inline bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, 
     }
     case ESPToSTMAny_CommunicationStatusResponse: {
       auto ptr = reinterpret_cast<const CommunicationStatusResponse *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ESPToSTMAny_WiFiScanResults: {
+      auto ptr = reinterpret_cast<const WiFiScanResults *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return false;

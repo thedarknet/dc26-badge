@@ -11,6 +11,11 @@ union STMToESPAny { SetupAP, StopAP, BytesToFromAddress, DisplayMessage, ESPRequ
 					BLEPairWithDevice, BLESendPINConfirmation,
 					BLESendDataToDevice,
 					BLEDisconnect}
+
+table WiFiScan {
+	filter:WiFiScanFilter;
+}
+
 table SetupAP {
 	ssid:string;
 	passwd:string;

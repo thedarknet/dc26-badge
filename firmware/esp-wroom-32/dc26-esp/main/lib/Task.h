@@ -52,6 +52,9 @@ public:
 	 */
 	virtual void run(void *data) = 0; // Make run pure virtual
 	void delay(int ms);
+protected:
+	virtual void onStart();
+	virtual void onStop();
 
 private:
 	xTaskHandle m_handle;

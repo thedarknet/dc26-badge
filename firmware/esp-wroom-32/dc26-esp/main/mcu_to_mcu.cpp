@@ -7,6 +7,12 @@
 #include "dc26_ble/ble.h"
 
 const char *MCUToMCUTask::LOGTAG = "MCUToMCUTask";
+static uint8_t ESPToSTMBuffer[MCUToMCUTask::ESP_TO_STM_MSG_QUEUE_SIZE*MCUToMCUTask::ESP_TO_STM_MSG_ITEM_SIZE];
+static QueueHandle_t uart0_queue;
+static StaticQueue_t OutgoingQueue;
+static QueueHandle_t OutgoingQueueHandle = nullptr;
+static xTaskHandle UARTSendTaskhandle = 0;
+
 
 const darknet7::ESPToSTM *MCUToMCUTask::Message::asESPToSTM() {
 	return darknet7::GetSizePrefixedESPToSTM(&MessageData[ENVELOP_HEADER]);
@@ -69,28 +75,51 @@ bool MCUToMCUTask::Message::checkFlags(uint16_t flags) {
 	return (SizeAndFlags & flags) == flags;
 }
 
-bool MCUToMCUTask::Message::transmit() {
-	ESP_LOGI(MCUToMCUTask::LOGTAG, "sending with break!");
-	if (getMessageSize()
-			== uart_write_bytes_with_break(UART_NUM_1,
-					(const char *) &MessageData[0], getMessageSize(), 100)) {
-		return true;
+/////////////////////////
+static void uart_send(void* arg) {
+	MCUToMCUTask::Message *m=0;
+	for(;;) {
+		if(xQueueReceive(OutgoingQueueHandle, &m, portMAX_DELAY)) {
+			if(m!=0) {
+				ESP_LOGI(MCUToMCUTask::LOGTAG, "sending with break!");
+				uint32_t bytesSent = uart_write_bytes_with_break(UART_NUM_1,
+						m->getMessageData(), m->getMessageSize(), 16);
+				if(m->getMessageSize()!= bytesSent) {
+					ESP_LOGI(MCUToMCUTask::LOGTAG, "failed to send all bytes! %u of %u",
+										 bytesSent, m->getMessageSize());
+				}
+				delete m;
+			}
+		}
 	}
-	return false;
 }
 
 ////////////
 MCUToMCUTask::MCUToMCUTask(CmdHandlerTask *pcht, const std::string &tName,
 		uint16_t stackSize, uint8_t p) :
-		Task(tName, stackSize, p), ESPToSTMBuffer(), BufSize(0), CmdHandler(pcht) {
+		Task(tName, stackSize, p), CmdHandler(pcht) {
 
 }
 
-static QueueHandle_t uart0_queue;
+void MCUToMCUTask::onStart() {
+	xTaskCreate(uart_send, "uart_send", 6048, NULL, 5, &UARTSendTaskhandle);
+}
+
+void MCUToMCUTask::onStop() {
+	xTaskHandle temp = UARTSendTaskhandle;
+	UARTSendTaskhandle = nullptr;
+	vTaskDelete(temp);
+}
 
 bool MCUToMCUTask::init(gpio_num_t tx, gpio_num_t rx, uint16_t rxBufSize) {
-	BufSize = rxBufSize;
 	ESP_LOGI(LOGTAG, "INIT");
+
+	OutgoingQueueHandle = xQueueCreateStatic(ESP_TO_STM_MSG_QUEUE_SIZE,
+			ESP_TO_STM_MSG_ITEM_SIZE, &ESPToSTMBuffer[0], &OutgoingQueue);
+	if (OutgoingQueueHandle == nullptr) {
+		ESP_LOGI(LOGTAG, "Failed creating OutgoingQueue");
+	}
+
 	uart_config_t uart_config = { .baud_rate = 115200, .data_bits =
 			UART_DATA_8_BITS, .parity = UART_PARITY_DISABLE, .stop_bits =
 			UART_STOP_BITS_1, .flow_ctrl = UART_HW_FLOWCTRL_DISABLE };
@@ -111,18 +140,21 @@ void MCUToMCUTask::send(const flatbuffers::FlatBufferBuilder &fbb) {
 	uint32_t size = fbb.GetSize();
 	assert(size < MAX_MESSAGE_SIZE);
 	uint16_t crc = crc16_le(0, msg, size);
-	ESP_LOGI(LOGTAG, "size %d, crc %d\n", size, crc);
-	Message m;
-	m.set(size, crc, msg);
-	m.transmit();
+	ESP_LOGI(LOGTAG, "Queuing size %d, crc %d\n", size, crc);
+	Message *m = new Message();
+	m->set(size, crc, msg);
+	xQueueSend(OutgoingQueueHandle, (void* )&m,(TickType_t ) 100);
+	//m.transmit();
 }
 
 
-bool MCUToMCUTask::processMessage(const uint8_t *data, uint32_t size) {
+int32_t MCUToMCUTask::processMessage(const uint8_t *data, uint32_t size) {
 	ESP_LOGI(LOGTAG, "Process Message");
 	Message *m = new Message();
+	int32_t retVal = 0;
 	if(m->read(data,size)) {
 		auto msg = m->asSTMToESP();
+		retVal = m->getMessageSize();
 		ESP_LOGI(LOGTAG, "MsgType %d", msg->Msg_type());
 		//ESP_LOGI(LOGTAG, darknet7::EnumNamesSTMToESPAny(msg->Msg_type()));
 		switch (msg->Msg_type()) {
@@ -151,11 +183,10 @@ bool MCUToMCUTask::processMessage(const uint8_t *data, uint32_t size) {
 		default:
 			break;
 		}
-		return true;
 	} else {
 		delete m;
-		return false;
 	}
+	return retVal;
 }
 
 void MCUToMCUTask::run(void *data) {
@@ -170,12 +201,14 @@ void MCUToMCUTask::run(void *data) {
 			switch (event.type) {
 			//Event of UART receiving data
 			case UART_DATA: 
-				ESP_LOGI(LOGTAG, "[UART DATA]: %d", event.size);
+				ESP_LOGI(LOGTAG, "Before receive [UART DATA]: %d (%d)", event.size, receivePtr);
 				receivePtr+=uart_read_bytes(UART_NUM_1, &dataBuf[0], sizeof(dataBuf), 100);
+				ESP_LOGI(LOGTAG, "after receive [UART DATA]: %d (%d)", event.size, receivePtr);
 				ESP_LOG_BUFFER_HEX(LOGTAG, &dataBuf[0], receivePtr);
 				if(receivePtr>ENVELOP_HEADER && GotBreak) {
 					if(processMessage(&dataBuf[0],receivePtr)) {
 						receivePtr = 0;
+						GotBreak = false;
 						bzero(&dataBuf[0],sizeof(dataBuf));
 					}
 				}
@@ -192,8 +225,9 @@ void MCUToMCUTask::run(void *data) {
 				break;
 				//Event of UART RX break detected
 			case UART_BREAK:
-				ESP_LOGI(LOGTAG, "uart rx break");
+				ESP_LOGI(LOGTAG, "Before rx break: %d (%d)", event.size, receivePtr);
 				receivePtr+=uart_read_bytes(UART_NUM_1, &dataBuf[0], sizeof(dataBuf), 100);
+				ESP_LOGI(LOGTAG, "After rx break: %d (%d)", event.size, receivePtr);
 				ESP_LOG_BUFFER_HEX(LOGTAG, &dataBuf[0], receivePtr);
 				GotBreak = true;
 				if(receivePtr>ENVELOP_HEADER) {

@@ -73,8 +73,16 @@ void Task::start(void* taskData) {
 	}
 	m_taskData = taskData;
 	::xTaskCreatePinnedToCore(&runTask, m_taskName.c_str(), m_stackSize, this, m_priority, &m_handle, m_coreId);
+	onStart();
 } // start
 
+
+void Task::onStart() {
+}
+
+void Task::onStop() {
+
+}
 
 /**
  * @brief Stop the task.
@@ -88,6 +96,7 @@ void Task::stop() {
 	xTaskHandle temp = m_handle;
 	m_handle = nullptr;
 	::vTaskDelete(temp);
+	onStop();
 } // stop
 
 /**

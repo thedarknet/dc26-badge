@@ -10,6 +10,8 @@
 
 namespace darknet7 {
 
+struct WiFiScan;
+
 struct SetupAP;
 
 struct StopAP;
@@ -220,6 +222,46 @@ inline const char *EnumNameESPRequestType(ESPRequestType e) {
   return EnumNamesESPRequestType()[index];
 }
 
+struct WiFiScan FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_FILTER = 4
+  };
+  WiFiScanFilter filter() const {
+    return static_cast<WiFiScanFilter>(GetField<int8_t>(VT_FILTER, 0));
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_FILTER) &&
+           verifier.EndTable();
+  }
+};
+
+struct WiFiScanBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_filter(WiFiScanFilter filter) {
+    fbb_.AddElement<int8_t>(WiFiScan::VT_FILTER, static_cast<int8_t>(filter), 0);
+  }
+  explicit WiFiScanBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  WiFiScanBuilder &operator=(const WiFiScanBuilder &);
+  flatbuffers::Offset<WiFiScan> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<WiFiScan>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<WiFiScan> CreateWiFiScan(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    WiFiScanFilter filter = WiFiScanFilter_ALL) {
+  WiFiScanBuilder builder_(_fbb);
+  builder_.add_filter(filter);
+  return builder_.Finish();
+}
+
 struct SetupAP FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_SSID = 4,
@@ -274,7 +316,7 @@ inline flatbuffers::Offset<SetupAP> CreateSetupAP(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> ssid = 0,
     flatbuffers::Offset<flatbuffers::String> passwd = 0,
-    WifiMode mode = WifiMode_OPEN) {
+    WifiMode mode = WifiMode_UNKNOWN) {
   SetupAPBuilder builder_(_fbb);
   builder_.add_passwd(passwd);
   builder_.add_ssid(ssid);
@@ -286,7 +328,7 @@ inline flatbuffers::Offset<SetupAP> CreateSetupAPDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *ssid = nullptr,
     const char *passwd = nullptr,
-    WifiMode mode = WifiMode_OPEN) {
+    WifiMode mode = WifiMode_UNKNOWN) {
   return darknet7::CreateSetupAP(
       _fbb,
       ssid ? _fbb.CreateString(ssid) : 0,

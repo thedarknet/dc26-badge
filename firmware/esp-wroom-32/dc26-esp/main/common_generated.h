@@ -13,27 +13,39 @@ struct BytesToFromAddress;
 struct DisplayMessage;
 
 enum WifiMode {
-  WifiMode_OPEN = 0,
-  WifiMode_WPA2 = 1,
-  WifiMode_WPA = 2,
-  WifiMode_MIN = WifiMode_OPEN,
-  WifiMode_MAX = WifiMode_WPA
+  WifiMode_UNKNOWN = 0,
+  WifiMode_OPEN = 1,
+  WifiMode_WEP = 2,
+  WifiMode_WPA = 3,
+  WifiMode_WPA2 = 4,
+  WifiMode_WPA_WPA2 = 5,
+  WifiMode_WPA2_ENTERPRISE = 6,
+  WifiMode_MIN = WifiMode_UNKNOWN,
+  WifiMode_MAX = WifiMode_WPA2_ENTERPRISE
 };
 
-inline const WifiMode (&EnumValuesWifiMode())[3] {
+inline const WifiMode (&EnumValuesWifiMode())[7] {
   static const WifiMode values[] = {
+    WifiMode_UNKNOWN,
     WifiMode_OPEN,
+    WifiMode_WEP,
+    WifiMode_WPA,
     WifiMode_WPA2,
-    WifiMode_WPA
+    WifiMode_WPA_WPA2,
+    WifiMode_WPA2_ENTERPRISE
   };
   return values;
 }
 
 inline const char * const *EnumNamesWifiMode() {
   static const char * const names[] = {
+    "UNKNOWN",
     "OPEN",
-    "WPA2",
+    "WEP",
     "WPA",
+    "WPA2",
+    "WPA_WPA2",
+    "WPA2_ENTERPRISE",
     nullptr
   };
   return names;
@@ -63,6 +75,35 @@ inline const BLEDeviceFilter (&EnumValuesBLEDeviceFilter())[5] {
     BLEDeviceFilter_NONE
   };
   return values;
+}
+
+enum WiFiScanFilter {
+  WiFiScanFilter_ALL = 0,
+  WiFiScanFilter_NPC = 1,
+  WiFiScanFilter_MIN = WiFiScanFilter_ALL,
+  WiFiScanFilter_MAX = WiFiScanFilter_NPC
+};
+
+inline const WiFiScanFilter (&EnumValuesWiFiScanFilter())[2] {
+  static const WiFiScanFilter values[] = {
+    WiFiScanFilter_ALL,
+    WiFiScanFilter_NPC
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesWiFiScanFilter() {
+  static const char * const names[] = {
+    "ALL",
+    "NPC",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameWiFiScanFilter(WiFiScanFilter e) {
+  const size_t index = static_cast<int>(e);
+  return EnumNamesWiFiScanFilter()[index];
 }
 
 struct BytesToFromAddress FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

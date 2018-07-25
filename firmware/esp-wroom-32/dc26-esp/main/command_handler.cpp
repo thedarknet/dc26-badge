@@ -12,7 +12,8 @@ static HttpServer Port80WebServer;
 class MyWiFiEventHandler: public WiFiEventHandler {
 public:
 	const char *logTag = "MyWiFiEventHandler";
-	MyWiFiEventHandler() : APStarted(false) {}
+	static const uint16_t MAX_APS = 15;
+	MyWiFiEventHandler() : APStarted(false), scanMsgID(0), WifiFilter(darknet7::WiFiScanFilter_ALL) {}
 public:
 	virtual esp_err_t staGotIp(system_event_sta_got_ip_t event_sta_got_ip) {
 		ESP_LOGD(logTag, "MyWiFiEventHandler(Class): staGotIp");
@@ -40,7 +41,45 @@ public:
 	virtual esp_err_t staDisconnected(system_event_sta_disconnected_t info) {
 		return ESP_OK;
 	}
+	darknet7::WifiMode convertToWiFiAuthMode(uint16_t authMode) {
+		switch(authMode) {
+		case WIFI_AUTH_OPEN:
+			return darknet7::WifiMode_OPEN;
+		case WIFI_AUTH_WEP:
+			return darknet7::WifiMode_WEP;
+		case WIFI_AUTH_WPA2_PSK:
+			return darknet7::WifiMode_WPA2;
+		case WIFI_AUTH_WPA_PSK:
+			return darknet7::WifiMode_WPA;
+		case WIFI_AUTH_WPA_WPA2_PSK:
+			return darknet7::WifiMode_WPA_WPA2;
+		case WIFI_AUTH_WPA2_ENTERPRISE:
+			return darknet7::WifiMode_WPA2_ENTERPRISE;
+		default:
+			return darknet7::WifiMode_UNKNOWN;
+		}
+	}
 	virtual esp_err_t staScanDone(system_event_sta_scan_done_t info) {
+		ESP_LOGI(logTag, "MyWiFiEventHandler(Class): scan done: APs Found %d", (int32_t) info.number);
+		uint16_t numAPs = info.number;
+		numAPs = std::min(numAPs,(uint16_t)15);
+		wifi_ap_record_t *recs = new wifi_ap_record_t[numAPs];
+		std::vector<flatbuffers::Offset<darknet7::WiFiScanResult>> APs;
+		flatbuffers::FlatBufferBuilder fbb;
+		if(ESP_OK==esp_wifi_scan_get_ap_records(&numAPs,recs)) {
+			for(auto i=0;i<numAPs;++i) {
+				flatbuffers::Offset<darknet7::WiFiScanResult> sro = 
+						  	darknet7::CreateWiFiScanResultDirect(fbb,(const char *)recs[i].ssid,
+									convertToWiFiAuthMode(recs[i].authmode));
+				APs.push_back(sro);
+			}
+			auto ssro = darknet7::CreateWiFiScanResultsDirect(fbb,&APs);
+			flatbuffers::Offset<darknet7::ESPToSTM> of = darknet7::CreateESPToSTM(fbb, 
+								 scanMsgID, darknet7::ESPToSTMAny_WiFiScanResults, ssro.Union());
+			darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+			getMCUToMCU().send(fbb);
+		}
+		delete [] recs;
 		return ESP_OK;
 	}
 	virtual esp_err_t staAuthChange(system_event_sta_authmode_change_t info) {
@@ -53,8 +92,11 @@ public:
 		return ESP_OK;
 	}
 	bool isAPStarted() {return APStarted;}
+	uint16_t getScanMsgID() {return scanMsgID;}
 private:
 	bool APStarted;
+	uint16_t scanMsgID;
+	darknet7::WiFiScanFilter WifiFilter;
 };
 
 

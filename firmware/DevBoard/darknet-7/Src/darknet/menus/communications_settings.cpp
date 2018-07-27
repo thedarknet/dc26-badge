@@ -35,6 +35,7 @@ public:
 protected:
 	virtual cmdc0de::ErrorType onInit() {
 		memset(&NewDeviceName[0],0,sizeof(NewDeviceName));
+		IHC.set(&NewDeviceName[0],sizeof(NewDeviceName));
 		VKB.init(VirtualKeyBoard::STDKBLowerCase,&IHC,5,DarkNet7::DISPLAY_WIDTH-5,80,RGBColor::WHITE, RGBColor::BLACK,
 				RGBColor::BLUE,'_');
 		return ErrorType();
@@ -114,6 +115,7 @@ protected:
 					darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
 				}
 				MCUToMCU::get().send(fbb);
+				HAL_Delay(1000);
 				nextState = DarkNet7::get().getCommunicationSettingState();
 			}
 		}

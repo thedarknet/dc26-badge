@@ -79,7 +79,7 @@ StateBase::ReturnStateContext MCUInfoState::onRun() {
 		}
 		break;
 	case DISPLAY_DATA:
-		if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+		if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
 			nextState = DarkNet7::get().getDisplayMenuState();
 		}
 		break;

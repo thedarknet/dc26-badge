@@ -9,13 +9,15 @@
 
 #include "scan.h"
 #include "../darknet7.h"
+#include "../messaging/stm_to_esp_generated.h"
+#include "menu_state.h"
 
 using cmdc0de::RGBColor;
 using cmdc0de::ErrorType;
 using cmdc0de::StateBase;
 
 
-Scan::Scan() : Darknet7BaseState(), NPCOnly(false)  {
+Scan::Scan() : Darknet7BaseState(), NPCOnly(false), DisplayList("WiFi:", Items, 0, 0, 160, 128, 0, (sizeof(Items) / sizeof(Items[0]))), ESPRequestID(0), InternalState(NONE)  {
 
 }
 
@@ -24,71 +26,64 @@ Scan::~Scan()
 
 }
 
-ErrorType Scan::onInit() {
-	//BLE - scan for devices - (see filters in scan.h
-	//WIFI scan for devices
-	/*
-	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
-	sprintf(&ListBuffer[0][0], "Name: %s", DarkNet7::get().getContacts().getSettings().getAgentName());
-	sprintf(&ListBuffer[1][0], "Num contacts: %u", DarkNet7::get().getContacts().getSettings().getNumContacts());
-	sprintf(&ListBuffer[2][0], "REG: %s", getRegCode(DarkNet7::get().getContacts()));
-	sprintf(&ListBuffer[3][0], "UID: %u", DarkNet7::get().getContacts().getMyInfo().getUniqueID());
-	uint8_t *pCP = DarkNet7::get().getContacts().getMyInfo().getCompressedPublicKey();
-	sprintf(&ListBuffer[4][0],
-			"PK: %02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
-			pCP[0], pCP[1], pCP[2], pCP[3], pCP[4], pCP[5], pCP[6], pCP[7], pCP[8], pCP[9], pCP[10], pCP[11],
-			pCP[12],
-			pCP[13], pCP[14], pCP[15], pCP[16], pCP[17], pCP[18], pCP[19], pCP[20], pCP[21], pCP[22], pCP[23],
-			pCP[24]);
-	sprintf(&ListBuffer[5][0], "DEVID: %lu", HAL_GetDEVID());
-	sprintf(&ListBuffer[6][0], "REVID: %lu", HAL_GetREVID());
-	sprintf(&ListBuffer[7][0], "HAL Version: %lu", HAL_GetHalVersion());
-	sprintf(&ListBuffer[8][0], "SVer: %s", VERSION);
+void Scan::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::WiFiScanResults> *mevt) {
+	if(mevt->RequestID==this->ESPRequestID) {
+		InternalState = DISPLAY_DATA;
 
-	for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++) {
-		Items[i].text = &ListBuffer[i][0];
-		Items[i].id = i;
-		Items[i].setShouldScroll();
+		MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
+
+		for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++) {
+			Items[i].text = &ListBuffer[i][0];
+			Items[i].id = i;
+			Items[i].setShouldScroll();
+		}
+
+		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+		DarkNet7::get().getGUI().drawList(&DisplayList);
 	}
+}
+
+ErrorType Scan::onInit() {
+	InternalState = FETCHING_DATA;
+	flatbuffers::FlatBufferBuilder fbb;
+	darknet7::WiFiScanFilter filter = this->isNPCOnly()?darknet7::WiFiScanFilter_NPC:darknet7::WiFiScanFilter_ALL;
+
+	auto r = darknet7::CreateWiFiScan(fbb,filter);
+	ESPRequestID = DarkNet7::get().nextSeq();
+	auto e = darknet7::CreateSTMToESPRequest(fbb,ESPRequestID,darknet7::STMToESPAny_ESPRequest, r.Union());
+	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
+	const MSGEvent<darknet7::WiFiScanResults> *si = 0;
+	MCUToMCU::get().getBus().addListener(this,si,&MCUToMCU::get());
 	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
-	DarkNet7::get().getGUI().drawList(&BadgeInfoList);
-	*/
+
+	if(isNPCOnly()) {
+		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Scanning for DarkNet NPCs",RGBColor::BLUE);
+	} else {
+		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Scanning for APs",RGBColor::BLUE);
+	}
+
+	MCUToMCU::get().send(fbb);
 	return ErrorType();
 
 }
 
 StateBase::ReturnStateContext Scan::onRun() {
-
 	StateBase *nextState = this;
-	/*
-	uint8_t key = rc.getKB().getLastKeyReleased();
-	switch (key) {
-		case QKeyboard::UP: {
-			if (BadgeInfoList.selectedItem == 0) {
-				BadgeInfoList.selectedItem = sizeof(Items) / sizeof(Items[0]) - 1;
-			} else {
-				BadgeInfoList.selectedItem--;
-			}
-			break;
+	switch(InternalState) {
+	case FETCHING_DATA:
+		if(this->getTimesRunCalledSinceLastReset()>200) {
+			nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(), DarkNet7::NO_DATA_FROM_ESP,2000);
 		}
-		case QKeyboard::DOWN: {
-			if (BadgeInfoList.selectedItem == (sizeof(Items) / sizeof(Items[0]) - 1)) {
-				BadgeInfoList.selectedItem = 0;
-			} else {
-				BadgeInfoList.selectedItem++;
-			}
-			break;
+		break;
+	case DISPLAY_DATA:
+		if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+			nextState = DarkNet7::get().getDisplayMenuState();
 		}
-		case QKeyboard::ENTER:
-			case QKeyboard::BACK:
-			nextState = StateFactory::getMenuState();
-			break;
+		break;
+	case NONE:
+		break;
 	}
-	if (rc.getKB().wasKeyReleased()
-			|| (Items[BadgeInfoList.selectedItem].shouldScroll() && getTimesRunCalledSinceLastReset() % 5 == 0)) {
-		rc.getGUI().drawList(&BadgeInfoList);
-	}
-	*/
 	return ReturnStateContext(nextState);
 }
 

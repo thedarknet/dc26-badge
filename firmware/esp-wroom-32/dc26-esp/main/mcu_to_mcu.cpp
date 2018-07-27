@@ -2,13 +2,14 @@
 #include "stm_to_esp_generated.h"
 #include "esp_to_stm_generated.h"
 #include "command_handler.h"
-#include <rom/crc.h>
 #include "dc26.h"
 #include "dc26_ble/ble.h"
+extern "C" {
+#include "checksum.h"
+}
 
 const char *MCUToMCUTask::LOGTAG = "MCUToMCUTask";
 static uint8_t ESPToSTMBuffer[MCUToMCUTask::ESP_TO_STM_MSG_QUEUE_SIZE*MCUToMCUTask::ESP_TO_STM_MSG_ITEM_SIZE];
-static QueueHandle_t uart0_queue;
 static StaticQueue_t OutgoingQueue;
 static QueueHandle_t OutgoingQueueHandle = nullptr;
 static xTaskHandle UARTSendTaskhandle = 0;
@@ -21,6 +22,16 @@ const darknet7::ESPToSTM *MCUToMCUTask::Message::asESPToSTM() {
 const darknet7::STMToESPRequest* MCUToMCUTask::Message::asSTMToESP() {
 	return darknet7::GetSizePrefixedSTMToESPRequest(
 			&MessageData[ENVELOP_HEADER]);
+}
+
+const darknet7::STMToESPRequest *MCUToMCUTask::Message::asSTMToESPVerify() {
+	flatbuffers::Verifier v(&MessageData[ENVELOP_HEADER],getDataSize()); 
+	if(darknet7::VerifySizePrefixedSTMToESPRequestBuffer(v)) {
+		return asSTMToESP();
+	} else {
+		ESP_LOGI(LOGTAG, "Failed to verify message");
+		return nullptr;
+	}
 }
 
 //We listen for the for our envelop portion of our message which is: 4 bytes:
@@ -45,14 +56,17 @@ bool MCUToMCUTask::Message::read(const uint8_t* data, uint32_t dataSize) {
 			(uint32_t)SizeAndFlags, (uint32_t)getDataSize(), (uint32_t)Crc16);
 	assert(getDataSize() < MAX_MESSAGE_SIZE);
 	//calc crc
-	uint16_t crc = crc16_le(0, &data[ENVELOP_HEADER], getDataSize());
+	//uint16_t crc = crc16_le(0, &data[ENVELOP_HEADER], getDataSize());
+	uint16_t crc = crc_16(&data[ENVELOP_HEADER], getDataSize());
 	if(crc!=Crc16) {
 		ESP_LOGI(LOGTAG, "CRC's don't match calced: %d, STM %d", crc, Crc16);
-	}
-	if (getMessageSize() <= dataSize) {
-		ESP_LOGI(LOGTAG, "coping data to message");
-		memcpy(&MessageData[0], &data[0], getMessageSize());
-		return true;
+	} else {
+		if (getMessageSize() <= dataSize) {
+			ESP_LOGI(LOGTAG, "CRC's match calced: %d, STM %d", crc, Crc16);
+			ESP_LOGI(LOGTAG, "coping data to message");
+			memcpy(&MessageData[0], &data[0], getMessageSize());
+			return true;
+		}
 	}
 	return false;
 }
@@ -127,7 +141,7 @@ bool MCUToMCUTask::init(gpio_num_t tx, gpio_num_t rx, uint16_t rxBufSize) {
 	uart_param_config(UART_NUM_1, &uart_config);
 	uart_set_pin(UART_NUM_1, tx, rx, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 	// added a buffer for send and receive that we don't have to handle the async send
-	uart_driver_install(UART_NUM_1, rxBufSize * 2, 0, 4, &uart0_queue, 0);
+	uart_driver_install(UART_NUM_1, rxBufSize * 2, 0, 0, NULL, 0);
 	return true;
 }
 
@@ -139,12 +153,11 @@ void MCUToMCUTask::send(const flatbuffers::FlatBufferBuilder &fbb) {
 	uint8_t *msg = fbb.GetBufferPointer();
 	uint32_t size = fbb.GetSize();
 	assert(size < MAX_MESSAGE_SIZE);
-	uint16_t crc = crc16_le(0, msg, size);
+	uint16_t crc = crc_16(msg, size);
 	ESP_LOGI(LOGTAG, "Queuing size %d, crc %d\n", size, crc);
 	Message *m = new Message();
 	m->set(size, crc, msg);
 	xQueueSend(OutgoingQueueHandle, (void* )&m,(TickType_t ) 100);
-	//m.transmit();
 }
 
 
@@ -153,35 +166,40 @@ int32_t MCUToMCUTask::processMessage(const uint8_t *data, uint32_t size) {
 	Message *m = new Message();
 	int32_t retVal = 0;
 	if(m->read(data,size)) {
-		auto msg = m->asSTMToESP();
-		retVal = m->getMessageSize();
-		ESP_LOGI(LOGTAG, "MsgType %d", msg->Msg_type());
-		//ESP_LOGI(LOGTAG, darknet7::EnumNamesSTMToESPAny(msg->Msg_type()));
-		switch (msg->Msg_type()) {
-		case darknet7::STMToESPAny_StopAP:
-		case darknet7::STMToESPAny_SetupAP:
-		case darknet7::STMToESPAny_CommunicationStatusRequest:
-		case darknet7::STMToESPAny_ESPRequest:
-			ESP_LOGI(LOGTAG, "sending to cmd handler");
-			xQueueSend(CmdHandler->getQueueHandle(), (void* )&m,(TickType_t ) 0);
-			ESP_LOGI(LOGTAG, "after send to cmd handler");
-			break;
-        case darknet7::STMToESPAny_BLEAdvertise:
-        case darknet7::STMToESPAny_BLESetDeviceName:
-        case darknet7::STMToESPAny_BLEGetInfectionData:
-        case darknet7::STMToESPAny_BLESetExposureData:
-        case darknet7::STMToESPAny_BLESetInfectionData:
-        case darknet7::STMToESPAny_BLESetCureData:
-        case darknet7::STMToESPAny_BLEScanForDevices:
-        case darknet7::STMToESPAny_BLEPairWithDevice:
-        case darknet7::STMToESPAny_BLESendPINConfirmation:
-        case darknet7::STMToESPAny_BLESendDataToDevice:
-        case darknet7::STMToESPAny_BLEDisconnect:
+		auto msg = m->asSTMToESPVerify();
+		if(msg) {
+			retVal = m->getMessageSize();
+			ESP_LOGI(LOGTAG, "MsgType %d", msg->Msg_type());
+			//ESP_LOGI(LOGTAG, darknet7::EnumNamesSTMToESPAny(msg->Msg_type()));
+			switch (msg->Msg_type()) {
+			case darknet7::STMToESPAny_StopAP:
+			case darknet7::STMToESPAny_SetupAP:
+			case darknet7::STMToESPAny_CommunicationStatusRequest:
+			case darknet7::STMToESPAny_ESPRequest:
+				ESP_LOGI(LOGTAG, "sending to cmd handler");
+				xQueueSend(CmdHandler->getQueueHandle(), (void* )&m,(TickType_t ) 0);
+				ESP_LOGI(LOGTAG, "after send to cmd handler");
+				break;
+	     	case darknet7::STMToESPAny_BLEAdvertise:
+        	case darknet7::STMToESPAny_BLESetDeviceName:
+        	case darknet7::STMToESPAny_BLEGetInfectionData:
+        	case darknet7::STMToESPAny_BLESetExposureData:
+        	case darknet7::STMToESPAny_BLESetInfectionData:
+        	case darknet7::STMToESPAny_BLESetCureData:
+        	case darknet7::STMToESPAny_BLEScanForDevices:
+        	case darknet7::STMToESPAny_BLEPairWithDevice:
+        	case darknet7::STMToESPAny_BLESendPINConfirmation:
+        	case darknet7::STMToESPAny_BLESendDataToDevice:
+        	case darknet7::STMToESPAny_BLEDisconnect:
 			ESP_LOGI(LOGTAG, "sending to bluetooth task");
 			xQueueSend(getBLETask().getQueueHandle(), (void*)&m, (TickType_t) 0);
 			ESP_LOGI(LOGTAG, "after send to bluetooth task");
-		default:
-			break;
+				break;
+			default:
+				break;
+			}
+		} else {
+			retVal = -1;
 		}
 	} else {
 		delete m;
@@ -191,75 +209,25 @@ int32_t MCUToMCUTask::processMessage(const uint8_t *data, uint32_t size) {
 
 void MCUToMCUTask::run(void *data) {
 	esp_log_level_set(LOGTAG, ESP_LOG_INFO);
-	uart_event_t event;
 	uint8_t dataBuf[MAX_MESSAGE_SIZE * 2] = {0};
 	size_t receivePtr = 0;
-	bool GotBreak = false;
 	while (1) {
-		//Waiting for UART event.
-		if (xQueueReceive(uart0_queue, (void * )&event, (portTickType )portMAX_DELAY)) {
-			switch (event.type) {
-			//Event of UART receiving data
-			case UART_DATA: 
-				ESP_LOGI(LOGTAG, "Before receive [UART DATA]: %d (%d)", event.size, receivePtr);
-				receivePtr+=uart_read_bytes(UART_NUM_1, &dataBuf[0], sizeof(dataBuf), 100);
-				ESP_LOGI(LOGTAG, "after receive [UART DATA]: %d (%d)", event.size, receivePtr);
-				ESP_LOG_BUFFER_HEX(LOGTAG, &dataBuf[0], receivePtr);
-				if(receivePtr>ENVELOP_HEADER && GotBreak) {
-					if(processMessage(&dataBuf[0],receivePtr)) {
-						receivePtr = 0;
-						GotBreak = false;
-						bzero(&dataBuf[0],sizeof(dataBuf));
-					}
-				}
-				GotBreak = false;
-				break;
-				//Event of HW FIFO overflow detected
-			case UART_FIFO_OVF:
-			case UART_BUFFER_FULL:
-				ESP_LOGI(LOGTAG, "hw fifo overflow or buffer full - is other MCU powered?");
-				// If fifo overflow happened, you should consider adding flow control for your application.
-				uart_flush_input (UART_NUM_1);
-				xQueueReset(uart0_queue);
-				GotBreak = false;
-				break;
-				//Event of UART RX break detected
-			case UART_BREAK:
-				ESP_LOGI(LOGTAG, "Before rx break: %d (%d)", event.size, receivePtr);
-				receivePtr+=uart_read_bytes(UART_NUM_1, &dataBuf[0], sizeof(dataBuf), 100);
-				ESP_LOGI(LOGTAG, "After rx break: %d (%d)", event.size, receivePtr);
-				ESP_LOG_BUFFER_HEX(LOGTAG, &dataBuf[0], receivePtr);
-				GotBreak = true;
-				if(receivePtr>ENVELOP_HEADER) {
-					if(processMessage(&dataBuf[0],receivePtr)) {
-						receivePtr = 0;
-						GotBreak = false;
-						bzero(&dataBuf[0],sizeof(dataBuf));
-					}
-				}
-				break;
-				//Event of UART parity check error
-			case UART_PARITY_ERR:
-				ESP_LOGI(LOGTAG, "uart parity error");
-				GotBreak = false;
-				xQueueReset(uart0_queue);
-				break;
-				//Event of UART frame error
-			case UART_FRAME_ERR:
-				ESP_LOGI(LOGTAG, "uart frame error");
-				GotBreak = false;
-				xQueueReset(uart0_queue);
-				break;
-				//UART_PATTERN_DET
-			case UART_PATTERN_DET:
-				ESP_LOGI(LOGTAG,"pattern message?????");
-				break;
-				//Others
-			default:
-				ESP_LOGI(LOGTAG, "uart event type: %d", event.type);
-				break;
+		receivePtr+=uart_read_bytes(UART_NUM_1, &dataBuf[0], sizeof(dataBuf), 100);
+		if(receivePtr>ENVELOP_HEADER) {
+			ESP_LOG_BUFFER_HEXDUMP(LOGTAG,&dataBuf[0],receivePtr, ESP_LOG_INFO);
+			int32_t consumed = processMessage(&dataBuf[0],receivePtr);
+			if(consumed>0) {
+				ESP_LOGI(LOGTAG, "process Msg: consumed=%d total=%d", consumed, receivePtr);
+				receivePtr -= consumed;
+				assert(receivePtr<sizeof(dataBuf));
+				memmove(&dataBuf[0],&dataBuf[consumed],consumed);
+			} else if (consumed<0) {
+				ESP_LOGI(LOGTAG, "error process message resetting queue");
+				bzero(&dataBuf[0],sizeof(dataBuf));
+			} else /*0*/ {
 			}
 		}
+		vTaskDelay(50/portTICK_PERIOD_MS);
 	}
 }
 

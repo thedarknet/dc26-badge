@@ -31,6 +31,7 @@ public:
 		static const uint16_t MESSAGE_FLAG_TRANSMITTED = 0x8000; //bit 15
 	public:
 		const darknet7::STMToESPRequest *asSTMToESP();
+		const darknet7::STMToESPRequest *asSTMToESPVerify();
 		const darknet7::ESPToSTM *asESPToSTM();
 		Message(); // TODO: return to protected
 		bool read(const uint8_t* data, uint32_t dataSize); // return to protected

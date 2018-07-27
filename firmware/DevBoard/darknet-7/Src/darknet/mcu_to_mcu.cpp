@@ -77,8 +77,7 @@ void MCUToMCU::init(UART_HandleTypeDef *uart) {
 	UartHandler = uart;
 	MX_USART1_UART_Init();
 	HAL_LIN_Init(UartHandler, UART_LINBREAKDETECTLENGTH_10B);
-	HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[0],
-			MCUToMCU::TOTAL_MESSAGE_SIZE);
+	HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[0],	MCUToMCU::TOTAL_MESSAGE_SIZE);
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
@@ -107,7 +106,7 @@ void MCUToMCU::onTransmitionComplete() {
 	Message &m = Outgoing.front();
 	if(m.checkFlags(Message::MESSAGE_FLAG_TRANSMITTED)) {
 		Outgoing.pop();
-		HAL_LIN_SendBreak(UartHandler);
+		//HAL_LIN_SendBreak(UartHandler);
 	}
 	transmitNow();
 }

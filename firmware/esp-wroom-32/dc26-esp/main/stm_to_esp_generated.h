@@ -63,11 +63,12 @@ enum STMToESPAny {
   STMToESPAny_BLESendPINConfirmation = 15,
   STMToESPAny_BLESendDataToDevice = 16,
   STMToESPAny_BLEDisconnect = 17,
+  STMToESPAny_WiFiScan = 18,
   STMToESPAny_MIN = STMToESPAny_NONE,
-  STMToESPAny_MAX = STMToESPAny_BLEDisconnect
+  STMToESPAny_MAX = STMToESPAny_WiFiScan
 };
 
-inline const STMToESPAny (&EnumValuesSTMToESPAny())[18] {
+inline const STMToESPAny (&EnumValuesSTMToESPAny())[19] {
   static const STMToESPAny values[] = {
     STMToESPAny_NONE,
     STMToESPAny_SetupAP,
@@ -86,7 +87,8 @@ inline const STMToESPAny (&EnumValuesSTMToESPAny())[18] {
     STMToESPAny_BLEPairWithDevice,
     STMToESPAny_BLESendPINConfirmation,
     STMToESPAny_BLESendDataToDevice,
-    STMToESPAny_BLEDisconnect
+    STMToESPAny_BLEDisconnect,
+    STMToESPAny_WiFiScan
   };
   return values;
 }
@@ -111,6 +113,7 @@ inline const char * const *EnumNamesSTMToESPAny() {
     "BLESendPINConfirmation",
     "BLESendDataToDevice",
     "BLEDisconnect",
+    "WiFiScan",
     nullptr
   };
   return names;
@@ -191,6 +194,10 @@ template<> struct STMToESPAnyTraits<BLESendDataToDevice> {
 
 template<> struct STMToESPAnyTraits<BLEDisconnect> {
   static const STMToESPAny enum_value = STMToESPAny_BLEDisconnect;
+};
+
+template<> struct STMToESPAnyTraits<WiFiScan> {
+  static const STMToESPAny enum_value = STMToESPAny_WiFiScan;
 };
 
 bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, STMToESPAny type);
@@ -942,6 +949,9 @@ struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const BLEDisconnect *Msg_as_BLEDisconnect() const {
     return Msg_type() == STMToESPAny_BLEDisconnect ? static_cast<const BLEDisconnect *>(Msg()) : nullptr;
   }
+  const WiFiScan *Msg_as_WiFiScan() const {
+    return Msg_type() == STMToESPAny_WiFiScan ? static_cast<const WiFiScan *>(Msg()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_MSGINSTANCEID) &&
@@ -1018,6 +1028,10 @@ template<> inline const BLESendDataToDevice *STMToESPRequest::Msg_as<BLESendData
 
 template<> inline const BLEDisconnect *STMToESPRequest::Msg_as<BLEDisconnect>() const {
   return Msg_as_BLEDisconnect();
+}
+
+template<> inline const WiFiScan *STMToESPRequest::Msg_as<WiFiScan>() const {
+  return Msg_as_WiFiScan();
 }
 
 struct STMToESPRequestBuilder {
@@ -1127,6 +1141,10 @@ inline bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, 
     }
     case STMToESPAny_BLEDisconnect: {
       auto ptr = reinterpret_cast<const BLEDisconnect *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case STMToESPAny_WiFiScan: {
+      auto ptr = reinterpret_cast<const WiFiScan *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return false;

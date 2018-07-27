@@ -2,15 +2,27 @@ include "common.fbs";
 
 namespace darknet7;
 
-union STMToESPAny { SetupAP, StopAP, BytesToFromAddress, DisplayMessage, ESPRequest, CommunicationStatusRequest,
-				 	BLEGetInfectionData,
-					BLEAdvertise, 
-					BLESetDeviceName,
-					BLESetInfectionData, BLESetExposureData, BLESetCureData,
-					BLEScanForDevices,
-					BLEPairWithDevice, BLESendPINConfirmation,
-					BLESendDataToDevice,
-					BLEDisconnect}
+union STMToESPAny 
+{ 					
+	SetupAP
+	,StopAP
+	,BytesToFromAddress
+	,DisplayMessage
+	,ESPRequest
+	,CommunicationStatusRequest
+	,BLEGetInfectionData
+	,BLEAdvertise
+	,BLESetDeviceName
+	,BLESetInfectionData
+	,BLESetExposureData
+	,BLESetCureData
+	,BLEScanForDevices
+	,BLEPairWithDevice
+	,BLESendPINConfirmation
+	,BLESendDataToDevice
+	,BLEDisconnect
+	,WiFiScan
+}
 
 table WiFiScan {
 	filter:WiFiScanFilter;

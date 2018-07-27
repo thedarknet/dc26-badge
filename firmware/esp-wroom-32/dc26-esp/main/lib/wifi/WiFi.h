@@ -20,6 +20,7 @@ public:
 	WIFI();
 	~WIFI();
 public:
+	bool init();
 	wifi_mode_t getMode();
 	void initWiFiConfig(wifi_config_t &wifi_config, const std::string &ssid); 
 	void initWiFiConfig(wifi_config_t &wifi_config, const std::string &ssid, const std::string &passwd, wifi_auth_mode_t authMode, bool isHidden, uint8_t max_con, uint16_t beacon_interval);
@@ -32,8 +33,11 @@ public:
 	void setWifiEventHandler(WiFiEventHandler *wifiEventHandler);
 	const WiFiEventHandler *getWifiEventHandler() const {return mpWifiEventHandler;}
 	WiFiEventHandler *getWifiEventHandler() {return mpWifiEventHandler;}
+	bool scan(bool showHidden);
 protected:
 	WiFiEventHandler*   mpWifiEventHandler;
+	bool EventLoopStarted;
+	bool InitCalled;
 };
 
 #endif

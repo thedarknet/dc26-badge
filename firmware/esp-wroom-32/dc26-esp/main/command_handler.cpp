@@ -68,6 +68,7 @@ public:
 		flatbuffers::FlatBufferBuilder fbb;
 		if(ESP_OK==esp_wifi_scan_get_ap_records(&numAPs,recs)) {
 			for(auto i=0;i<numAPs;++i) {
+				ESP_LOGI(logTag, "ssid: %s \t auth: %d", (const char *)recs[i].ssid,recs[i].authmode);
 				flatbuffers::Offset<darknet7::WiFiScanResult> sro = 
 						  	darknet7::CreateWiFiScanResultDirect(fbb,(const char *)recs[i].ssid,
 									convertToWiFiAuthMode(recs[i].authmode));
@@ -77,7 +78,7 @@ public:
 			flatbuffers::Offset<darknet7::ESPToSTM> of = darknet7::CreateESPToSTM(fbb, 
 								 scanMsgID, darknet7::ESPToSTMAny_WiFiScanResults, ssro.Union());
 			darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-			getMCUToMCU().send(fbb);
+			//getMCUToMCU().send(fbb);
 		}
 		delete [] recs;
 		return ESP_OK;
@@ -93,6 +94,14 @@ public:
 	}
 	bool isAPStarted() {return APStarted;}
 	uint16_t getScanMsgID() {return scanMsgID;}
+	void setScanMsgID(uint16_t sid) {scanMsgID=sid;}
+	void setWiFiScanNPCOnly(bool b) {
+		if(b) {
+			WifiFilter = darknet7::WiFiScanFilter_NPC;
+		} else  {
+			WifiFilter = darknet7::WiFiScanFilter_ALL;
+		}
+	}
 private:
 	bool APStarted;
 	uint16_t scanMsgID;
@@ -120,13 +129,11 @@ bool CmdHandlerTask::init() {
 	}
 	WiFiEventHandler *handler = new MyWiFiEventHandler();
 	wifi.setWifiEventHandler(handler);
-	return true;
+	return wifi.init();
 }
 
 CmdHandlerTask::~CmdHandlerTask() {
 }
-
-wifi_auth_mode_t ap_mode = WIFI_AUTH_WPA_WPA2_PSK;
 
 wifi_auth_mode_t convertAuthMode(darknet7::WifiMode m) {
 	switch(m) {
@@ -177,6 +184,7 @@ void CmdHandlerTask::run(void *data) {
 				}
 				break;
 			case darknet7::STMToESPAny_ESPRequest: {
+						wifi.scan(false);
 						ESP_LOGI(LOGTAG, "processing system info");
 						flatbuffers::FlatBufferBuilder fbb;
 						System::logSystemInfo();
@@ -214,6 +222,17 @@ void CmdHandlerTask::run(void *data) {
 						getMCUToMCU().send(fbb);
 					}
 					break;
+			case darknet7::STMToESPAny_WiFiScan: {
+					MyWiFiEventHandler *eh = (MyWiFiEventHandler*)wifi.getWifiEventHandler();
+					const darknet7::WiFiScan * ws = msg->Msg_as_WiFiScan();
+					if(eh) {
+						eh->setScanMsgID(msg->msgInstanceID());
+						if(ws->filter()==darknet7::WiFiScanFilter_NPC) {
+							eh->setWiFiScanNPCOnly(true);
+						}
+					}
+				}
+				break;
 			default:
 				break;
 			}

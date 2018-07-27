@@ -184,7 +184,7 @@ void CmdHandlerTask::run(void *data) {
 				}
 				break;
 			case darknet7::STMToESPAny_ESPRequest: {
-						wifi.scan(false);
+						//wifi.scan(false);
 						ESP_LOGI(LOGTAG, "processing system info");
 						flatbuffers::FlatBufferBuilder fbb;
 						System::logSystemInfo();

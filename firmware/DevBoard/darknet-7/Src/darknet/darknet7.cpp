@@ -35,6 +35,7 @@
 #include "menus/health.h"
 #include "menus/scan.h"
 #include "menus/sao_menu.h"
+#include "art/images.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::DisplayST7735;
@@ -175,6 +176,8 @@ DarkNet7::~DarkNet7() {
 }
 
 ErrorType DarkNet7::onInit() {
+	MCUToMCU::get().init(&huart1);
+
 	ErrorType et;
 
 	GUIListItemData items[4];
@@ -186,11 +189,14 @@ ErrorType DarkNet7::onInit() {
 		items[0].set(0, "OLED_INIT");
 		DrawList.ItemsCount++;
 		Display.setTextColor(cmdc0de::RGBColor::WHITE);
+	} else {
+		while (1) {
+			HAL_GPIO_WritePin(SIMPLE_LED1_GPIO_Port, SIMPLE_LED1_Pin, GPIO_PIN_SET);
+			HAL_Delay(200);
+			HAL_GPIO_WritePin(SIMPLE_LED1_GPIO_Port, SIMPLE_LED1_Pin, GPIO_PIN_RESET);
+			HAL_Delay(400);
+		}
 	}
-#if 0
-	HAL_GPIO_WritePin(SIMPLE_LED1_GPIO_Port, SIMPLE_LED1_Pin, GPIO_PIN_SET);
-	//HAL_GPIO_WritePin(SIMPLE_LED2_GPIO_Port, SIMPLE_LED2_Pin, GPIO_PIN_SET);
-#endif
 	GUI gui(&Display);
 	gui.drawList(&DrawList);
 	Display.swap();
@@ -207,6 +213,16 @@ ErrorType DarkNet7::onInit() {
 	Display.swap();
 #endif
 
+#if 0
+	Display.fillScreen(cmdc0de::RGBColor::BLACK);
+	getDisplay().drawImage(getLogo1());
+	Display.swap();
+	HAL_Delay(1000);
+	Display.fillScreen(cmdc0de::RGBColor::BLACK);
+	getDisplay().drawImage(getLogo2());
+	Display.swap();
+	HAL_Delay(2000);
+#endif
 	setCurrentState(getDisplayMenuState());
 
 #define TEST_SD_CARD
@@ -242,8 +258,6 @@ ErrorType DarkNet7::onInit() {
 		 }
 	 }
 #endif
-
-	MCUToMCU::get().init(&huart1);
 	return et;
 }
 

@@ -56,8 +56,8 @@ MEMORY
 {
 RAM (xrw)              : ORIGIN = 0x20000000, LENGTH = 128K
 FLASH0 (rx)            : ORIGIN =  0x8000000, LENGTH = 16K
-DATA_ADDRESS_BOOK(xrw) : ORIGIN =  0x8004000, LENGTH = 112K
-FLASH (rx)             : ORIGIN =  0x801C000, LENGTH = 384K
+DATA_ADDRESS_BOOK(xrw) : ORIGIN =  0x8004000, LENGTH = 48K
+FLASH (rx)             : ORIGIN =  0x8010000, LENGTH = 448K
 }
 
 /* Define output sections */

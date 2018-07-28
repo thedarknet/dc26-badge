@@ -146,8 +146,10 @@ void MCUToMCU::handleMcuToMcu() {
 			HAL_UART_AbortReceive_IT(UartHandler);
 			HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[0], MAX_MESSAGE_SIZE);
 		} else {
-			//HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[0], MAX_MESSAGE_SIZE);
+			HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[size], MAX_MESSAGE_SIZE-size);
 		}
+	} else {
+		HAL_UART_Receive_IT(UartHandler, &UartRXBuffer[size], MAX_MESSAGE_SIZE-size);
 	}
 }
 
@@ -185,6 +187,11 @@ void MCUToMCU::process() {
 			break;
 		case darknet7::ESPToSTMAny_CommunicationStatusResponse: {
 			MSGEvent<darknet7::CommunicationStatusResponse> mevt(msg->Msg_as_CommunicationStatusResponse(),msg->msgInstanceID());
+			this->getBus().emitSignal(this,mevt);
+			}
+			break;
+		case darknet7::ESPToSTMAny_WiFiScanResults: {
+			MSGEvent<darknet7::WiFiScanResults> mevt(msg->Msg_as_WiFiScanResults(),msg->msgInstanceID());
 			this->getBus().emitSignal(this,mevt);
 			}
 			break;

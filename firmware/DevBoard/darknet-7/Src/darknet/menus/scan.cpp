@@ -16,6 +16,62 @@ using cmdc0de::RGBColor;
 using cmdc0de::ErrorType;
 using cmdc0de::StateBase;
 
+///////////////////////////////////////////
+class NPCInteract: public Darknet7BaseState {
+public:
+	enum INTERNAL_STATE {NONE, FETCHING_DATA, DISPLAYING_DATA};
+
+private:
+	uint32_t RequestID;
+	cmdc0de::GUIListData DisplayList;
+	cmdc0de::GUIListItemData Items[7];
+	char ListBuffer[7][48]; //height then width
+	INTERNAL_STATE InternalState;
+public:
+	NPCInteract() : Darknet7BaseState(), RequestID(0), DisplayList("NPC Interaction:", Items, 0, 0, 160, 128, 0, (sizeof(Items) / sizeof(Items[0]))), InternalState(NONE) {
+
+	}
+	virtual ~NPCInteract() {}
+	void Scan::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::WiFiScanResults> *mevt) {
+		if(mevt->RequestID==this->ESPRequestID) {
+			InternalState = DISPLAY_DATA;
+
+			MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
+
+			for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++) {
+				Items[i].text = &ListBuffer[i][0];
+				Items[i].id = i;
+				Items[i].setShouldScroll();
+			}
+			for(uint32_t i=0;i<mevt->InnerMsg->APs()->Length() && i<(sizeof(Items) / sizeof(Items[0]));++i) {
+				sprintf(&ListBuffer[i][0], "%s : %s ", mevt->InnerMsg->APs()->Get(i)->ssid()->c_str(), darknet7::EnumNameWifiMode(mevt->InnerMsg->APs()->Get(i)->authMode()));
+			}
+
+			DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
+			DarkNet7::get().getGUI().drawList(&DisplayList);
+		}
+	}
+protected:
+	virtual cmdc0de::ErrorType onInit() {
+
+		return ErrorType();
+	}
+
+	virtual cmdc0de::StateBase::ReturnStateContext onRun() {
+		StateBase *nextState = this;
+		return ReturnStateContext(nextState);
+	}
+
+	virtual cmdc0de::ErrorType onShutdown() {
+		return ErrorType();
+	}
+};
+static NPCInteract NPCInteraction;
+
+
+
+
+////////////////////////////////////////////
 
 Scan::Scan() : Darknet7BaseState(), NPCOnly(false), DisplayList("WiFi:", Items, 0, 0, 160, 128, 0, (sizeof(Items) / sizeof(Items[0]))), ESPRequestID(0), InternalState(NONE)  {
 
@@ -37,6 +93,9 @@ void Scan::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::WiFiScanResults> *me
 			Items[i].id = i;
 			Items[i].setShouldScroll();
 		}
+		for(uint32_t i=0;i<mevt->InnerMsg->APs()->Length() && i<(sizeof(Items) / sizeof(Items[0]));++i) {
+			sprintf(&ListBuffer[i][0], "%s : %s ", mevt->InnerMsg->APs()->Get(i)->ssid()->c_str(), darknet7::EnumNameWifiMode(mevt->InnerMsg->APs()->Get(i)->authMode()));
+		}
 
 		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 		DarkNet7::get().getGUI().drawList(&DisplayList);
@@ -50,7 +109,7 @@ ErrorType Scan::onInit() {
 
 	auto r = darknet7::CreateWiFiScan(fbb,filter);
 	ESPRequestID = DarkNet7::get().nextSeq();
-	auto e = darknet7::CreateSTMToESPRequest(fbb,ESPRequestID,darknet7::STMToESPAny_ESPRequest, r.Union());
+	auto e = darknet7::CreateSTMToESPRequest(fbb,ESPRequestID,darknet7::STMToESPAny_WiFiScan, r.Union());
 	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
 	memset(&ListBuffer[0], 0, sizeof(ListBuffer));
 	const MSGEvent<darknet7::WiFiScanResults> *si = 0;
@@ -77,9 +136,14 @@ StateBase::ReturnStateContext Scan::onRun() {
 		}
 		break;
 	case DISPLAY_DATA:
-		if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
-			nextState = DarkNet7::get().getDisplayMenuState();
+		if (!GUIListProcessor::process(&DisplayList,(sizeof(Items) / sizeof(Items[0])))) {
+			if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+				nextState = DarkNet7::get().getDisplayMenuState();
+			} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+				nextState = &NPCInteraction;
+			}
 		}
+		DarkNet7::get().getGUI().drawList(&DisplayList);
 		break;
 	case NONE:
 		break;
@@ -87,13 +151,13 @@ StateBase::ReturnStateContext Scan::onRun() {
 	return ReturnStateContext(nextState);
 }
 
+
 ErrorType Scan::onShutdown()
 {
+	const MSGEvent<darknet7::WiFiScanResults> *mevt=0;
+	MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
 	return ErrorType();
 }
-
-
-
 
 
 

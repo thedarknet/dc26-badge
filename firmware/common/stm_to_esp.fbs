@@ -22,6 +22,12 @@ union STMToESPAny
 	,BLESendDataToDevice
 	,BLEDisconnect
 	,WiFiScan
+	,WiFiNPCInteract
+}
+
+table WiFiNPCInteract {
+	bssid:[ubyte]; //bssid ap to interact with
+	action:byte; //option choosen
 }
 
 table WiFiScan {

@@ -10,6 +10,8 @@
 
 namespace darknet7 {
 
+struct WiFiNPCInteract;
+
 struct WiFiScan;
 
 struct SetupAP;
@@ -64,11 +66,12 @@ enum STMToESPAny {
   STMToESPAny_BLESendDataToDevice = 16,
   STMToESPAny_BLEDisconnect = 17,
   STMToESPAny_WiFiScan = 18,
+  STMToESPAny_WiFiNPCInteract = 19,
   STMToESPAny_MIN = STMToESPAny_NONE,
-  STMToESPAny_MAX = STMToESPAny_WiFiScan
+  STMToESPAny_MAX = STMToESPAny_WiFiNPCInteract
 };
 
-inline const STMToESPAny (&EnumValuesSTMToESPAny())[19] {
+inline const STMToESPAny (&EnumValuesSTMToESPAny())[20] {
   static const STMToESPAny values[] = {
     STMToESPAny_NONE,
     STMToESPAny_SetupAP,
@@ -88,7 +91,8 @@ inline const STMToESPAny (&EnumValuesSTMToESPAny())[19] {
     STMToESPAny_BLESendPINConfirmation,
     STMToESPAny_BLESendDataToDevice,
     STMToESPAny_BLEDisconnect,
-    STMToESPAny_WiFiScan
+    STMToESPAny_WiFiScan,
+    STMToESPAny_WiFiNPCInteract
   };
   return values;
 }
@@ -114,6 +118,7 @@ inline const char * const *EnumNamesSTMToESPAny() {
     "BLESendDataToDevice",
     "BLEDisconnect",
     "WiFiScan",
+    "WiFiNPCInteract",
     nullptr
   };
   return names;
@@ -200,6 +205,10 @@ template<> struct STMToESPAnyTraits<WiFiScan> {
   static const STMToESPAny enum_value = STMToESPAny_WiFiScan;
 };
 
+template<> struct STMToESPAnyTraits<WiFiNPCInteract> {
+  static const STMToESPAny enum_value = STMToESPAny_WiFiNPCInteract;
+};
+
 bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, STMToESPAny type);
 bool VerifySTMToESPAnyVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types);
 
@@ -227,6 +236,67 @@ inline const char * const *EnumNamesESPRequestType() {
 inline const char *EnumNameESPRequestType(ESPRequestType e) {
   const size_t index = static_cast<int>(e);
   return EnumNamesESPRequestType()[index];
+}
+
+struct WiFiNPCInteract FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_BSSID = 4,
+    VT_ACTION = 6
+  };
+  const flatbuffers::Vector<uint8_t> *bssid() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_BSSID);
+  }
+  int8_t action() const {
+    return GetField<int8_t>(VT_ACTION, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_BSSID) &&
+           verifier.Verify(bssid()) &&
+           VerifyField<int8_t>(verifier, VT_ACTION) &&
+           verifier.EndTable();
+  }
+};
+
+struct WiFiNPCInteractBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_bssid(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> bssid) {
+    fbb_.AddOffset(WiFiNPCInteract::VT_BSSID, bssid);
+  }
+  void add_action(int8_t action) {
+    fbb_.AddElement<int8_t>(WiFiNPCInteract::VT_ACTION, action, 0);
+  }
+  explicit WiFiNPCInteractBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  WiFiNPCInteractBuilder &operator=(const WiFiNPCInteractBuilder &);
+  flatbuffers::Offset<WiFiNPCInteract> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<WiFiNPCInteract>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<WiFiNPCInteract> CreateWiFiNPCInteract(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> bssid = 0,
+    int8_t action = 0) {
+  WiFiNPCInteractBuilder builder_(_fbb);
+  builder_.add_bssid(bssid);
+  builder_.add_action(action);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<WiFiNPCInteract> CreateWiFiNPCInteractDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<uint8_t> *bssid = nullptr,
+    int8_t action = 0) {
+  return darknet7::CreateWiFiNPCInteract(
+      _fbb,
+      bssid ? _fbb.CreateVector<uint8_t>(*bssid) : 0,
+      action);
 }
 
 struct WiFiScan FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -952,6 +1022,9 @@ struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const WiFiScan *Msg_as_WiFiScan() const {
     return Msg_type() == STMToESPAny_WiFiScan ? static_cast<const WiFiScan *>(Msg()) : nullptr;
   }
+  const WiFiNPCInteract *Msg_as_WiFiNPCInteract() const {
+    return Msg_type() == STMToESPAny_WiFiNPCInteract ? static_cast<const WiFiNPCInteract *>(Msg()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_MSGINSTANCEID) &&
@@ -1032,6 +1105,10 @@ template<> inline const BLEDisconnect *STMToESPRequest::Msg_as<BLEDisconnect>() 
 
 template<> inline const WiFiScan *STMToESPRequest::Msg_as<WiFiScan>() const {
   return Msg_as_WiFiScan();
+}
+
+template<> inline const WiFiNPCInteract *STMToESPRequest::Msg_as<WiFiNPCInteract>() const {
+  return Msg_as_WiFiNPCInteract();
 }
 
 struct STMToESPRequestBuilder {
@@ -1145,6 +1222,10 @@ inline bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, 
     }
     case STMToESPAny_WiFiScan: {
       auto ptr = reinterpret_cast<const WiFiScan *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case STMToESPAny_WiFiNPCInteract: {
+      auto ptr = reinterpret_cast<const WiFiNPCInteract *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return false;

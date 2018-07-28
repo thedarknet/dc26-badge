@@ -95,7 +95,8 @@ static void uart_send(void* arg) {
 	for(;;) {
 		if(xQueueReceive(OutgoingQueueHandle, &m, portMAX_DELAY)) {
 			if(m!=0) {
-				ESP_LOGI(MCUToMCUTask::LOGTAG, "sending with break!");
+				ESP_LOGI(MCUToMCUTask::LOGTAG, "sending %d bytes of msg type %d with break!",
+							(int)m->getMessageSize(),(int)m->asESPToSTM()->Msg_type());
 				uint32_t bytesSent = uart_write_bytes_with_break(UART_NUM_1,
 						m->getMessageData(), m->getMessageSize(), 16);
 				if(m->getMessageSize()!= bytesSent) {
@@ -152,9 +153,9 @@ MCUToMCUTask::~MCUToMCUTask() {
 void MCUToMCUTask::send(const flatbuffers::FlatBufferBuilder &fbb) {
 	uint8_t *msg = fbb.GetBufferPointer();
 	uint32_t size = fbb.GetSize();
-	assert(size < MAX_MESSAGE_SIZE);
 	uint16_t crc = crc_16(msg, size);
 	ESP_LOGI(LOGTAG, "Queuing size %d, crc %d\n", size, crc);
+	assert(size < MAX_MESSAGE_SIZE);
 	Message *m = new Message();
 	m->set(size, crc, msg);
 	xQueueSend(OutgoingQueueHandle, (void* )&m,(TickType_t ) 100);
@@ -176,6 +177,7 @@ int32_t MCUToMCUTask::processMessage(const uint8_t *data, uint32_t size) {
 			case darknet7::STMToESPAny_SetupAP:
 			case darknet7::STMToESPAny_CommunicationStatusRequest:
 			case darknet7::STMToESPAny_ESPRequest:
+			case darknet7::STMToESPAny_WiFiScan:
 				ESP_LOGI(LOGTAG, "sending to cmd handler");
 				xQueueSend(CmdHandler->getQueueHandle(), (void* )&m,(TickType_t ) 0);
 				ESP_LOGI(LOGTAG, "after send to cmd handler");

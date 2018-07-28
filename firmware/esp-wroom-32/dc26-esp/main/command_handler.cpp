@@ -62,24 +62,26 @@ public:
 	virtual esp_err_t staScanDone(system_event_sta_scan_done_t info) {
 		ESP_LOGI(logTag, "MyWiFiEventHandler(Class): scan done: APs Found %d", (int32_t) info.number);
 		uint16_t numAPs = info.number;
-		numAPs = std::min(numAPs,(uint16_t)15);
 		wifi_ap_record_t *recs = new wifi_ap_record_t[numAPs];
 		std::vector<flatbuffers::Offset<darknet7::WiFiScanResult>> APs;
 		flatbuffers::FlatBufferBuilder fbb;
 		if(ESP_OK==esp_wifi_scan_get_ap_records(&numAPs,recs)) {
 			for(auto i=0;i<numAPs;++i) {
-				ESP_LOGI(logTag, "ssid: %s \t auth: %d", (const char *)recs[i].ssid,recs[i].authmode);
-				flatbuffers::Offset<darknet7::WiFiScanResult> sro = 
+				if(i<5) {
+					ESP_LOGI(logTag, "ssid: %s \t auth: %d", (const char *)recs[i].ssid,recs[i].authmode);
+					flatbuffers::Offset<darknet7::WiFiScanResult> sro = 
 						  	darknet7::CreateWiFiScanResultDirect(fbb,(const char *)recs[i].ssid,
 									convertToWiFiAuthMode(recs[i].authmode));
-				APs.push_back(sro);
+					APs.push_back(sro);
+				}
 			}
 			auto ssro = darknet7::CreateWiFiScanResultsDirect(fbb,&APs);
 			flatbuffers::Offset<darknet7::ESPToSTM> of = darknet7::CreateESPToSTM(fbb, 
 								 scanMsgID, darknet7::ESPToSTMAny_WiFiScanResults, ssro.Union());
 			darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-			//getMCUToMCU().send(fbb);
+			getMCUToMCU().send(fbb);
 		}
+		//esp_wifi_scan_stop();
 		delete [] recs;
 		return ESP_OK;
 	}
@@ -181,10 +183,10 @@ void CmdHandlerTask::run(void *data) {
 			case darknet7::STMToESPAny_StopAP: {
 					Port80WebServer.stop();
 					wifi.stopWiFi();
+					wifi.shutdown();
 				}
 				break;
 			case darknet7::STMToESPAny_ESPRequest: {
-						//wifi.scan(false);
 						ESP_LOGI(LOGTAG, "processing system info");
 						flatbuffers::FlatBufferBuilder fbb;
 						System::logSystemInfo();
@@ -223,6 +225,7 @@ void CmdHandlerTask::run(void *data) {
 					}
 					break;
 			case darknet7::STMToESPAny_WiFiScan: {
+					ESP_LOGI(LOGTAG, "processing wifi scan");
 					MyWiFiEventHandler *eh = (MyWiFiEventHandler*)wifi.getWifiEventHandler();
 					const darknet7::WiFiScan * ws = msg->Msg_as_WiFiScan();
 					if(eh) {
@@ -230,6 +233,10 @@ void CmdHandlerTask::run(void *data) {
 						if(ws->filter()==darknet7::WiFiScanFilter_NPC) {
 							eh->setWiFiScanNPCOnly(true);
 						}
+						//stop the wifi if its running
+						wifi.stopWiFi();
+						ESP_LOGI(LOGTAG, "starting scan requestID: %d", msg->msgInstanceID());
+						wifi.scan(false);
 					}
 				}
 				break;

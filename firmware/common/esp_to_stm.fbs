@@ -5,7 +5,12 @@ namespace darknet7;
 enum RESPONSE_SUCCESS : byte { False = 0, True = 1 }
 
 union ESPToSTMAny { GenericResponse, ESPSystemInfo, BLEInfectionData, CommunicationStatusResponse,
-				WiFiScanResults }
+				WiFiScanResults, NPCInteractionResponse}
+
+table NPCInteractionResponse {
+	message:string;
+	actions:[string];
+}
 
 table GenericResponse {
 	successful:RESPONSE_SUCCESS;

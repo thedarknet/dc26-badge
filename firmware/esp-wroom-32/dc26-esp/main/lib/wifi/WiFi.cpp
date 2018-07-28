@@ -131,7 +131,7 @@ bool WIFI::scan(bool showHidden) {
 	if(!init()) {
 		return false;
 	}
-	esp_wifi_set_mode(WIFI_MODE_APSTA);
+	esp_wifi_set_mode(WIFI_MODE_STA);
 	wifi_config_t wifi_config;
 	memset(&wifi_config.sta,0,sizeof(wifi_sta_config_t));
 	wifi_config.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
@@ -171,8 +171,12 @@ void WIFI::wifi_start_access_point(wifi_config_t &wifi_config, tcpip_adapter_ip_
 	}
 }
 
-void WIFI::stopWiFi() {
-	esp_wifi_stop();
+bool WIFI::stopWiFi() {
+	return ESP_OK==esp_wifi_stop();
+}
+
+bool WIFI::shutdown() {
+	return ESP_OK==esp_wifi_deinit();
 }
 
 #if 0

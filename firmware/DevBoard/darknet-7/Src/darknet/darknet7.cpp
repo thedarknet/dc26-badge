@@ -48,10 +48,10 @@ using cmdc0de::RGBColor;
 static const uint32_t DISPLAY_OPT_WRITE_ROWS = DarkNet7::DISPLAY_HEIGHT;
 static uint16_t DrawBuffer[DarkNet7::DISPLAY_WIDTH * DISPLAY_OPT_WRITE_ROWS]; //120 wide, 10 pixels high, 2 bytes per pixel (uint16_t)
 
-static const uint8_t MyAddressInfoSector = 1; //same sector as settings just first thing
+static const uint8_t MyAddressInfoSector = 3; //same sector as settings just first thing
 static const uint32_t MyAddressInfoOffSet = 0;
 static const uint8_t SettingSector = 1;
-static const uint32_t SettingOffset = 128;
+static const uint32_t SettingOffset = 0;
 static const uint8_t StartContactSector = 2;
 static const uint8_t EndContactSector = 3;
 
@@ -180,12 +180,11 @@ ErrorType DarkNet7::onInit() {
 
 	ErrorType et;
 
-	GUIListItemData items[4];
+	GUIListItemData items[3];
 	GUIListData DrawList((const char *) "Self Check", items, uint8_t(0),
 			uint8_t(0), uint8_t(DISPLAY_WIDTH), uint8_t(DISPLAY_HEIGHT / 2), uint8_t(0), uint8_t(0));
 	//DO SELF CHECK
 	if ((et = Display.init(DisplayST7735::FORMAT_16_BIT, &Font_6x10, &DisplayBuffer)).ok()) {
-		HAL_Delay(1000);
 		items[0].set(0, "OLED_INIT");
 		DrawList.ItemsCount++;
 		Display.setTextColor(cmdc0de::RGBColor::WHITE);
@@ -200,6 +199,18 @@ ErrorType DarkNet7::onInit() {
 	GUI gui(&Display);
 	gui.drawList(&DrawList);
 	Display.swap();
+	HAL_Delay(1000);
+	if(MyContacts.getMyInfo().init()) {
+		items[1].set(1,"Flash INIT");
+	} else {
+		items[1].set(1,"Flash INIT FAILED!");
+	}
+	DrawList.ItemsCount++;
+	DrawList.selectedItem++;
+	gui.drawList(&DrawList);
+	Display.swap();
+	HAL_Delay(1000);
+	MyContacts.getSettings().init();
 	Display.fillScreen(cmdc0de::RGBColor::BLACK);
 	Display.swap();
 

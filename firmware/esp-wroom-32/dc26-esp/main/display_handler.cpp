@@ -10,7 +10,7 @@ static StaticQueue_t InCommingQueue;
 static uint8_t CommandBuffer[DisplayTask::DISPLAY_QUEUE_SIZE 
 	* DisplayTask::DISPLAY_MSG_ITEM_SIZE] = { 0 };
 
-ESP32_I2CMaster I2cDisplay(GPIO_NUM_19,GPIO_NUM_18,1000000, I2C_NUM_0, 1024, 1024);
+ESP32_I2CMaster I2cDisplay(GPIO_NUM_19,GPIO_NUM_18,1000000, I2C_NUM_0, 0, 32);
 
 DisplayTask::DisplayTask(const std::string &tName, uint16_t stackSize, uint8_t p) :
 		Task(tName, stackSize, p), InCommingQueueHandle(nullptr) {
@@ -50,6 +50,7 @@ void DisplayTask::run(void *data) {
 			SSD1306_Fill(SSD1306_COLOR_BLACK);
 			SSD1306_GotoXY(m->x,m->y);
 			SSD1306_Puts(&m->Msg[0], &Font_7x10, SSD1306_COLOR_WHITE);
+			SSD1306_UpdateScreen();
 			uint32_t time = m->TimeInMSToDisplay;
 			delete m;
 			vTaskDelay((TickType_t) time/portTICK_PERIOD_MS);

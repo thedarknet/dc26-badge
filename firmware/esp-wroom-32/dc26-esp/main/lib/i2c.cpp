@@ -130,6 +130,7 @@ bool ESP32_I2CMaster::stop(uint16_t ticksToWait) {
 	} else {
 		ESP_LOGE(tag,"ESP_OK==i2c_master_stop");
 	}
+	i2c_cmd_link_delete(CmdHandle);
 	return bRetVal;
 }
 

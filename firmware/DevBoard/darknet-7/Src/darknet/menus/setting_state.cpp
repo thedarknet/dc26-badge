@@ -39,9 +39,11 @@ ErrorType SettingState::onInit() {
 	memset(&AgentName[0], 0, sizeof(AgentName));
 	DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 	DarkNet7::get().getGUI().drawList(&SettingList);
+	IHC.set(&AgentName[0],sizeof(AgentName));
 	return ErrorType();
 }
 
+static char Misc[8] = {'\0'};
 
 StateBase::ReturnStateContext SettingState::onRun() {
 	StateBase *nextState = this;
@@ -79,9 +81,6 @@ StateBase::ReturnStateContext SettingState::onRun() {
 				DarkNet7::get().getDisplay().drawString(0, 60, &AgentName[0]);
 				break;
 			case 101:
-				DarkNet7::get().getDisplay().drawString(0, 10, (const char*) "Time until badge\ngoes to sleep:", RGBColor::WHITE, RGBColor::BLACK, 1, true);
-				DarkNet7::get().getDisplay().drawString(0, 30, (const char*) "Up to increase, down to decrease", RGBColor::WHITE, RGBColor::BLACK, 1, true);
-				DarkNet7::get().getDisplay().drawString(0, 40, (const char*) "Fire completes", RGBColor::WHITE, RGBColor::BLACK, 1, true);
 				MiscCounter = DarkNet7::get().getContacts().getSettings().getScreenSaverTime();
 				break;
 			case 102:
@@ -106,6 +105,13 @@ StateBase::ReturnStateContext SettingState::onRun() {
 			}
 			break;
 		case 101: {
+				if(MiscCounter>9) MiscCounter=9;
+				else if (MiscCounter<1) MiscCounter=1;
+				sprintf(&Misc[0],"%d",(int)MiscCounter);
+				DarkNet7::get().getDisplay().drawString(0, 10, (const char*) "Badge Sleep Time:", RGBColor::WHITE, RGBColor::BLACK, 1, true);
+				DarkNet7::get().getDisplay().drawString(0, 30, (const char*) "Up to increase, down to decrease", RGBColor::WHITE, RGBColor::BLACK, 1, true);
+				DarkNet7::get().getDisplay().drawString(10, 60, &Misc[0], RGBColor::WHITE, RGBColor::BLACK, 1, true);
+				DarkNet7::get().getDisplay().drawString(0, 100, (const char*) "MID Button completes", RGBColor::WHITE, RGBColor::BLACK, 1, true);
 				if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_UP)) {
 					MiscCounter++;
 				} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_DOWN)) {
@@ -122,6 +128,7 @@ StateBase::ReturnStateContext SettingState::onRun() {
 		case 102:
 			if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
 				DarkNet7::get().getContacts().resetToFactory();
+				nextState = DarkNet7::get().getDisplayMenuState();
 			} else if (DarkNet7::get().getButtonInfo().wasAnyButtonReleased()) {
 				nextState = DarkNet7::get().getDisplayMenuState();
 			}

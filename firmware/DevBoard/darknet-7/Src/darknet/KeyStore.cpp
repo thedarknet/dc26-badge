@@ -43,10 +43,10 @@ ContactStore::SettingsInfo::SettingsInfo(uint8_t sector, uint32_t offSet, uint8_
 
 bool ContactStore::SettingsInfo::init() {
 	for (uint32_t addr = getStartAddress(); addr < getEndAddress(); addr += SettingsInfo::SIZE) {
-		uint16_t value = *((uint16_t*) addr);
-		if (value == 0xDCDC) {
+		uint32_t value = *((uint32_t*) addr);
+		if (value == SETTING_MARKER) {
 			CurrentAddress = addr;
-			const char *AgentNameAddr = ((const char *) (CurrentAddress + sizeof(uint16_t) + sizeof(uint32_t)));
+			const char *AgentNameAddr = ((const char *) (CurrentAddress + sizeof(uint32_t) + sizeof(uint32_t)));
 			strncpy(&AgentName[0], AgentNameAddr, sizeof(AgentName));
 			return true;
 		}
@@ -54,8 +54,7 @@ bool ContactStore::SettingsInfo::init() {
 	//couldn't find DS
 	CurrentAddress = getEndAddress();
 	DataStructure ds;
-	ds.Reserved1 = 0;
-	ds.Reserved2 = 0;
+	ds.Health = 0;
 	ds.ScreenSaverTime = 1;
 	ds.ScreenSaverType = 0;
 	ds.SleepTimer = 3;
@@ -77,6 +76,27 @@ bool ContactStore::SettingsInfo::setAgentname(const char name[AGENT_NAME_LENGTH]
 	return writeSettings(ds);
 }
 
+bool ContactStore::SettingsInfo::setHealth(uint16_t v) {
+	DataStructure ds = getSettings();
+	if(v==CLEAR_ALL) {
+		ds.Health = 0;
+	} else {
+		ds.Health|=v;
+	}
+	return writeSettings(ds);
+}
+
+bool ContactStore::SettingsInfo::isInfectedWith(uint16_t v) {
+	DataStructure ds = getSettings();
+	return ((v&ds.Health)==v);
+}
+
+bool ContactStore::SettingsInfo::cure(uint16_t v) {
+	DataStructure ds = getSettings();
+	ds.Health = (ds.Health&~v);
+	return writeSettings(ds);
+}
+
 bool ContactStore::SettingsInfo::isNameSet() {
 	return (AgentName[0] != '\0' && AgentName[0] != '_');
 }
@@ -85,8 +105,8 @@ const char *ContactStore::SettingsInfo::getAgentName() {
 	return &AgentName[0];
 }
 
-uint16_t ContactStore::SettingsInfo::getVersion() {
-	return *((uint16_t*) CurrentAddress);
+uint32_t ContactStore::SettingsInfo::getVersion() {
+	return *((uint32_t*) CurrentAddress);
 }
 
 uint8_t ContactStore::SettingsInfo::getNumContacts() {
@@ -95,18 +115,19 @@ uint8_t ContactStore::SettingsInfo::getNumContacts() {
 }
 
 ContactStore::SettingsInfo::DataStructure ContactStore::SettingsInfo::getSettings() {
-	return *((ContactStore::SettingsInfo::DataStructure*) (CurrentAddress + sizeof(uint16_t)));
+	return *((ContactStore::SettingsInfo::DataStructure*) (CurrentAddress + sizeof(uint32_t)));
 }
 
 void ContactStore::SettingsInfo::resetToFactory() {
 	{
 		FLASH_LOCKER f;
-		uint32_t sectorError;
+		uint32_t sectorError = 0;
 		FLASH_EraseInitTypeDef EraseInitStruct;
 		EraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
 		EraseInitStruct.Sector = this->SettingSector;
 		EraseInitStruct.Banks = 0;
 		EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+		EraseInitStruct.NbSectors = 1;
 		HAL_FLASHEx_Erase(&EraseInitStruct, &sectorError);
 	}
 	init();
@@ -122,6 +143,7 @@ bool ContactStore::SettingsInfo::writeSettings(const DataStructure &ds) {
 		EraseInitStruct.Sector = this->SettingSector;
 		EraseInitStruct.Banks = 0;
 		EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+		EraseInitStruct.NbSectors = 1;
 		uint32_t SectorError = 0;
 
 		if (HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError) != HAL_OK) {
@@ -132,17 +154,17 @@ bool ContactStore::SettingsInfo::writeSettings(const DataStructure &ds) {
 		endNewAddress = CurrentAddress + SettingsInfo::SIZE;
 	} else {
 		//zero out the one we were on
-		HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, CurrentAddress, 0); //2
-		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, CurrentAddress + 2, 0); //4
-		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, CurrentAddress + 6, 0);
-		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, CurrentAddress + 10, 0);
-		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, CurrentAddress + 14, 0);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, CurrentAddress, 0); //2
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, CurrentAddress + 4, 0); //4
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, CurrentAddress + 8, 0);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, CurrentAddress + 12, 0);
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, CurrentAddress + 16, 0);
 		CurrentAddress = startNewAddress;
 	}
-	HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, CurrentAddress, 0xDCDC);
+	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, CurrentAddress, SETTING_MARKER);
 	uint32_t data = *((uint32_t*) &ds);
-	if (HAL_OK == HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, (CurrentAddress + sizeof(uint16_t)), data)) {
-		uint32_t agentStart = CurrentAddress + sizeof(uint16_t) + sizeof(uint32_t);
+	if (HAL_OK == HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, (CurrentAddress + sizeof(uint32_t)), data)) {
+		uint32_t agentStart = CurrentAddress + sizeof(uint32_t) + sizeof(uint32_t);
 		if (HAL_OK == HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, agentStart, (*((uint32_t *) &AgentName[0])))) {
 			if (HAL_OK == HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, agentStart + 4, (*((uint32_t *) &AgentName[4])))) {
 				if (HAL_OK
@@ -345,6 +367,7 @@ void ContactStore::resetToFactory() {
 		EraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
 		EraseInitStruct.Sector = StartingContactSector;
 		EraseInitStruct.Banks = 0;
+		EraseInitStruct.NbSectors = 1;
 		EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
 
 		uint32_t SectorError = 0;

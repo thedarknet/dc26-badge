@@ -225,11 +225,24 @@ void BluetoothTask::scanForDevices(const darknet7::STMToESPRequest* m)
 	pScan->start(10);
 	std::map<std::string, std::string> results = pScanCallbacks->getResults();
 
-	for(const auto &p : results)
-		printf("Device Found: %s - %s\n", p.first.c_str(), p.second.c_str());
-	printf("done scanning!\n");
-
 	// TODO: return result
+	std::vector<flatbuffers::Offset<darknet7::Badge>> badges;
+	flatbuffers::FlatBufferBuilder fbb;
+	for (const auto &p : results)
+	{
+		printf("Device Found: %s - %s\n", p.first.c_str(), p.second.c_str());
+		auto name = fbb.CreateString(p.first);
+		auto addr = fbb.CreateString(p.second);
+		flatbuffers::Offset<darknet7::Badge> badge = darknet7::CreateBadge(fbb, name, addr);
+		badges.push_back(badge);
+	}
+	auto badgeList = fbb.CreateVector<flatbuffers::Offset<darknet7::Badge>>(badges);
+	auto badgesInArea = darknet7::CreateBadgesInArea(fbb, badgeList);
+	flatbuffers::Offset<darknet7::ESPToSTM> of = darknet7::CreateESPToSTM(fbb,
+		m->msgInstanceID(), darknet7::ESPToSTMAny_BadgesInArea, badgesInArea.Union());
+	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+	getMCUToMCU().send(fbb);
+	
 	return;
 }
 

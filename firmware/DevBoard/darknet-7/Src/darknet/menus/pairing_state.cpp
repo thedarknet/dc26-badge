@@ -1,7 +1,11 @@
 #include "pairing_state.h"
+#include "../darknet7.h"
 #include <tim.h>
 #include "../libstm32/crypto/crypto_helper.h"
-#include "../darknet7.h"
+#include "../messaging/stm_to_esp_generated.h"
+#include "../messaging/esp_to_stm_generated.h"
+#include "gui_list_processor.h"
+#include "menu_state.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::StateBase;
@@ -14,9 +18,10 @@ enum {
 	ALICE_RECEIVE_ONE
 };
 
-PairingState::PairingState() :
-		TimeoutMS(1000), RetryCount(3), CurrentRetryCount(0), TimeInState(0), TransmitInternalState(
-				ALICE_INIT_CONVERSATION), ReceiveInternalState(BOB_WAITING_FOR_FIRST_TRANSMIT) {
+PairingState::PairingState() : Darknet7BaseState()
+	, BadgeList("Badge List:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0])))
+	, Items(), ListBuffer(), InternalState(NONE), ESPRequestID(0), timesRunCalledSinceReset(0), TimeoutMS(1000), RetryCount(3), CurrentRetryCount(0)
+	, TimeInState(0), TransmitInternalState(ALICE_INIT_CONVERSATION), ReceiveInternalState(BOB_WAITING_FOR_FIRST_TRANSMIT) {
 
 }
 
@@ -27,14 +32,48 @@ PairingState::~PairingState() {
 ErrorType PairingState::onInit() {
 	//stop receiving
 	//IRStopRX();
+	InternalState = FETCHING_DATA;
+
+	// set up defaults
+	this->timesRunCalledSinceReset = 0;
 	CurrentRetryCount = 0;
 	memset(&AIC, 0, sizeof(AIC));
 	memset(&BRTI, 0, sizeof(BRTI));
 	memset(&ATBS, 0, sizeof(ATBS));
+
+	//TODO Build the STM to ESP Buffer
+	flatbuffers::FlatBufferBuilder fbb;
+	auto r = darknet7::CreateBLEScanForDevices(fbb, darknet7::BLEDeviceFilter_BADGE);
+	// TODO Add the filter
+	ESPRequestID = DarkNet7::get().nextSeq();
+	auto e = darknet7::CreateSTMToESPRequest(fbb, ESPRequestID, darknet7::STMToESPAny_BLEScanForDevices, r.Union());
+	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+
+	// Register a callback handler
+	const MSGEvent<darknet7::BadgesInArea> * si = 0;
+	MCUToMCU::get().getBus().addListener(this, si, &MCUToMCU::get());
+
 	TransmitInternalState = ALICE_INIT_CONVERSATION;
 	ReceiveInternalState = I_AM_ALICE_DISABLE_LISTEN;
 	DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
+	DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Scanning for Badges", cmdc0de::RGBColor::BLUE);
+
+	// Send the STMToESP Message
+	MCUToMCU::get().send(fbb);
 	return ErrorType();
+}
+
+void PairingState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BadgesInArea>* mevt) {
+	// TODO
+	if (mevt->RequestID == this->ESPRequestID)
+	{
+		for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++)
+		{
+			// TODO
+		}
+		// Draw the list of things to the screen
+	}
+	return;
 }
 
 void PairingState::ListenForAlice() {
@@ -134,6 +173,21 @@ void PairingState::ListenForAlice() {
 //alice starts convo
 //bob
 StateBase::ReturnStateContext PairingState::onRun() {
+	StateBase *nextState = this;
+	if (InternalState == FETCHING_DATA)
+	{
+		if (this->timesRunCalledSinceReset > 200)
+		{
+			const MSGEvent<darknet7::BadgesInArea> *mevt=0;
+			MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
+			nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),DarkNet7::get().NO_DATA_FROM_ESP,2000);
+		}
+	} else
+	{
+		// TODO: Received Data
+	}
+	this->timesRunCalledSinceReset += 1;
+	return ReturnStateContext(nextState);
 	/*
 	static const char *msg1 = "Init convo complete.";
 	static const char *msg2 = "Listening for Bob";
@@ -226,7 +280,7 @@ StateBase::ReturnStateContext PairingState::onRun() {
 		}
 	}
 	*/
-	return ReturnStateContext(this);
+	//return ReturnStateContext(this);
 }
 
 void PairingState::BeTheBob() {

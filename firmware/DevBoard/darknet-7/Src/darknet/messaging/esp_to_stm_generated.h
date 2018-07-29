@@ -18,7 +18,7 @@ struct WiFiScanResult;
 
 struct WiFiScanResults;
 
-struct Badges;
+struct Badge;
 
 struct BadgesInArea;
 
@@ -67,11 +67,12 @@ enum ESPToSTMAny {
   ESPToSTMAny_CommunicationStatusResponse = 4,
   ESPToSTMAny_WiFiScanResults = 5,
   ESPToSTMAny_NPCInteractionResponse = 6,
+  ESPToSTMAny_BadgesInArea = 7,
   ESPToSTMAny_MIN = ESPToSTMAny_NONE,
-  ESPToSTMAny_MAX = ESPToSTMAny_NPCInteractionResponse
+  ESPToSTMAny_MAX = ESPToSTMAny_BadgesInArea
 };
 
-inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[7] {
+inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[8] {
   static const ESPToSTMAny values[] = {
     ESPToSTMAny_NONE,
     ESPToSTMAny_GenericResponse,
@@ -79,7 +80,8 @@ inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[7] {
     ESPToSTMAny_BLEInfectionData,
     ESPToSTMAny_CommunicationStatusResponse,
     ESPToSTMAny_WiFiScanResults,
-    ESPToSTMAny_NPCInteractionResponse
+    ESPToSTMAny_NPCInteractionResponse,
+    ESPToSTMAny_BadgesInArea
   };
   return values;
 }
@@ -93,6 +95,7 @@ inline const char * const *EnumNamesESPToSTMAny() {
     "CommunicationStatusResponse",
     "WiFiScanResults",
     "NPCInteractionResponse",
+    "BadgesInArea",
     nullptr
   };
   return names;
@@ -129,6 +132,10 @@ template<> struct ESPToSTMAnyTraits<WiFiScanResults> {
 
 template<> struct ESPToSTMAnyTraits<NPCInteractionResponse> {
   static const ESPToSTMAny enum_value = ESPToSTMAny_NPCInteractionResponse;
+};
+
+template<> struct ESPToSTMAnyTraits<BadgesInArea> {
+  static const ESPToSTMAny enum_value = ESPToSTMAny_BadgesInArea;
 };
 
 bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, ESPToSTMAny type);
@@ -401,74 +408,74 @@ inline flatbuffers::Offset<WiFiScanResults> CreateWiFiScanResultsDirect(
       APs ? _fbb.CreateVector<flatbuffers::Offset<WiFiScanResult>>(*APs) : 0);
 }
 
-struct Badges FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+struct Badge FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_ADDRESS = 4,
-    VT_NAMES = 6
+    VT_NAME = 4,
+    VT_ADDRESS = 6
   };
-  const flatbuffers::String *Address() const {
-    return GetPointer<const flatbuffers::String *>(VT_ADDRESS);
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
   }
-  const flatbuffers::String *Names() const {
-    return GetPointer<const flatbuffers::String *>(VT_NAMES);
+  const flatbuffers::String *address() const {
+    return GetPointer<const flatbuffers::String *>(VT_ADDRESS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.Verify(name()) &&
            VerifyOffset(verifier, VT_ADDRESS) &&
-           verifier.Verify(Address()) &&
-           VerifyOffset(verifier, VT_NAMES) &&
-           verifier.Verify(Names()) &&
+           verifier.Verify(address()) &&
            verifier.EndTable();
   }
 };
 
-struct BadgesBuilder {
+struct BadgeBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_Address(flatbuffers::Offset<flatbuffers::String> Address) {
-    fbb_.AddOffset(Badges::VT_ADDRESS, Address);
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(Badge::VT_NAME, name);
   }
-  void add_Names(flatbuffers::Offset<flatbuffers::String> Names) {
-    fbb_.AddOffset(Badges::VT_NAMES, Names);
+  void add_address(flatbuffers::Offset<flatbuffers::String> address) {
+    fbb_.AddOffset(Badge::VT_ADDRESS, address);
   }
-  explicit BadgesBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit BadgeBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  BadgesBuilder &operator=(const BadgesBuilder &);
-  flatbuffers::Offset<Badges> Finish() {
+  BadgeBuilder &operator=(const BadgeBuilder &);
+  flatbuffers::Offset<Badge> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<Badges>(end);
+    auto o = flatbuffers::Offset<Badge>(end);
     return o;
   }
 };
 
-inline flatbuffers::Offset<Badges> CreateBadges(
+inline flatbuffers::Offset<Badge> CreateBadge(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> Address = 0,
-    flatbuffers::Offset<flatbuffers::String> Names = 0) {
-  BadgesBuilder builder_(_fbb);
-  builder_.add_Names(Names);
-  builder_.add_Address(Address);
+    flatbuffers::Offset<flatbuffers::String> name = 0,
+    flatbuffers::Offset<flatbuffers::String> address = 0) {
+  BadgeBuilder builder_(_fbb);
+  builder_.add_address(address);
+  builder_.add_name(name);
   return builder_.Finish();
 }
 
-inline flatbuffers::Offset<Badges> CreateBadgesDirect(
+inline flatbuffers::Offset<Badge> CreateBadgeDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const char *Address = nullptr,
-    const char *Names = nullptr) {
-  return darknet7::CreateBadges(
+    const char *name = nullptr,
+    const char *address = nullptr) {
+  return darknet7::CreateBadge(
       _fbb,
-      Address ? _fbb.CreateString(Address) : 0,
-      Names ? _fbb.CreateString(Names) : 0);
+      name ? _fbb.CreateString(name) : 0,
+      address ? _fbb.CreateString(address) : 0);
 }
 
 struct BadgesInArea FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_BADGELIST = 4
   };
-  const flatbuffers::Vector<flatbuffers::Offset<Badges>> *BadgeList() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Badges>> *>(VT_BADGELIST);
+  const flatbuffers::Vector<flatbuffers::Offset<Badge>> *BadgeList() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Badge>> *>(VT_BADGELIST);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -482,7 +489,7 @@ struct BadgesInArea FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct BadgesInAreaBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_BadgeList(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Badges>>> BadgeList) {
+  void add_BadgeList(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Badge>>> BadgeList) {
     fbb_.AddOffset(BadgesInArea::VT_BADGELIST, BadgeList);
   }
   explicit BadgesInAreaBuilder(flatbuffers::FlatBufferBuilder &_fbb)
@@ -499,7 +506,7 @@ struct BadgesInAreaBuilder {
 
 inline flatbuffers::Offset<BadgesInArea> CreateBadgesInArea(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Badges>>> BadgeList = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Badge>>> BadgeList = 0) {
   BadgesInAreaBuilder builder_(_fbb);
   builder_.add_BadgeList(BadgeList);
   return builder_.Finish();
@@ -507,10 +514,10 @@ inline flatbuffers::Offset<BadgesInArea> CreateBadgesInArea(
 
 inline flatbuffers::Offset<BadgesInArea> CreateBadgesInAreaDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<flatbuffers::Offset<Badges>> *BadgeList = nullptr) {
+    const std::vector<flatbuffers::Offset<Badge>> *BadgeList = nullptr) {
   return darknet7::CreateBadgesInArea(
       _fbb,
-      BadgeList ? _fbb.CreateVector<flatbuffers::Offset<Badges>>(*BadgeList) : 0);
+      BadgeList ? _fbb.CreateVector<flatbuffers::Offset<Badge>>(*BadgeList) : 0);
 }
 
 struct BLEInfectionData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -801,6 +808,9 @@ struct ESPToSTM FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const NPCInteractionResponse *Msg_as_NPCInteractionResponse() const {
     return Msg_type() == ESPToSTMAny_NPCInteractionResponse ? static_cast<const NPCInteractionResponse *>(Msg()) : nullptr;
   }
+  const BadgesInArea *Msg_as_BadgesInArea() const {
+    return Msg_type() == ESPToSTMAny_BadgesInArea ? static_cast<const BadgesInArea *>(Msg()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_MSGINSTANCEID) &&
@@ -833,6 +843,10 @@ template<> inline const WiFiScanResults *ESPToSTM::Msg_as<WiFiScanResults>() con
 
 template<> inline const NPCInteractionResponse *ESPToSTM::Msg_as<NPCInteractionResponse>() const {
   return Msg_as_NPCInteractionResponse();
+}
+
+template<> inline const BadgesInArea *ESPToSTM::Msg_as<BadgesInArea>() const {
+  return Msg_as_BadgesInArea();
 }
 
 struct ESPToSTMBuilder {
@@ -898,6 +912,10 @@ inline bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, 
     }
     case ESPToSTMAny_NPCInteractionResponse: {
       auto ptr = reinterpret_cast<const NPCInteractionResponse *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ESPToSTMAny_BadgesInArea: {
+      auto ptr = reinterpret_cast<const BadgesInArea *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return false;

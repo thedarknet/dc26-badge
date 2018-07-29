@@ -13,6 +13,7 @@ using cmdc0de::RGBColor;
 
 const char *VirtualKeyBoard::STDKBLowerCase = "abcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()-";
 const char *VirtualKeyBoard::STDKBNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()-_";
+const char *VirtualKeyBoard::STDCAPS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 void VirtualKeyBoard::InputHandleContext::addChar(char b) {
 	if(Buf!=0) {

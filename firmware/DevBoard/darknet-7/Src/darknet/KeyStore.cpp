@@ -54,7 +54,7 @@ bool ContactStore::SettingsInfo::init() {
 	//couldn't find DS
 	CurrentAddress = getEndAddress();
 	DataStructure ds;
-	ds.Health = 0;
+	ds.Health = 0x1FE; //all the virus
 	ds.ScreenSaverTime = 1;
 	ds.ScreenSaverType = 0;
 	ds.SleepTimer = 3;

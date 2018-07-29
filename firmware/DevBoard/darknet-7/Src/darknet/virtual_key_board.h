@@ -28,6 +28,7 @@ public:
 	typedef cmdc0de::EventBus<1,2,2,3> VKB_EVENT_BUS_TYPE;
 	static const char *STDKBLowerCase;
 	static const char *STDKBNames;
+	static const char *STDCAPS;
 public:
 	VirtualKeyBoard();
 	void init(const char *vkb, InputHandleContext *ic, int16_t xdisplayPos, int16_t xEndDisplay, int16_t yDisplayPos, const cmdc0de::RGBColor &fontColor,

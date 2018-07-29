@@ -21,6 +21,9 @@ protected:
 	virtual cmdc0de::StateBase::ReturnStateContext onRun();
 	virtual cmdc0de::ErrorType onShutdown();
 private:
+	cmdc0de::GUIListData HealthList;
+	cmdc0de::GUIListItemData Items[8];
+	char ListBuffer[8][24];
 
 };
 

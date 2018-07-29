@@ -85,16 +85,16 @@ public:
 
 	/*
 	 *
-		InfectionID		vector		remedy			permanence		contraction%
-		Clear Bit (Bit:0)  	Wireless  	Operative Only					100%
-		Avian Flu (Bit: 1)	Wireless	AGTAGAAACAAGG		Recurring		12%
-		Measles (Bit: 2)	Wireless	GTCAGTTCCACAT		Curable			90%
-		Tetanus (Bit: 3)	BLE GATT	GAGGTGCAGCTGG		Recurring		50%
-		Polio (Bit: 4)		BLE GATT	ATTCTAACCATGG		“Curable”		13%
-		Plague (Bit: 5)		BLE GATT	AAGAGTATAATCG / DN Table Curable		50%
+		InfectionID				vector		remedy			permanence		contraction%
+		Clear Bit (Bit:0)  		Wireless  	Operative Only						100%
+		Avian Flu (Bit: 1)		Wireless	AGTAGAAACAAGG		Recurring		12%
+		Measles (Bit: 2)		Wireless	GTCAGTTCCACAT		Curable			90%
+		Tetanus (Bit: 3)		BLE GATT	GAGGTGCAGCTGG		Recurring		50%
+		Polio (Bit: 4)			BLE GATT	ATTCTAACCATGG		“Curable”		13%
+		Plague (Bit: 5)			BLE GATT	AAGAGTATAATCG / DN Table Curable	50%
 		Toxoplasmosis (Bit: 6)  BLE GATT	CCTAAACCCTGAA		Recurring		20%
-		Chlamydia (Bit: 7) 	Add-On		GTATTAGTATTTG		Curable			50%
-		Herpes (Bit: 8)		Add-On		GATCGTTATTCCC		Recurring		30%
+		Chlamydia (Bit: 7) 		Add-On		GTATTAGTATTTG		Curable			50%
+		Herpes (Bit: 8)			Add-On		GATCGTTATTCCC		Recurring		30%
 	 *
 	 *
 	 */

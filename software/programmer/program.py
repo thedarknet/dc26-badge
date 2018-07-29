@@ -29,8 +29,8 @@ from openocd.flashProgrammer import flashProgrammer
 
 MAIN_FLASH_ADDR = 0x8000000
 FLASH_BASE = 0x8000000
-KEY_FLASH_OFFSET = 0x1ffd4
-SECTOR_SIZE = 0x800
+KEY_FLASH_OFFSET = 0xC000
+#SECTOR_SIZE = 0x800
 
 def get_used_key_dir(key_dir):
     return key_dir + '/used'
@@ -99,6 +99,7 @@ def readUID(flasher):
     #stm32f411 0x1FFF7A10
     #define ID_FLASH_ADDRESS       0x1FFF7A22
     #define ID_DBGMCU_IDCODE      0xE0042000
+    #uid_bytes = flasher.readMem(0x1FFFF7E8, 12)
     uid_bytes = flasher.readMem(0x1FFF7A10, 12)
     uid = ''
     for byte in range(len(uid_bytes)):
@@ -116,8 +117,8 @@ def dcdcCheck(flasher):
         return False
 
 
-def roundToSectorSize(size):
-    return int(math.ceil(float(size)/float(SECTOR_SIZE)) * SECTOR_SIZE)
+#def roundToSectorSize(size):
+#    return int(math.ceil(float(size)/float(SECTOR_SIZE)) * SECTOR_SIZE)
 
 
 def programKeyfile(flasher, key_filename):
@@ -142,6 +143,8 @@ def programMainFlash(flash_filename):
 
         # Erase everything until the key
         # flasher.erase(FLASH_BASE, KEY_FLASH_OFFSET)
+        flasher.eraseSector(0,0,0)
+        flasher.eraseSector(0,4,7)
 
         if '.bin' in flash_filename:
             # If a .bin file is used, we need to specify the base address

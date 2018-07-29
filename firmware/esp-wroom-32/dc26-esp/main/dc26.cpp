@@ -13,6 +13,7 @@
 #include "mcu_to_mcu.h"
 #include "command_handler.h"
 #include "display_handler.h"
+#include "lib/ssd1306.h"
 
 #include "dc26_ble/ble.h"
 
@@ -55,8 +56,10 @@ static void gpio_task_example(void* arg) {
 		if(xQueueReceive(gpio_evt_queue, &io_num, portMAX_DELAY)) {
 			uint32_t level = (uint32_t) gpio_get_level((gpio_num_t)io_num);
 			printf("GPIO[%d] intr, val: %d\n", io_num, level);
+			SSD1306_UpdateScreen();
 			//build test message
 			System::logSystemInfo();
+
 		}
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}

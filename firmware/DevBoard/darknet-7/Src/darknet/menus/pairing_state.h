@@ -45,7 +45,8 @@ private:
 	// Badge:Address list
 	cmdc0de::GUIListData BadgeList;
 	cmdc0de::GUIListItemData Items[8];
-	char ListBuffer[8][24];
+	char ListBuffer[8][12];
+	char AddressBuffer[8][17];
 
 	// Internal State information
 	INTERNAL_STATE InternalState;

@@ -19,7 +19,7 @@ enum {
 };
 
 PairingState::PairingState() : Darknet7BaseState()
-	, BadgeList("Badge List:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0])))
+	, BadgeList("Badge List:", Items, 0, 0, 160, 128, 0, (sizeof(Items) / sizeof(Items[0])))
 	, Items(), ListBuffer(), InternalState(NONE), ESPRequestID(0), timesRunCalledSinceReset(0), TimeoutMS(1000), RetryCount(3), CurrentRetryCount(0)
 	, TimeInState(0), TransmitInternalState(ALICE_INIT_CONVERSATION), ReceiveInternalState(BOB_WAITING_FOR_FIRST_TRANSMIT), bloop(0) {
 
@@ -76,12 +76,13 @@ void PairingState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BadgesInArea
 		{
 			const darknet7::Badge* badge = badges->Get(i);
 			sprintf(&this->ListBuffer[i][0], "%s", badge->name()->c_str());
-			//DarkNet7::get().getDisplay().drawString(5,10,(const char *)badge->name()->c_str(), cmdc0de::RGBColor::BLUE);
+			sprintf(&this->AddressBuffer[i][0], "%s", badge->address()->c_str());
+			Items[i].text = &this->ListBuffer[i][0];
+			Items[i].id = i;
+			Items[i].setShouldScroll();
 		}
-
 		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
 		DarkNet7::get().getGUI().drawList(&BadgeList);
-
 		MCUToMCU::get().getBus().removeListener(this, mevt, &MCUToMCU::get());
 		InternalState = DISPLAY_DATA;
 	}

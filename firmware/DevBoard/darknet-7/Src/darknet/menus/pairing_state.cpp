@@ -45,7 +45,7 @@ ErrorType PairingState::onInit() {
 	flatbuffers::FlatBufferBuilder fbb;
 	auto r = darknet7::CreateBLEScanForDevices(fbb, darknet7::BLEDeviceFilter_BADGE);
 	// TODO Add the filter
-	ESPRequestID = DarkNet7::get().nextSeq();
+	this->ESPRequestID = DarkNet7::get().nextSeq();
 	auto e = darknet7::CreateSTMToESPRequest(fbb, ESPRequestID, darknet7::STMToESPAny_BLEScanForDevices, r.Union());
 	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
 
@@ -65,13 +65,20 @@ ErrorType PairingState::onInit() {
 
 void PairingState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BadgesInArea>* mevt) {
 	// TODO
+	const flatbuffers::Vector<flatbuffers::Offset<darknet7::Badge>>* badges;
 	if (mevt->RequestID == this->ESPRequestID)
 	{
-		for (uint32_t i = 0; i < (sizeof(Items) / sizeof(Items[0])); i++)
+		badges = mevt->InnerMsg->BadgeList();
+		unsigned int len = badges->Length();
+		for (unsigned int i = 0; i < len; i++)
 		{
-			// TODO
+			const darknet7::Badge* badge = badges->Get(i);
+			sprintf(&this->ListBuffer[i][0], "%s", badge->name()->c_str());
 		}
-		// Draw the list of things to the screen
+		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
+		DarkNet7::get().getGUI().drawList(&BadgeList);
+		MCUToMCU::get().getBus().removeListener(this, mevt, &MCUToMCU::get());
+		InternalState = DISPLAY_DATA;
 	}
 	return;
 }
@@ -176,7 +183,7 @@ StateBase::ReturnStateContext PairingState::onRun() {
 	StateBase *nextState = this;
 	if (InternalState == FETCHING_DATA)
 	{
-		if (this->timesRunCalledSinceReset > 200)
+		if (this->timesRunCalledSinceReset > 2000)
 		{
 			const MSGEvent<darknet7::BadgesInArea> *mevt=0;
 			MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
@@ -184,7 +191,19 @@ StateBase::ReturnStateContext PairingState::onRun() {
 		}
 	} else
 	{
-		// TODO: Received Data
+		if (!GUIListProcessor::process(&BadgeList,(sizeof(Items) / sizeof(Items[0])))) {
+			if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+				DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
+				switch(BadgeList.selectedItem) {
+				default:
+					nextState = this;
+					break;
+				}
+			} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+				nextState = DarkNet7::get().getDisplayMenuState();
+			}
+		}
+		DarkNet7::get().getGUI().drawList(&BadgeList);
 	}
 	this->timesRunCalledSinceReset += 1;
 	return ReturnStateContext(nextState);

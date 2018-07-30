@@ -195,6 +195,11 @@ void MCUToMCU::process() {
 			this->getBus().emitSignal(this,mevt);
 			}
 			break;
+		case darknet7::ESPToSTMAny_BadgesInArea: {
+			MSGEvent<darknet7::BadgesInArea> mevt(msg->Msg_as_BadgesInArea(), msg->msgInstanceID());
+			this->getBus().emitSignal(this, mevt);
+			}
+			break;
 		default:
 			break;
 		}

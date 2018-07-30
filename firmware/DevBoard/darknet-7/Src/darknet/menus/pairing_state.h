@@ -45,7 +45,7 @@ private:
 	// Badge:Address list
 	cmdc0de::GUIListData BadgeList;
 	cmdc0de::GUIListItemData Items[8];
-	char ListBuffer[3][24];
+	char ListBuffer[8][24];
 
 	// Internal State information
 	INTERNAL_STATE InternalState;
@@ -62,6 +62,7 @@ private:
 	AliceToBobSignature ATBS;
 	uint16_t TransmitInternalState;
 	uint16_t ReceiveInternalState;
+	uint32_t bloop;
 };
 
 #endif

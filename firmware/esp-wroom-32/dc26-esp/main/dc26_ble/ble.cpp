@@ -225,7 +225,6 @@ void BluetoothTask::scanForDevices(const darknet7::STMToESPRequest* m)
 	pScan->start(10);
 	std::map<std::string, std::string> results = pScanCallbacks->getResults();
 
-	// TODO: return result
 	std::vector<flatbuffers::Offset<darknet7::Badge>> badges;
 	flatbuffers::FlatBufferBuilder fbb;
 	for (const auto &p : results)
@@ -376,85 +375,15 @@ void BluetoothTask::run(void * data)
 		}
 		else
 		{
-
 			// TODO: check how long since last scan, scan if beyond that time
 			// this is so we periodically attempt to get infected
 			// scan without filtering anything
 			//pScanCallbacks->reset();
 			//pScan->setActiveScan(true);
-			//pScan->start(10);
+			//pScan->start(1); // Do a very very short scan
 		}
 	}
 }
-
-/*
-static void initialize_test(QueueHandle_t queue)
-{
-	flatbuffers::FlatBufferBuilder fbb;
-	uint8_t *data = nullptr;
-	MCUToMCUTask::Message* m;
-	flatbuffers::Offset<darknet7::STMToESPRequest> of;
-	flatbuffers::uoffset_t size;
-
-	// Setup Advertising
-	auto advert = darknet7::CreateBLEAdvertise(fbb, true);
-	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEAdvertise,
-		advert.Union());
-	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
-	size = fbb.GetSize();
-	data = fbb.GetBufferPointer();
-	m = new MCUToMCUTask::Message();
-	m->set(size, 0, data);
-	xQueueSend(queue, &m, (TickType_t) 0);
-
-	// Scan for Devices
-	auto scan = darknet7::CreateBLEScanForDevices(fbb, darknet7::BLEDeviceFilter_BADGE);
-	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEScanForDevices,
-		scan.Union());
-	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
-	size = fbb.GetSize();
-	data = fbb.GetBufferPointer();
-	m = new MCUToMCUTask::Message();
-	m->set(size, 0, data);
-	xQueueSend(queue, &m, (TickType_t) 0);
-
-	// Connect to this specific device: 30:ae:a4:42:e9:22
-	auto addr = fbb.CreateString("30:ae:a4:42:e9:22");
-	auto connect = darknet7::CreateBLEPairWithDevice(fbb, addr);
-	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEPairWithDevice,
-		connect.Union());
-	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
-	size = fbb.GetSize();
-	data = fbb.GetBufferPointer();
-	m = new MCUToMCUTask::Message();
-	m->set(size, 0, data);
-	xQueueSend(queue, &m, (TickType_t) 0);
-
-	// Send a sample message
-	auto sdata = fbb.CreateString("012345678901234567890123456");
-	auto sendData = darknet7::CreateBLESendDataToDevice(fbb, sdata);
-	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice,
-		sendData.Union());
-	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
-	size = fbb.GetSize();
-	data = fbb.GetBufferPointer();
-	m = new MCUToMCUTask::Message();
-	m->set(size, 0, data);
-	xQueueSend(queue, &m, (TickType_t) 0);
-
-	// Disconnect from the connected device
-	auto disconnect = darknet7::CreateBLEDisconnect(fbb);
-	of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEDisconnect,
-		disconnect.Union());
-	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
-	size = fbb.GetSize();
-	data = fbb.GetBufferPointer();
-	m = new MCUToMCUTask::Message();
-	m->set(size, 0, data);
-	xQueueSend(queue, &m, (TickType_t) 0);
-	return;
-}
-*/
 
 bool BluetoothTask::init()
 {
@@ -467,9 +396,7 @@ bool BluetoothTask::init()
 
 	STMQueueHandle = xQueueCreateStatic(STM_MSG_QUEUE_SIZE, STM_MSG_ITEM_SIZE,
 										fromSTMBuffer, &STMQueue);
-	//initialize_test(STMQueueHandle);
-
-	BLEDevice::init("DCDN BLE Device");
+	BLEDevice::init("DNDevice");
 	BLEDevice::setMTU(43);
 
 	BLEDevice::setEncryptionLevel(ESP_BLE_SEC_ENCRYPT);

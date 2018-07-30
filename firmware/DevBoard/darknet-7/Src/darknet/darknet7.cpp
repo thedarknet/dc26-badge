@@ -36,7 +36,7 @@
 #include "menus/scan.h"
 #include "menus/sao_menu.h"
 #include "art/images.h"
-#include "ws2812b.h"
+//#include "ws2812b.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::DisplayST7735;
@@ -282,7 +282,7 @@ ErrorType DarkNet7::onInit() {
 	 }
 #endif
 
-	darknet7_led_init();
+	//darknet7_led_init();
 	return et;
 }
 
@@ -298,7 +298,7 @@ ErrorType DarkNet7::onRun() {
 
 	cmdc0de::StateBase::ReturnStateContext rsc = getCurrentState()->run();
 	Display.swap();
-	handleLEDS();
+	//handleLEDS();
 
 	if (rsc.Err.ok()) {
 		if (getCurrentState() != rsc.NextMenuToRun) {

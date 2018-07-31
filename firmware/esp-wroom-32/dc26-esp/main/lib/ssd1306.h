@@ -63,7 +63,7 @@ SDA        |PB7          |Serial data line
 #endif
 /* SSD1306 LCD height in pixels */
 #ifndef SSD1306_HEIGHT
-#define SSD1306_HEIGHT           32
+#define SSD1306_HEIGHT           64
 #endif
 
 /*!< Black color, no pixel */

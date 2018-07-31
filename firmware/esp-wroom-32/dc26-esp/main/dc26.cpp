@@ -45,8 +45,12 @@ DisplayTask &getDisplayTask() {
 	return ESPDisplayTask;
 }
 
+#define LED_PIN GPIO_NUM_14
+
 static void IRAM_ATTR gpio_isr_handler(void* arg) {
 	uint32_t gpio_num = (uint32_t) arg;
+	static int32_t cnt = 0;
+	gpio_set_level(LED_PIN,++cnt%2);
 	xQueueSendFromISR(gpio_evt_queue, &gpio_num, NULL);
 }
 
@@ -56,6 +60,9 @@ static void gpio_task_example(void* arg) {
 		if(xQueueReceive(gpio_evt_queue, &io_num, portMAX_DELAY)) {
 			uint32_t level = (uint32_t) gpio_get_level((gpio_num_t)io_num);
 			printf("GPIO[%d] intr, val: %d\n", io_num, level);
+			SSD1306_Fill(SSD1306_COLOR_BLACK);
+			SSD1306_GotoXY(0,16);
+			SSD1306_Puts("1233456778", &Font_7x10, SSD1306_COLOR_WHITE);
 			SSD1306_UpdateScreen();
 			//build test message
 			System::logSystemInfo();
@@ -86,6 +93,14 @@ void initButton() {
 	gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
 	//hook isr handler for specific gpio pin
 	gpio_isr_handler_add(GPIO_NUM_0, gpio_isr_handler, (void*) GPIO_INPUT_IO_0);
+	//set up pin for output
+	io_conf.intr_type = GPIO_INTR_DISABLE;
+	io_conf.mode = GPIO_MODE_OUTPUT;
+#define GPIO_OUTPUT_LED_MASK (1ULL << GPIO_NUM_14)
+	io_conf.pin_bit_mask = GPIO_OUTPUT_LED_MASK;
+	io_conf.pull_down_en =GPIO_PULLDOWN_DISABLE; 
+	io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+	gpio_config(&io_conf);
 }
 
 ////

@@ -13,9 +13,6 @@ using cmdc0de::StateBase;
 enum {
 	BOB_WAITING_FOR_FIRST_TRANSMIT,
 	BOB_WAITING_FOR_SECOND_TRANSMIT,
-	I_AM_ALICE_DISABLE_LISTEN,
-	ALICE_INIT_CONVERSATION,
-	ALICE_RECEIVE_ONE
 };
 
 PairingState::PairingState() : Darknet7BaseState()
@@ -55,7 +52,6 @@ ErrorType PairingState::onInit() {
 	MCUToMCU::get().getBus().addListener(this, si, &MCUToMCU::get());
 
 	TransmitInternalState = ALICE_INIT_CONVERSATION;
-	ReceiveInternalState = I_AM_ALICE_DISABLE_LISTEN;
 	DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
 	DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Scanning for Badges", cmdc0de::RGBColor::BLUE);
 
@@ -89,12 +85,27 @@ void PairingState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BadgesInArea
 	return;
 }
 
-
+void PairingState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::GenericResponse>* mevt) {
+	// TODO
+	DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
+	bool success = false;
+	if (mevt->RequestID == this->ESPRequestID)
+	{
+		if (mevt->InnerMsg->successful())
+			InternalState = ALICE_INIT_CONVERSATION;
+		else
+			InternalState = PAIRING_FAILED;
+		const MSGEvent<darknet7::BadgesInArea> *mevt=0;
+		MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
+	}
+	return;
+}
 
 //alice starts convo
 //bob
 StateBase::ReturnStateContext PairingState::onRun() {
 	StateBase *nextState = this;
+	flatbuffers::FlatBufferBuilder fbb;
 	if (InternalState == FETCHING_DATA)
 	{
 		if (this->timesRunCalledSinceReset > 500)
@@ -104,21 +115,69 @@ StateBase::ReturnStateContext PairingState::onRun() {
 			nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),DarkNet7::get().NO_DATA_FROM_ESP,2000);
 		}
 	}
-	else
+	else if (InternalState == DISPLAY_DATA)
 	{
 		if (!GUIListProcessor::process(&BadgeList,(sizeof(Items) / sizeof(Items[0])))) {
-			if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
+			if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1))
+			{
+				// send connect message with address
+				auto sdata = fbb.CreateString((char *)&this->AddressBuffer[BadgeList.selectedItem][0], 17);
+				auto r = darknet7::CreateBLEPairWithDevice(fbb, sdata);
+				this->ESPRequestID = DarkNet7::get().nextSeq();
+				auto e = darknet7::CreateSTMToESPRequest(fbb, ESPRequestID, darknet7::STMToESPAny_BLEPairWithDevice, r.Union());
+				darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+
+				// Register for a callback
+				const MSGEvent<darknet7::GenericResponse> * si = 0;
+				MCUToMCU::get().getBus().addListener(this, si, &MCUToMCU::get());
+
+				InternalState = CONNECTING;
 				DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
-				switch(BadgeList.selectedItem) {
-				default:
-					nextState = this;
-					break;
-				}
-			} else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+				DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Pairing with device", cmdc0de::RGBColor::BLUE);
+				DarkNet7::get().getDisplay().drawString(5,20,(const char *)&this->ListBuffer[BadgeList.selectedItem][0], cmdc0de::RGBColor::BLUE);
+				MCUToMCU::get().send(fbb); // send the connect message
+				this->timesRunCalledSinceReset = 0;
+				nextState = this;
+			}
+			else if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID))
+			{
 				nextState = DarkNet7::get().getDisplayMenuState();
 			}
+			else
+				DarkNet7::get().getGUI().drawList(&BadgeList);
 		}
-		DarkNet7::get().getGUI().drawList(&BadgeList);
+		else
+			DarkNet7::get().getGUI().drawList(&BadgeList);
+	}
+	else if (InternalState == CONNECTING)
+	{
+		if (this->timesRunCalledSinceReset > 500)
+		{
+			const MSGEvent<darknet7::GenericResponse> *mevt=0;
+			MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
+			nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),DarkNet7::get().NO_DATA_FROM_ESP,2000);
+		}
+	}
+	else if (InternalState == PAIRING_FAILED)
+	{
+		nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),DarkNet7::get().BLE_CONNECT_FAILED,2000);
+	}
+	else if (InternalState == ALICE_INIT_CONVERSATION)
+	{
+		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
+		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Connected to bob", cmdc0de::RGBColor::BLUE);
+		nextState = this;
+		// Send the doodle, wait for dingus
+		//auto r = darknet7::CreateBLEDisconnect(fbb);
+		//this->ESPRequestID = DarkNet7::get().nextSeq();
+		//auto e = darknet7::CreateSTMToESPRequest(fbb, ESPRequestID, darknet7::STMToESPAny_BLEDisconnect, r.Union());
+		//darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+		//nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),DarkNet7::get().BLE_DISCONNECTING,2000);
+	}
+	else if (InternalState == ALICE_RECEIVE_ONE)
+	{
+		// we've received the dingus
+		// send the bungus
 	}
 	this->timesRunCalledSinceReset += 1;
 	return ReturnStateContext(nextState);

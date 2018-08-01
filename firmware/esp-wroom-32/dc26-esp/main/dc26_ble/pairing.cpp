@@ -88,7 +88,8 @@ void UartServerCallbacks::onConnect(BLEServer* server)
 {
 	ESP_LOGI(PAIR_SVR_TAG, "connection received");
 	isConnected = true;
-	pBTTask->isActingServer = true;
+	if (!pBTTask->isActingClient)
+		pBTTask->isActingServer = true;
 }
 
 void UartServerCallbacks::onDisconnect(BLEServer* server)

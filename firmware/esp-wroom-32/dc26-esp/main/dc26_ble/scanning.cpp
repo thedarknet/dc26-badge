@@ -51,12 +51,14 @@ void MyScanCallbacks::onResult(BLEAdvertisedDevice advertisedDevice)
 	if (advertisedDevice.haveAppearance() &&
 		advertisedDevice.getAppearance() == 0x26DC)
 	{
+		ESP_LOGI("************", "Found The Device");
 		// filter out only the requested devices (Badge or NPC)
 		if (this->filter == darknet7::BLEDeviceFilter_ALL ||
 			this->filter == darknet7::BLEDeviceFilter_INFECT ||
 			(advertisedDevice.haveManufacturerData() && 
 			((advertisedDevice.getManufacturerData()[2] == this->filter) != 0)))
 		{
+			ESP_LOGI("************", "Not Filtered");
 			// get manufacturer data for infection vectors
 			std::string manData = advertisedDevice.getManufacturerData();
 			this->exposures |= ((manData[3] << 8) | manData[4]);
@@ -72,10 +74,12 @@ void MyScanCallbacks::onResult(BLEAdvertisedDevice advertisedDevice)
 			else
 				return;
 
+			ESP_LOGI("************", "has RSSI");
 			// FIXME: this code is the worst, for the love of god fix it.
 			// add only the 8 higest power devices to final message
 			if (this->results.size() == 8 && (rssi > this->min_RSSI))
 			{
+				ESP_LOGI("************", "results.size() < 8");
 				std::string smallest;
 				for (const auto &p : this->RSSIs)
 					smallest = (p.second == this->min_RSSI) ? p.first : smallest;
@@ -94,6 +98,7 @@ void MyScanCallbacks::onResult(BLEAdvertisedDevice advertisedDevice)
 			}
 			else
 			{
+				ESP_LOGI("************", "In the map");
 				std::string name = advertisedDevice.getName();
 				std::string address = advertisedDevice.getAddress().toString();
 				this->results[name] = address;

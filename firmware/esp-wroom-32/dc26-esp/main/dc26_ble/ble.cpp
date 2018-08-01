@@ -222,7 +222,7 @@ void BluetoothTask::scanForDevices(const darknet7::STMToESPRequest* m)
 
 	pScanCallbacks->setFilter(filter);
 	pScan->setActiveScan(true);
-	pScan->start(10);
+	pScan->start(5);
 	std::map<std::string, std::string> results = pScanCallbacks->getResults();
 
 	std::vector<flatbuffers::Offset<darknet7::Badge>> badges;
@@ -253,6 +253,7 @@ void BluetoothTask::pairWithDevice(const darknet7::STMToESPRequest* m)
 	this->isActingClient = true;
 	pClient->connect(remoteAddr);
 
+	pMySecurity->msgInstanceID = m->msgInstanceID();	
 	if (pClient->isConnected())
 	{
 		iUartClientCallbacks.afterConnect();

@@ -200,6 +200,11 @@ void MCUToMCU::process() {
 			this->getBus().emitSignal(this, mevt);
 			}
 			break;
+		case darknet7::ESPToSTMAny_BLESecurityConfirm: {
+			MSGEvent<darknet7::BLESecurityConfirm> mevt(msg->Msg_as_BLESecurityConfirm(), msg->msgInstanceID());
+			this->getBus().emitSignal(this, mevt);
+			}
+			break;
 		default:
 			break;
 		}

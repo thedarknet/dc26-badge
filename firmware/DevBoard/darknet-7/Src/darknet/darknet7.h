@@ -15,12 +15,13 @@
 #include "libstm32/display/gui.h"
 #include "KeyStore.h"
 
-
 class MenuState;
 class TestState;
 class SendMsgState;
 class SettingState;
 class PairingState;
+//class PairWithState; // Why doesn't this work?
+#include "menus/pair_with_state.h"
 class AddressState;
 class Menu3D;
 class GameOfLife;
@@ -38,6 +39,8 @@ public:
 	static const char *sYES;
 	static const char *sNO;
 	static const char *NO_DATA_FROM_ESP;
+	static const char *BLE_CONNECT_FAILED;
+	static const char *BLE_DISCONNECTING;
 
 	#define START_LANDSCAPE
 	#ifdef START_LANDSCAPE
@@ -86,6 +89,7 @@ public:
 	SendMsgState *getSendMsgState();
 	SettingState *getSettingState();
 	PairingState *getPairingState();
+	PairWithState *getPairWithState();
 	AddressState *getAddressBookState();
 	Menu3D *get3DState();
 	GameOfLife *getGameOfLifeState();

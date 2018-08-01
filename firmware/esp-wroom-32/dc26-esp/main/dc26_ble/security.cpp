@@ -8,6 +8,7 @@
 
 #include "../dc26.h"
 #include "../mcu_to_mcu.h"
+#include "../esp_to_stm_generated.h"
 #include "../stm_to_esp_generated.h"
 #include "../display_handler.h"
 
@@ -43,13 +44,21 @@ bool MySecurity::onConfirmPIN(uint32_t pass_key)
 	this->confirmed = false;
 
 	// TODO: Send to STM, get back confirmation
+	flatbuffers::FlatBufferBuilder fbb;
+	flatbuffers::Offset<darknet7::ESPToSTM> of;
+	auto infect = darknet7::CreateBLESecurityConfirm(fbb);
+	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_BLESecurityConfirm, infect.Union());
+	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+	getMCUToMCU().send(fbb);
+	
 
 	// Wait for the confirmation to come through
-	while ((this->confirmed == false) && (waited < 10))
+	while ((this->confirmed == false) && (waited < 15))
 	{
 		vTaskDelay(1000 / portTICK_PERIOD_MS);
 		waited++;
 	}
+	printf("Client Confirmed? %d\n", this->confirmed);
 	return this->confirmed;
 }
 
@@ -70,6 +79,15 @@ void MySecurity::onAuthenticationComplete(esp_ble_auth_cmpl_t auth_cmpl)
 			ESP_LOGI(SECTAG, "address type = %d", auth_cmpl.addr_type);
 		}
 		ESP_LOGI(SECTAG, "pair status = %s", auth_cmpl.success ? "success" : "fail");
+		// TODO: Send Generic Response
+		darknet7::RESPONSE_SUCCESS res = darknet7::RESPONSE_SUCCESS_True;
+		flatbuffers::FlatBufferBuilder fbb;
+		flatbuffers::Offset<darknet7::ESPToSTM> of;
+		auto infect = darknet7::CreateGenericResponse(fbb, res);
+		of = darknet7::CreateESPToSTM(fbb, this->msgInstanceID, 
+			darknet7::ESPToSTMAny_GenericResponse, infect.Union());
+		darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+		getMCUToMCU().send(fbb);
 	}
 	else
 	{

@@ -1,5 +1,5 @@
 #ifndef IRMENU_H_
-#define IRMENU_H
+#define IRMENU_H_
 
 #include "darknet7_base_state.h"
 #include "../mcu_to_mcu.h"
@@ -36,8 +36,9 @@ public:
 	void ListenForAlice();
 	void BeTheBob();
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BadgesInArea>* mevt);
+	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::GenericResponse>* mevt);
 protected:
-	enum INTERNAL_STATE { NONE, FETCHING_DATA, DISPLAY_DATA };
+	enum INTERNAL_STATE { NONE, FETCHING_DATA, DISPLAY_DATA, CONNECTING, PAIRING_FAILED, ALICE_INIT_CONVERSATION, ALICE_RECEIVE_ONE };
 	virtual cmdc0de::ErrorType onInit();
 	virtual cmdc0de::StateBase::ReturnStateContext onRun();
 	virtual cmdc0de::ErrorType onShutdown();
@@ -46,7 +47,7 @@ private:
 	cmdc0de::GUIListData BadgeList;
 	cmdc0de::GUIListItemData Items[8];
 	char ListBuffer[8][12];
-	char AddressBuffer[8][17];
+	char AddressBuffer[8][18];
 
 	// Internal State information
 	INTERNAL_STATE InternalState;

@@ -24,6 +24,8 @@ struct BadgesInArea;
 
 struct BLEInfectionData;
 
+struct BLESecurityConfirm;
+
 struct CommunicationStatusResponse;
 
 struct ESPSystemInfo;
@@ -68,11 +70,12 @@ enum ESPToSTMAny {
   ESPToSTMAny_WiFiScanResults = 5,
   ESPToSTMAny_NPCInteractionResponse = 6,
   ESPToSTMAny_BadgesInArea = 7,
+  ESPToSTMAny_BLESecurityConfirm = 8,
   ESPToSTMAny_MIN = ESPToSTMAny_NONE,
-  ESPToSTMAny_MAX = ESPToSTMAny_BadgesInArea
+  ESPToSTMAny_MAX = ESPToSTMAny_BLESecurityConfirm
 };
 
-inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[8] {
+inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[9] {
   static const ESPToSTMAny values[] = {
     ESPToSTMAny_NONE,
     ESPToSTMAny_GenericResponse,
@@ -81,7 +84,8 @@ inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[8] {
     ESPToSTMAny_CommunicationStatusResponse,
     ESPToSTMAny_WiFiScanResults,
     ESPToSTMAny_NPCInteractionResponse,
-    ESPToSTMAny_BadgesInArea
+    ESPToSTMAny_BadgesInArea,
+    ESPToSTMAny_BLESecurityConfirm
   };
   return values;
 }
@@ -96,6 +100,7 @@ inline const char * const *EnumNamesESPToSTMAny() {
     "WiFiScanResults",
     "NPCInteractionResponse",
     "BadgesInArea",
+    "BLESecurityConfirm",
     nullptr
   };
   return names;
@@ -136,6 +141,10 @@ template<> struct ESPToSTMAnyTraits<NPCInteractionResponse> {
 
 template<> struct ESPToSTMAnyTraits<BadgesInArea> {
   static const ESPToSTMAny enum_value = ESPToSTMAny_BadgesInArea;
+};
+
+template<> struct ESPToSTMAnyTraits<BLESecurityConfirm> {
+  static const ESPToSTMAny enum_value = ESPToSTMAny_BLESecurityConfirm;
 };
 
 bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, ESPToSTMAny type);
@@ -580,6 +589,34 @@ inline flatbuffers::Offset<BLEInfectionData> CreateBLEInfectionData(
   return builder_.Finish();
 }
 
+struct BLESecurityConfirm FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct BLESecurityConfirmBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit BLESecurityConfirmBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BLESecurityConfirmBuilder &operator=(const BLESecurityConfirmBuilder &);
+  flatbuffers::Offset<BLESecurityConfirm> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BLESecurityConfirm>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BLESecurityConfirm> CreateBLESecurityConfirm(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  BLESecurityConfirmBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
 struct CommunicationStatusResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_WIFISTATUS = 4,
@@ -811,6 +848,9 @@ struct ESPToSTM FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const BadgesInArea *Msg_as_BadgesInArea() const {
     return Msg_type() == ESPToSTMAny_BadgesInArea ? static_cast<const BadgesInArea *>(Msg()) : nullptr;
   }
+  const BLESecurityConfirm *Msg_as_BLESecurityConfirm() const {
+    return Msg_type() == ESPToSTMAny_BLESecurityConfirm ? static_cast<const BLESecurityConfirm *>(Msg()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_MSGINSTANCEID) &&
@@ -847,6 +887,10 @@ template<> inline const NPCInteractionResponse *ESPToSTM::Msg_as<NPCInteractionR
 
 template<> inline const BadgesInArea *ESPToSTM::Msg_as<BadgesInArea>() const {
   return Msg_as_BadgesInArea();
+}
+
+template<> inline const BLESecurityConfirm *ESPToSTM::Msg_as<BLESecurityConfirm>() const {
+  return Msg_as_BLESecurityConfirm();
 }
 
 struct ESPToSTMBuilder {
@@ -916,6 +960,10 @@ inline bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, 
     }
     case ESPToSTMAny_BadgesInArea: {
       auto ptr = reinterpret_cast<const BadgesInArea *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ESPToSTMAny_BLESecurityConfirm: {
+      auto ptr = reinterpret_cast<const BLESecurityConfirm *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return false;

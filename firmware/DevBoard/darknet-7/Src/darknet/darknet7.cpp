@@ -23,6 +23,7 @@
 #include "menus/menu_state.h"
 #include "menus/setting_state.h"
 #include "menus/pairing_state.h"
+#include "menus/pair_with_state.h"
 #include "menus/AddressState.h"
 #include "menus/menu3d.h"
 #include "menus/GameOfLife.h"
@@ -58,6 +59,8 @@ static const uint8_t EndContactSector = 3;
 const char *DarkNet7::sYES="Yes";
 const char *DarkNet7::sNO="No";
 const char *DarkNet7::NO_DATA_FROM_ESP = "No data returned from ESP, try resetting ESP.";
+const char *DarkNet7::BLE_CONNECT_FAILED = "BLE Connection failed.";
+const char *DarkNet7::BLE_DISCONNECTING = "BLE Disconnecting.";
 
 
 
@@ -329,6 +332,7 @@ static TestState MyTestState;
 static SendMsgState MySendMsgState;
 static SettingState MySettingState;
 static PairingState MyPairingState;
+static PairWithState MyPairWithState;
 static AddressState MyAddressState;
 static Menu3D MyMenu3D;
 static GameOfLife MyGameOfLife;
@@ -363,6 +367,10 @@ SettingState *DarkNet7::getSettingState() {
 
 PairingState *DarkNet7::getPairingState() {
 	return &MyPairingState;
+}
+
+PairWithState *DarkNet7::getPairWithState() {
+	return &MyPairWithState;
 }
 
 AddressState *DarkNet7::getAddressBookState() {

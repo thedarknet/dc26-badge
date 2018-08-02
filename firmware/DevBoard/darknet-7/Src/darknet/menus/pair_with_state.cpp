@@ -68,7 +68,7 @@ cmdc0de::ErrorType PairWithState::onInit()
 
 cmdc0de::StateBase::ReturnStateContext PairWithState::onRun()
 {
-	StateBase *nextState = this;
+	cmdc0de::StateBase *nextState = this;
 	flatbuffers::FlatBufferBuilder fbb;
 	if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID))
 	{
@@ -121,7 +121,7 @@ cmdc0de::StateBase::ReturnStateContext PairWithState::onRun()
 		MCUToMCU::get().getBus().addListener(this, alice2, &MCUToMCU::get());
 
 		// TODO: Send the data
-		auto sdata = fbb.CreateString((char *)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 62); // TODO: Get the data
+		auto sdata = fbb.CreateString((char *)"abcdefghijklmnopqrst", 20); // TODO: Get the data
 		auto r = darknet7::CreateBLESendDataToDevice(fbb, sdata);
 		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);

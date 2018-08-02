@@ -187,7 +187,7 @@ StateBase::ReturnStateContext PairingState::onRun() {
 		MCUToMCU::get().getBus().addListener(this, frombob, &MCUToMCU::get());
 
 		//TODO Connecting is done, send the doodle
-		auto sdata = fbb.CreateString((char *)"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 62); // TODO: Get the data
+		auto sdata = fbb.CreateString((char *)"abcdefghijklmnopqrst", 20); // TODO: Get the data
 		auto r = darknet7::CreateBLESendDataToDevice(fbb, sdata);
 		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
@@ -215,7 +215,7 @@ StateBase::ReturnStateContext PairingState::onRun() {
 		MCUToMCU::get().getBus().addListener(this, pcom, &MCUToMCU::get());
 
 		 // TODO: Get the data
-		auto sdata2 = fbb.CreateString((char *)"9876543210ZYXWVUTSRQPONMLKJIHGFEDBCAzyxwvutsrqponmlkjihgfedcba", 62);
+		auto sdata2 = fbb.CreateString((char *)"bbcdefghijklmnopqrst", 20);
 		auto r = darknet7::CreateBLESendDataToDevice(fbb, sdata2);
 		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);

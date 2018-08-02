@@ -86,15 +86,20 @@ void UartCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 
 void UartServerCallbacks::onConnect(BLEServer* server)
 {
-	ESP_LOGI(PAIR_SVR_TAG, "connection received");
-	isConnected = true;
 	if (!pBTTask->isActingClient)
+	{
+		ESP_LOGI(PAIR_SVR_TAG, "connection received");
+		isConnected = true;
 		pBTTask->isActingServer = true;
+	}
 }
 
 void UartServerCallbacks::onDisconnect(BLEServer* server)
 {
-	ESP_LOGI(PAIR_SVR_TAG, "connection dropped");
-	isConnected = false;
+	if (this->isConnected)
+	{
+		ESP_LOGI(PAIR_SVR_TAG, "connection dropped");
+		isConnected = false;
+	}
 	pBTTask->isActingServer = false;
 }

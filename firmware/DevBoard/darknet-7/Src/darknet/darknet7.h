@@ -41,6 +41,8 @@ public:
 	static const char *NO_DATA_FROM_ESP;
 	static const char *BLE_CONNECT_FAILED;
 	static const char *BLE_DISCONNECTING;
+	static const char *BLE_PAIRING_SUCCESS;
+	static const char *BLE_PAIRING_FAILED;
 
 	#define START_LANDSCAPE
 	#ifdef START_LANDSCAPE

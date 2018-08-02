@@ -61,6 +61,8 @@ const char *DarkNet7::sNO="No";
 const char *DarkNet7::NO_DATA_FROM_ESP = "No data returned from ESP, try resetting ESP.";
 const char *DarkNet7::BLE_CONNECT_FAILED = "BLE Connection failed.";
 const char *DarkNet7::BLE_DISCONNECTING = "BLE Disconnecting.";
+const char *DarkNet7::BLE_PAIRING_SUCCESS = "Paired.";
+const char *DarkNet7::BLE_PAIRING_FAILED = "Failed to Pair.";
 
 
 

@@ -20,6 +20,7 @@ union STMToESPAny
 	,BLEPairWithDevice
 	,BLESendPINConfirmation
 	,BLESendDataToDevice
+	,BLESendDNPairComplete
 	,BLEDisconnect
 	,WiFiScan
 	,WiFiNPCInteract
@@ -85,6 +86,9 @@ table BLESendPINConfirmation {
 
 table BLESendDataToDevice {
 	data:string;
+}
+
+table BLESendDNPairComplete {
 }
 
 table BLEDisconnect {

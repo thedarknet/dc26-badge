@@ -26,6 +26,16 @@ struct BLEInfectionData;
 
 struct BLESecurityConfirm;
 
+struct BLEConnected;
+
+struct BLEMessageOneFromAlice;
+
+struct BLEMessageFromBob;
+
+struct BLEMessageTwoFromAlice;
+
+struct BLEPairingComplete;
+
 struct CommunicationStatusResponse;
 
 struct ESPSystemInfo;
@@ -71,11 +81,16 @@ enum ESPToSTMAny {
   ESPToSTMAny_NPCInteractionResponse = 6,
   ESPToSTMAny_BadgesInArea = 7,
   ESPToSTMAny_BLESecurityConfirm = 8,
+  ESPToSTMAny_BLEConnected = 9,
+  ESPToSTMAny_BLEMessageOneFromAlice = 10,
+  ESPToSTMAny_BLEMessageFromBob = 11,
+  ESPToSTMAny_BLEMessageTwoFromAlice = 12,
+  ESPToSTMAny_BLEPairingComplete = 13,
   ESPToSTMAny_MIN = ESPToSTMAny_NONE,
-  ESPToSTMAny_MAX = ESPToSTMAny_BLESecurityConfirm
+  ESPToSTMAny_MAX = ESPToSTMAny_BLEPairingComplete
 };
 
-inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[9] {
+inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[14] {
   static const ESPToSTMAny values[] = {
     ESPToSTMAny_NONE,
     ESPToSTMAny_GenericResponse,
@@ -85,7 +100,12 @@ inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[9] {
     ESPToSTMAny_WiFiScanResults,
     ESPToSTMAny_NPCInteractionResponse,
     ESPToSTMAny_BadgesInArea,
-    ESPToSTMAny_BLESecurityConfirm
+    ESPToSTMAny_BLESecurityConfirm,
+    ESPToSTMAny_BLEConnected,
+    ESPToSTMAny_BLEMessageOneFromAlice,
+    ESPToSTMAny_BLEMessageFromBob,
+    ESPToSTMAny_BLEMessageTwoFromAlice,
+    ESPToSTMAny_BLEPairingComplete
   };
   return values;
 }
@@ -101,6 +121,11 @@ inline const char * const *EnumNamesESPToSTMAny() {
     "NPCInteractionResponse",
     "BadgesInArea",
     "BLESecurityConfirm",
+    "BLEConnected",
+    "BLEMessageOneFromAlice",
+    "BLEMessageFromBob",
+    "BLEMessageTwoFromAlice",
+    "BLEPairingComplete",
     nullptr
   };
   return names;
@@ -145,6 +170,26 @@ template<> struct ESPToSTMAnyTraits<BadgesInArea> {
 
 template<> struct ESPToSTMAnyTraits<BLESecurityConfirm> {
   static const ESPToSTMAny enum_value = ESPToSTMAny_BLESecurityConfirm;
+};
+
+template<> struct ESPToSTMAnyTraits<BLEConnected> {
+  static const ESPToSTMAny enum_value = ESPToSTMAny_BLEConnected;
+};
+
+template<> struct ESPToSTMAnyTraits<BLEMessageOneFromAlice> {
+  static const ESPToSTMAny enum_value = ESPToSTMAny_BLEMessageOneFromAlice;
+};
+
+template<> struct ESPToSTMAnyTraits<BLEMessageFromBob> {
+  static const ESPToSTMAny enum_value = ESPToSTMAny_BLEMessageFromBob;
+};
+
+template<> struct ESPToSTMAnyTraits<BLEMessageTwoFromAlice> {
+  static const ESPToSTMAny enum_value = ESPToSTMAny_BLEMessageTwoFromAlice;
+};
+
+template<> struct ESPToSTMAnyTraits<BLEPairingComplete> {
+  static const ESPToSTMAny enum_value = ESPToSTMAny_BLEPairingComplete;
 };
 
 bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, ESPToSTMAny type);
@@ -617,6 +662,209 @@ inline flatbuffers::Offset<BLESecurityConfirm> CreateBLESecurityConfirm(
   return builder_.Finish();
 }
 
+struct BLEConnected FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct BLEConnectedBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit BLEConnectedBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BLEConnectedBuilder &operator=(const BLEConnectedBuilder &);
+  flatbuffers::Offset<BLEConnected> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BLEConnected>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BLEConnected> CreateBLEConnected(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  BLEConnectedBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
+struct BLEMessageOneFromAlice FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_DATA = 4
+  };
+  const flatbuffers::String *data() const {
+    return GetPointer<const flatbuffers::String *>(VT_DATA);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_DATA) &&
+           verifier.Verify(data()) &&
+           verifier.EndTable();
+  }
+};
+
+struct BLEMessageOneFromAliceBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_data(flatbuffers::Offset<flatbuffers::String> data) {
+    fbb_.AddOffset(BLEMessageOneFromAlice::VT_DATA, data);
+  }
+  explicit BLEMessageOneFromAliceBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BLEMessageOneFromAliceBuilder &operator=(const BLEMessageOneFromAliceBuilder &);
+  flatbuffers::Offset<BLEMessageOneFromAlice> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BLEMessageOneFromAlice>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BLEMessageOneFromAlice> CreateBLEMessageOneFromAlice(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> data = 0) {
+  BLEMessageOneFromAliceBuilder builder_(_fbb);
+  builder_.add_data(data);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<BLEMessageOneFromAlice> CreateBLEMessageOneFromAliceDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *data = nullptr) {
+  return darknet7::CreateBLEMessageOneFromAlice(
+      _fbb,
+      data ? _fbb.CreateString(data) : 0);
+}
+
+struct BLEMessageFromBob FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_DATA = 4
+  };
+  const flatbuffers::String *data() const {
+    return GetPointer<const flatbuffers::String *>(VT_DATA);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_DATA) &&
+           verifier.Verify(data()) &&
+           verifier.EndTable();
+  }
+};
+
+struct BLEMessageFromBobBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_data(flatbuffers::Offset<flatbuffers::String> data) {
+    fbb_.AddOffset(BLEMessageFromBob::VT_DATA, data);
+  }
+  explicit BLEMessageFromBobBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BLEMessageFromBobBuilder &operator=(const BLEMessageFromBobBuilder &);
+  flatbuffers::Offset<BLEMessageFromBob> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BLEMessageFromBob>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BLEMessageFromBob> CreateBLEMessageFromBob(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> data = 0) {
+  BLEMessageFromBobBuilder builder_(_fbb);
+  builder_.add_data(data);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<BLEMessageFromBob> CreateBLEMessageFromBobDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *data = nullptr) {
+  return darknet7::CreateBLEMessageFromBob(
+      _fbb,
+      data ? _fbb.CreateString(data) : 0);
+}
+
+struct BLEMessageTwoFromAlice FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_DATA = 4
+  };
+  const flatbuffers::String *data() const {
+    return GetPointer<const flatbuffers::String *>(VT_DATA);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_DATA) &&
+           verifier.Verify(data()) &&
+           verifier.EndTable();
+  }
+};
+
+struct BLEMessageTwoFromAliceBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_data(flatbuffers::Offset<flatbuffers::String> data) {
+    fbb_.AddOffset(BLEMessageTwoFromAlice::VT_DATA, data);
+  }
+  explicit BLEMessageTwoFromAliceBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BLEMessageTwoFromAliceBuilder &operator=(const BLEMessageTwoFromAliceBuilder &);
+  flatbuffers::Offset<BLEMessageTwoFromAlice> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BLEMessageTwoFromAlice>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BLEMessageTwoFromAlice> CreateBLEMessageTwoFromAlice(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> data = 0) {
+  BLEMessageTwoFromAliceBuilder builder_(_fbb);
+  builder_.add_data(data);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<BLEMessageTwoFromAlice> CreateBLEMessageTwoFromAliceDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *data = nullptr) {
+  return darknet7::CreateBLEMessageTwoFromAlice(
+      _fbb,
+      data ? _fbb.CreateString(data) : 0);
+}
+
+struct BLEPairingComplete FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           verifier.EndTable();
+  }
+};
+
+struct BLEPairingCompleteBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  explicit BLEPairingCompleteBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BLEPairingCompleteBuilder &operator=(const BLEPairingCompleteBuilder &);
+  flatbuffers::Offset<BLEPairingComplete> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BLEPairingComplete>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BLEPairingComplete> CreateBLEPairingComplete(
+    flatbuffers::FlatBufferBuilder &_fbb) {
+  BLEPairingCompleteBuilder builder_(_fbb);
+  return builder_.Finish();
+}
+
 struct CommunicationStatusResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_WIFISTATUS = 4,
@@ -851,6 +1099,21 @@ struct ESPToSTM FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const BLESecurityConfirm *Msg_as_BLESecurityConfirm() const {
     return Msg_type() == ESPToSTMAny_BLESecurityConfirm ? static_cast<const BLESecurityConfirm *>(Msg()) : nullptr;
   }
+  const BLEConnected *Msg_as_BLEConnected() const {
+    return Msg_type() == ESPToSTMAny_BLEConnected ? static_cast<const BLEConnected *>(Msg()) : nullptr;
+  }
+  const BLEMessageOneFromAlice *Msg_as_BLEMessageOneFromAlice() const {
+    return Msg_type() == ESPToSTMAny_BLEMessageOneFromAlice ? static_cast<const BLEMessageOneFromAlice *>(Msg()) : nullptr;
+  }
+  const BLEMessageFromBob *Msg_as_BLEMessageFromBob() const {
+    return Msg_type() == ESPToSTMAny_BLEMessageFromBob ? static_cast<const BLEMessageFromBob *>(Msg()) : nullptr;
+  }
+  const BLEMessageTwoFromAlice *Msg_as_BLEMessageTwoFromAlice() const {
+    return Msg_type() == ESPToSTMAny_BLEMessageTwoFromAlice ? static_cast<const BLEMessageTwoFromAlice *>(Msg()) : nullptr;
+  }
+  const BLEPairingComplete *Msg_as_BLEPairingComplete() const {
+    return Msg_type() == ESPToSTMAny_BLEPairingComplete ? static_cast<const BLEPairingComplete *>(Msg()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_MSGINSTANCEID) &&
@@ -891,6 +1154,26 @@ template<> inline const BadgesInArea *ESPToSTM::Msg_as<BadgesInArea>() const {
 
 template<> inline const BLESecurityConfirm *ESPToSTM::Msg_as<BLESecurityConfirm>() const {
   return Msg_as_BLESecurityConfirm();
+}
+
+template<> inline const BLEConnected *ESPToSTM::Msg_as<BLEConnected>() const {
+  return Msg_as_BLEConnected();
+}
+
+template<> inline const BLEMessageOneFromAlice *ESPToSTM::Msg_as<BLEMessageOneFromAlice>() const {
+  return Msg_as_BLEMessageOneFromAlice();
+}
+
+template<> inline const BLEMessageFromBob *ESPToSTM::Msg_as<BLEMessageFromBob>() const {
+  return Msg_as_BLEMessageFromBob();
+}
+
+template<> inline const BLEMessageTwoFromAlice *ESPToSTM::Msg_as<BLEMessageTwoFromAlice>() const {
+  return Msg_as_BLEMessageTwoFromAlice();
+}
+
+template<> inline const BLEPairingComplete *ESPToSTM::Msg_as<BLEPairingComplete>() const {
+  return Msg_as_BLEPairingComplete();
 }
 
 struct ESPToSTMBuilder {
@@ -964,6 +1247,26 @@ inline bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, 
     }
     case ESPToSTMAny_BLESecurityConfirm: {
       auto ptr = reinterpret_cast<const BLESecurityConfirm *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ESPToSTMAny_BLEConnected: {
+      auto ptr = reinterpret_cast<const BLEConnected *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ESPToSTMAny_BLEMessageOneFromAlice: {
+      auto ptr = reinterpret_cast<const BLEMessageOneFromAlice *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ESPToSTMAny_BLEMessageFromBob: {
+      auto ptr = reinterpret_cast<const BLEMessageFromBob *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ESPToSTMAny_BLEMessageTwoFromAlice: {
+      auto ptr = reinterpret_cast<const BLEMessageTwoFromAlice *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ESPToSTMAny_BLEPairingComplete: {
+      auto ptr = reinterpret_cast<const BLEPairingComplete *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return false;

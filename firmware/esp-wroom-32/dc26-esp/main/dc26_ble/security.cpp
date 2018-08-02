@@ -46,8 +46,8 @@ bool MySecurity::onConfirmPIN(uint32_t pass_key)
 	// TODO: Send to STM, get back confirmation
 	flatbuffers::FlatBufferBuilder fbb;
 	flatbuffers::Offset<darknet7::ESPToSTM> of;
-	auto infect = darknet7::CreateBLESecurityConfirm(fbb);
-	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_BLESecurityConfirm, infect.Union());
+	auto c = darknet7::CreateBLESecurityConfirm(fbb);
+	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_BLESecurityConfirm, c.Union());
 	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
 	getMCUToMCU().send(fbb);
 	
@@ -59,6 +59,7 @@ bool MySecurity::onConfirmPIN(uint32_t pass_key)
 		waited++;
 	}
 	printf("Client Confirmed? %d\n", this->confirmed);
+
 	return this->confirmed;
 }
 
@@ -79,15 +80,6 @@ void MySecurity::onAuthenticationComplete(esp_ble_auth_cmpl_t auth_cmpl)
 			ESP_LOGI(SECTAG, "address type = %d", auth_cmpl.addr_type);
 		}
 		ESP_LOGI(SECTAG, "pair status = %s", auth_cmpl.success ? "success" : "fail");
-		// TODO: Send Generic Response
-		darknet7::RESPONSE_SUCCESS res = darknet7::RESPONSE_SUCCESS_True;
-		flatbuffers::FlatBufferBuilder fbb;
-		flatbuffers::Offset<darknet7::ESPToSTM> of;
-		auto infect = darknet7::CreateGenericResponse(fbb, res);
-		of = darknet7::CreateESPToSTM(fbb, this->msgInstanceID, 
-			darknet7::ESPToSTMAny_GenericResponse, infect.Union());
-		darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-		getMCUToMCU().send(fbb);
 	}
 	else
 	{
@@ -99,4 +91,11 @@ void MySecurity::onAuthenticationComplete(esp_ble_auth_cmpl_t auth_cmpl)
 			ESP_LOGI(SECTAG, "size: %d", length);
 		}
 	}
+	// TODO: Send Generic Response
+	flatbuffers::FlatBufferBuilder fbb;
+	auto con = darknet7::CreateBLEConnected(fbb);
+	flatbuffers::Offset<darknet7::ESPToSTM> of = darknet7::CreateESPToSTM(fbb, 0, 
+		darknet7::ESPToSTMAny_BLEConnected, con.Union());
+	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+	getMCUToMCU().send(fbb);
 }

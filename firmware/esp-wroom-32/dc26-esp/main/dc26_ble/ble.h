@@ -59,6 +59,7 @@ public: // API
 	void pairWithDevice(const darknet7::STMToESPRequest* m);
 	void sendPINConfirmation(const darknet7::STMToESPRequest* m);
 	void sendDataToDevice(const darknet7::STMToESPRequest* m);
+	void sendDNPairComplete(const darknet7::STMToESPRequest* m);
 	void disconnect();
 
 public:

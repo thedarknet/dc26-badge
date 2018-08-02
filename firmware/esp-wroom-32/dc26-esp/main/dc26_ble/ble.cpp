@@ -60,29 +60,50 @@ BLE2902 j2902;
 		1) a read() has occurred, or
 		2) an override event occurs (i.e. a disconnection)
 */
+char mesgbuf[200];
+unsigned int midx;
 static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 							uint8_t* pData, size_t length, bool isNotify)
 {
-	printf("Client Received: length %d --- %s\n", length, pData);
-
-	/*
 	flatbuffers::FlatBufferBuilder fbb;
-	uint8_t *bufData = nullptr;
-	flatbuffers::Offset<darknet7::STMToESPRequest> of;
-	flatbuffers::uoffset_t size;
-	MCUToMCUTask::Message* m;
-	auto sdata = fbb.CreateString((char *)pData, length);
-	auto sendData = darknet7::CreateBLESendDataToDevice(fbb, sdata);
-	of = darknet7::CreateSTMToESPRequest(fbb, 0,
-		darknet7::STMToESPAny_BLESendDataToDevice, sendData.Union());
-	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
-	size = fbb.GetSize();
-	bufData = fbb.GetBufferPointer();
-	m = new MCUToMCUTask::Message();
-	m->set(size, 0, bufData);
-	xQueueSend(pBTTask->getQueueHandle(), &m, (TickType_t) 0);
-	*/
-	// TODO: actually send it back to the STM
+	flatbuffers::Offset<darknet7::ESPToSTM> of;
+	printf("Client Received: length %d --- %s\n", length, pData);
+	if (pData[0] == '0')
+	{
+		// clear mesgbuf and start from beginning
+		midx = 0;
+		memset(mesgbuf, 0, 200);
+		memcpy(&mesgbuf[midx], &pData[1], length-1);
+		midx += (length-1);
+	}
+	else if (pData[0] == '1')
+	{
+		// continue copying, don't send
+		memcpy(&mesgbuf[midx], &pData[1], length-1);
+		midx += (length-1);
+	}
+	else if (pData[0] == '2')
+	{
+		// finished copying
+		memcpy(&mesgbuf[midx], &pData[1], length-1);
+		midx += (length-1);
+		// send MessageFromBob STM
+		auto sdata = fbb.CreateString(mesgbuf, midx);
+		auto sendData = darknet7::CreateBLEMessageFromBob(fbb, sdata);
+		of = darknet7::CreateESPToSTM(fbb, 0,
+			darknet7::ESPToSTMAny_BLEMessageFromBob, sendData.Union());
+		darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+		getMCUToMCU().send(fbb);
+	}
+	else if (pData[0] == '3')
+	{
+		// send Pairing Complete
+		auto sendData = darknet7::CreateBLEPairingComplete(fbb);
+		of = darknet7::CreateESPToSTM(fbb, 0,
+			darknet7::ESPToSTMAny_BLEPairingComplete, sendData.Union());
+		darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+		getMCUToMCU().send(fbb);
+	}
 }
 
 static void sendGenericResponse(bool result)
@@ -274,24 +295,57 @@ void BluetoothTask::sendPINConfirmation(const darknet7::STMToESPRequest* m)
 void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESendDataToDevice* msg = m->Msg_as_BLESendDataToDevice();
-	bool sent = false;
 	// TODO: Check if null bytes work
 	std::string buffer = msg->data()->str();
-	if (iUartClientCallbacks.isConnected)
+	int len = buffer.length();
+	int size = 0;
+	int sent = 0;
+	const char* buf = buffer.c_str();
+	uint8_t temp[23];
+	if (this->isActingClient && iUartClientCallbacks.isConnected)
 	{
-		printf("Client Sending: %s\n", buffer.c_str());
-		iUartClientCallbacks.pTxChar->writeValue(buffer);
-		sent = true;
+		while (len > 0)
+		{
+			size = (len > 22) ? 22 : len;
+			if (sent == 0)
+				temp[0] = '0';
+			else
+				temp[0] = (len > 22) ? '1' : '2';
+			memcpy(&temp[1], &buf[sent], size);
+			printf("Client Sending\n"); // TODO Print Stuff
+			iUartClientCallbacks.pTxChar->writeValue(temp, size + 1);
+			sent += size;
+			len -= size;
+		}
 	}
 	else if (iUartServerCallbacks.isConnected)
 	{
-		printf("Server Sending: %s\n", buffer.c_str());
-		pUartCisoCharacteristic->setValue(buffer);
-		pUartCisoCharacteristic->notify();
-		sent = true;
+		while (len > 0)
+		{
+			size = (len > 22) ? 22 : len;
+			if (sent == 0)
+				temp[0] = '0';
+			else
+				temp[0] = (len > 22) ? '1' : '2';
+			memcpy(&temp[1], &buf[sent], size);
+			printf("Server Sending\n"); // TODO Print Stuff
+			pUartCisoCharacteristic->setValue(temp, size + 1);
+			pUartCisoCharacteristic->notify();
+			sent += size;
+			len -= sent;
+		}
 	}
 	
 	sendGenericResponse(sent);
+}
+
+void BluetoothTask::sendDNPairComplete(const darknet7::STMToESPRequest* m)
+{
+	if (iUartServerCallbacks.isConnected)
+	{
+		pUartCisoCharacteristic->setValue("3");
+		pUartCisoCharacteristic->notify();
+	}
 }
 
 void BluetoothTask::disconnect()
@@ -343,6 +397,9 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 			break;
 		case darknet7::STMToESPAny_BLESendDataToDevice:
 			this->sendDataToDevice(m);
+			break;
+		case darknet7::STMToESPAny_BLESendDNPairComplete:
+			this->sendDNPairComplete(m);
 			break;
 		case darknet7::STMToESPAny_BLEDisconnect:
 			this->disconnect();

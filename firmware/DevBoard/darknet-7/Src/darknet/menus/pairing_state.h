@@ -34,11 +34,16 @@ public:
 	PairingState();
 	virtual ~PairingState();
 	void ListenForAlice();
-	void BeTheBob();
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BadgesInArea>* mevt);
-	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::GenericResponse>* mevt);
+	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEConnected>* mevt);
+	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEMessageFromBob>* mevt);
+	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEPairingComplete>* mevt);
 protected:
-	enum INTERNAL_STATE { NONE, FETCHING_DATA, DISPLAY_DATA, CONNECTING, PAIRING_FAILED, ALICE_INIT_CONVERSATION, ALICE_RECEIVE_ONE };
+	enum INTERNAL_STATE { NONE, FETCHING_DATA, DISPLAY_DATA,
+							CONNECTING,
+							ALICE_SEND_ONE, ALICE_RECEIVE_ONE,
+							ALICE_SEND_TWO, ALICE_RECEIVE_TWO,
+							PAIRING_COMPLETE, PAIRING_FAILED };
 	virtual cmdc0de::ErrorType onInit();
 	virtual cmdc0de::StateBase::ReturnStateContext onRun();
 	virtual cmdc0de::ErrorType onShutdown();
@@ -62,9 +67,6 @@ private:
 	AliceInitConvo AIC;
 	BobReplyToInit BRTI;
 	AliceToBobSignature ATBS;
-	uint16_t TransmitInternalState;
-	uint16_t ReceiveInternalState;
-	uint32_t bloop;
 };
 
 #endif

@@ -89,9 +89,9 @@ static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 		midx += (length-1);
 		// send MessageFromBob STM
 		auto sdata = fbb.CreateString(mesgbuf, midx);
-		auto sendData = darknet7::CreateBLEMessageFromBob(fbb, sdata);
+		auto sendData = darknet7::CreateBLEMessageFromDevice(fbb, sdata);
 		of = darknet7::CreateESPToSTM(fbb, 0,
-			darknet7::ESPToSTMAny_BLEMessageFromBob, sendData.Union());
+			darknet7::ESPToSTMAny_BLEMessageFromDevice, sendData.Union());
 		darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
 		getMCUToMCU().send(fbb);
 	}

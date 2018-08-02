@@ -210,18 +210,8 @@ void MCUToMCU::process() {
 			this->getBus().emitSignal(this, mevt);
 			}
 			break;
-		case darknet7::ESPToSTMAny_BLEMessageOneFromAlice: {
-			MSGEvent<darknet7::BLEMessageOneFromAlice> mevt(msg->Msg_as_BLEMessageOneFromAlice(), msg->msgInstanceID());
-			this->getBus().emitSignal(this, mevt);
-			}
-			break;
-		case darknet7::ESPToSTMAny_BLEMessageFromBob: {
-			MSGEvent<darknet7::BLEMessageFromBob> mevt(msg->Msg_as_BLEMessageFromBob(), msg->msgInstanceID());
-			this->getBus().emitSignal(this, mevt);
-			}
-			break;
-		case darknet7::ESPToSTMAny_BLEMessageTwoFromAlice: {
-			MSGEvent<darknet7::BLEMessageTwoFromAlice> mevt(msg->Msg_as_BLEMessageTwoFromAlice(), msg->msgInstanceID());
+		case darknet7::ESPToSTMAny_BLEMessageFromDevice: {
+			MSGEvent<darknet7::BLEMessageFromDevice> mevt(msg->Msg_as_BLEMessageFromDevice(), msg->msgInstanceID());
 			this->getBus().emitSignal(this, mevt);
 			}
 			break;

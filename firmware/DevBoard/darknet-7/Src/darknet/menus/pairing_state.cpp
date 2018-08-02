@@ -18,7 +18,7 @@ enum {
 PairingState::PairingState() : Darknet7BaseState()
 	, BadgeList("Badge List:", Items, 0, 0, 160, 128, 0, (sizeof(Items) / sizeof(Items[0])))
 	, Items(), ListBuffer(), InternalState(NONE), ESPRequestID(0), timesRunCalledSinceReset(0), TimeoutMS(1000), RetryCount(3), CurrentRetryCount(0)
-	, TimeInState(0) {
+	, TimeInState(0), bobMessage(1) {
 
 }
 
@@ -33,6 +33,7 @@ ErrorType PairingState::onInit() {
 
 	// set up defaults
 	this->timesRunCalledSinceReset = 0;
+	this->bobMessage = 1;
 	CurrentRetryCount = 0;
 	memset(&AIC, 0, sizeof(AIC));
 	memset(&BRTI, 0, sizeof(BRTI));
@@ -92,11 +93,19 @@ void PairingState::receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEConnecte
 	return;
 }
 
-void PairingState::receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEMessageFromBob>* mevt) {
+void PairingState::receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEMessageFromDevice>* mevt) {
 	DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
 	// TODO : Get data out
 	MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
-	InternalState = ALICE_SEND_TWO;
+	if (bobMessage == 1)
+	{
+		InternalState = ALICE_SEND_TWO;
+		bobMessage += 1;
+	}
+	else if (bobMessage == 2)
+	{
+		InternalState = PAIRING_COMPLETE;
+	}
 	this->timesRunCalledSinceReset = 0;
 	return;
 }
@@ -169,7 +178,7 @@ StateBase::ReturnStateContext PairingState::onRun() {
 	else if (InternalState == ALICE_SEND_ONE)
 	{
 		// Add the listener for Bob Message 1
-		const MSGEvent<darknet7::BLEMessageFromBob> * frombob = 0;
+		const MSGEvent<darknet7::BLEMessageFromDevice> * frombob = 0;
 		MCUToMCU::get().getBus().addListener(this, frombob, &MCUToMCU::get());
 
 		//TODO Connecting is done, send the doodle
@@ -190,7 +199,7 @@ StateBase::ReturnStateContext PairingState::onRun() {
 		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Receiving Data 1", cmdc0de::RGBColor::BLUE);
 		if (this->timesRunCalledSinceReset > 500)
 		{
-			const MSGEvent<darknet7::BLEMessageFromBob> *removebob=0;
+			const MSGEvent<darknet7::BLEMessageFromDevice> *removebob=0;
 			MCUToMCU::get().getBus().removeListener(this,removebob,&MCUToMCU::get());
 			InternalState = PAIRING_FAILED;
 		}

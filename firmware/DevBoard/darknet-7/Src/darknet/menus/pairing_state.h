@@ -36,7 +36,7 @@ public:
 	void ListenForAlice();
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BadgesInArea>* mevt);
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEConnected>* mevt);
-	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEMessageFromBob>* mevt);
+	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEMessageFromDevice>* mevt);
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEPairingComplete>* mevt);
 protected:
 	enum INTERNAL_STATE { NONE, FETCHING_DATA, DISPLAY_DATA,
@@ -67,6 +67,7 @@ private:
 	AliceInitConvo AIC;
 	BobReplyToInit BRTI;
 	AliceToBobSignature ATBS;
+	unsigned char bobMessage = 0;
 };
 
 #endif

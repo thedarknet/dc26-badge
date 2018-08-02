@@ -4,7 +4,7 @@ namespace darknet7;
 
 enum RESPONSE_SUCCESS : byte { False = 0, True = 1 }
 
-union ESPToSTMAny { GenericResponse, ESPSystemInfo, BLEInfectionData, CommunicationStatusResponse, WiFiScanResults, NPCInteractionResponse, BadgesInArea, BLESecurityConfirm, BLEConnected, BLEMessageOneFromAlice, BLEMessageFromBob, BLEMessageTwoFromAlice, BLEPairingComplete}
+union ESPToSTMAny { GenericResponse, ESPSystemInfo, BLEInfectionData, CommunicationStatusResponse, WiFiScanResults, NPCInteractionResponse, BadgesInArea, BLESecurityConfirm, BLEConnected, BLEMessageFromDevice, BLEPairingComplete}
 
 table NPCInteractionResponse {
 	message:string;
@@ -46,15 +46,7 @@ table BLESecurityConfirm {
 table BLEConnected {
 }
 
-table BLEMessageOneFromAlice {
-	data:string;
-}
-
-table BLEMessageFromBob {
-	data:string;
-}
-
-table BLEMessageTwoFromAlice {
+table BLEMessageFromDevice {
 	data:string;
 }
 

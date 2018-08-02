@@ -55,11 +55,7 @@ void UartClientCallbacks::onDisconnect(BLEClient* client)
 	isConnected = false;
 }
 
-
-
-char mesgbuf2[200];
-unsigned int midx2 = 0;
-unsigned int aliceMessage = 1;
+int aliceMessage = 1;
 void UartCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 {
 	flatbuffers::FlatBufferBuilder fbb;
@@ -67,7 +63,6 @@ void UartCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 	std::string rxValue = pCharacteristic->getValue();
 	unsigned int length = rxValue.length();
 	const char* pData = rxValue.c_str();
-	printf("Server Recevied %s\n", pData); // TODO: print stuff
 	if (pData[0] == '0')
 	{
 		// clear mesgbuf2 and start from beginning
@@ -88,24 +83,14 @@ void UartCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 		midx2 += (length-1);
 		// send MessageFromBob STM
 		auto sdata = fbb.CreateString(mesgbuf2, midx2);
-		if (aliceMessage == 1)
-		{
-			auto sendData = darknet7::CreateBLEMessageOneFromAlice(fbb, sdata);
-			of = darknet7::CreateESPToSTM(fbb, 0,
-				darknet7::ESPToSTMAny_BLEMessageOneFromAlice, sendData.Union());
-			darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-			getMCUToMCU().send(fbb);
-			aliceMessage += 1;
-		}
-		else if (aliceMessage == 2)
-		{
-			auto sendData = darknet7::CreateBLEMessageTwoFromAlice(fbb, sdata);
-			of = darknet7::CreateESPToSTM(fbb, 0,
-				darknet7::ESPToSTMAny_BLEMessageTwoFromAlice, sendData.Union());
-			darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-			getMCUToMCU().send(fbb);
-			aliceMessage += 1;
-		}
+		mesgbuf2[midx2] = 0x0;
+		printf("Send Message From Alice To STM: %s\n", mesgbuf2); // TODO: print stuff
+		auto sendData = darknet7::CreateBLEMessageFromDevice(fbb, sdata);
+		of = darknet7::CreateESPToSTM(fbb, 0,
+			darknet7::ESPToSTMAny_BLEMessageFromDevice, sendData.Union());
+		darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+		getMCUToMCU().send(fbb);
+		aliceMessage += 1;
 	}
 }
 
@@ -113,10 +98,10 @@ void UartServerCallbacks::onConnect(BLEServer* server)
 {
 	if (!pBTTask->isActingClient)
 	{
-		aliceMessage = 1;
 		ESP_LOGI(PAIR_SVR_TAG, "connection received");
 		isConnected = true;
 		pBTTask->isActingServer = true;
+		aliceMessage = 1;
 	}
 }
 

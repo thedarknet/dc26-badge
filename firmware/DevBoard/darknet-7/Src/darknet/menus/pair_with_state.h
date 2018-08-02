@@ -11,16 +11,18 @@ public:
 	PairWithState();
 	virtual ~PairWithState();
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLESecurityConfirm>* mevt);
-	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEMessageOneFromAlice>* mevt);
-	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEMessageTwoFromAlice>* mevt);
+	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEMessageFromDevice>* mevt);
 protected:
-	enum INTERNAL_STATE { NONE, CONNECTING, BOB_RECEIVE_ONE, BOB_SEND_ONE, BOB_RECEIVE_TWO, BOB_SEND_TWO, PAIRING_SUCCESS, PAIRING_FAILED};
+	enum INTERNAL_STATE { NONE, CONNECTING, BOB_RECEIVE, BOB_SEND_ONE, BOB_SEND_TWO, PAIRING_SUCCESS, PAIRING_FAILED};
 	virtual cmdc0de::ErrorType onInit();
 	virtual cmdc0de::StateBase::ReturnStateContext onRun();
 	virtual cmdc0de::ErrorType onShutdown();
 private:
 	uint32_t loops = 0;
 	INTERNAL_STATE InternalState;
+	char MesgBuf[200];
+	unsigned int MesgLen;
+	unsigned char aliceMessage = 1;
 };
 
 #endif

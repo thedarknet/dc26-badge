@@ -103,6 +103,7 @@ static void uart_send(void* arg) {
 					ESP_LOGI(MCUToMCUTask::LOGTAG, "failed to send all bytes! %u of %u",
 										 bytesSent, m->getMessageSize());
 				}
+				ESP_LOGI(MCUToMCUTask::LOGTAG, "Sent!");
 				delete m;
 			}
 		}

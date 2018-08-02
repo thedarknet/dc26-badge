@@ -10,7 +10,8 @@
 
 void PairWithState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLESecurityConfirm>* mevt)
 {
-	MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
+	const MSGEvent<darknet7::BLESecurityConfirm> * si = 0;
+	MCUToMCU::get().getBus().removeListener(this,si,&MCUToMCU::get());
 	InternalState = CONNECTING;
 	this->loops = 0;
 	return;
@@ -18,7 +19,8 @@ void PairWithState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLESecurity
 
 void PairWithState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEMessageFromDevice>* mevt)
 {
-	MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
+	const MSGEvent<darknet7::BLEMessageFromDevice> * si = 0;
+	MCUToMCU::get().getBus().removeListener(this,si,&MCUToMCU::get());
 	//TODO: store the information locally
 	const flatbuffers::String* tmesg = mevt->InnerMsg->data();
 	this->MesgLen = tmesg->Length();
@@ -103,7 +105,7 @@ cmdc0de::StateBase::ReturnStateContext PairWithState::onRun()
 	else if (InternalState == BOB_RECEIVE)
 	{
 		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
-		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"BOB_RECEIVE_ONE", cmdc0de::RGBColor::BLUE);
+		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"BOB Receiving", cmdc0de::RGBColor::BLUE);
 		if(this->loops > 300)
 		{
 			const MSGEvent<darknet7::BLEMessageFromDevice> * ra1 = 0;
@@ -114,7 +116,7 @@ cmdc0de::StateBase::ReturnStateContext PairWithState::onRun()
 	else if (InternalState == BOB_SEND_ONE)
 	{
 		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
-		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"BOB_SEND_ONE", cmdc0de::RGBColor::BLUE);
+		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"BOB Sending First", cmdc0de::RGBColor::BLUE);
 		const MSGEvent<darknet7::BLEMessageFromDevice> * alice2 = 0;
 		MCUToMCU::get().getBus().addListener(this, alice2, &MCUToMCU::get());
 
@@ -130,7 +132,7 @@ cmdc0de::StateBase::ReturnStateContext PairWithState::onRun()
 	else if (InternalState == BOB_SEND_TWO)
 	{
 		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
-		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"BOB_SEND_TWO", cmdc0de::RGBColor::BLUE);
+		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"BOB Sending Complete", cmdc0de::RGBColor::BLUE);
 
 		auto r = darknet7::CreateBLESendDNPairComplete(fbb);
 		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDNPairComplete, r.Union());

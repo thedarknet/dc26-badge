@@ -41,8 +41,7 @@ public:
 protected:
 	enum INTERNAL_STATE { NONE, FETCHING_DATA, DISPLAY_DATA,
 							CONNECTING,
-							ALICE_SEND_ONE, ALICE_RECEIVE_ONE,
-							ALICE_SEND_TWO, ALICE_RECEIVE_TWO,
+							ALICE_SEND_ONE, ALICE_RECEIVE, ALICE_SEND_TWO,
 							PAIRING_COMPLETE, PAIRING_FAILED };
 	virtual cmdc0de::ErrorType onInit();
 	virtual cmdc0de::StateBase::ReturnStateContext onRun();

@@ -177,6 +177,7 @@ StateBase::ReturnStateContext PairingState::onRun() {
 		auto r = darknet7::CreateBLESendDataToDevice(fbb, sdata);
 		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+		MCUToMCU::get().send(fbb);
 
 		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
 		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Sending Data 1", cmdc0de::RGBColor::BLUE);
@@ -204,6 +205,7 @@ StateBase::ReturnStateContext PairingState::onRun() {
 		auto r = darknet7::CreateBLESendDataToDevice(fbb, sdata2);
 		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+		MCUToMCU::get().send(fbb);
 
 		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
 		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Sending Data 2", cmdc0de::RGBColor::BLUE);
@@ -226,6 +228,7 @@ StateBase::ReturnStateContext PairingState::onRun() {
 		this->ESPRequestID = DarkNet7::get().nextSeq();
 		auto e = darknet7::CreateSTMToESPRequest(fbb, ESPRequestID, darknet7::STMToESPAny_BLEDisconnect, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+		MCUToMCU::get().send(fbb);
 		nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),DarkNet7::get().BLE_PAIRING_SUCCESS,2000);
 	}
 	else if (InternalState == PAIRING_FAILED)
@@ -234,6 +237,7 @@ StateBase::ReturnStateContext PairingState::onRun() {
 		this->ESPRequestID = DarkNet7::get().nextSeq();
 		auto e = darknet7::CreateSTMToESPRequest(fbb, ESPRequestID, darknet7::STMToESPAny_BLEDisconnect, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+		MCUToMCU::get().send(fbb);
 		nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),DarkNet7::get().BLE_PAIRING_FAILED,2000);
 	}
 	this->timesRunCalledSinceReset += 1;

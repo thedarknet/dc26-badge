@@ -61,13 +61,13 @@ BLE2902 j2902;
 		2) an override event occurs (i.e. a disconnection)
 */
 char mesgbuf[200];
-unsigned int midx;
+unsigned int midx = 0;
 static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 							uint8_t* pData, size_t length, bool isNotify)
 {
 	flatbuffers::FlatBufferBuilder fbb;
 	flatbuffers::Offset<darknet7::ESPToSTM> of;
-	printf("Client Received: length %d --- %s\n", length, pData);
+	printf("Client Received: %s\n", pData);
 	if (pData[0] == '0')
 	{
 		// clear mesgbuf and start from beginning
@@ -302,8 +302,9 @@ void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 	int sent = 0;
 	const char* buf = buffer.c_str();
 	uint8_t temp[23];
-	if (this->isActingClient && iUartClientCallbacks.isConnected)
+	if (iUartClientCallbacks.isConnected)
 	{
+		printf("Client Sending\n"); // TODO Print Stuff
 		while (len > 0)
 		{
 			size = (len > 22) ? 22 : len;
@@ -312,7 +313,6 @@ void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 			else
 				temp[0] = (len > 22) ? '1' : '2';
 			memcpy(&temp[1], &buf[sent], size);
-			printf("Client Sending\n"); // TODO Print Stuff
 			iUartClientCallbacks.pTxChar->writeValue(temp, size + 1);
 			sent += size;
 			len -= size;
@@ -320,6 +320,7 @@ void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 	}
 	else if (iUartServerCallbacks.isConnected)
 	{
+		printf("Server Sending\n"); // TODO Print Stuff
 		while (len > 0)
 		{
 			size = (len > 22) ? 22 : len;
@@ -328,7 +329,6 @@ void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 			else
 				temp[0] = (len > 22) ? '1' : '2';
 			memcpy(&temp[1], &buf[sent], size);
-			printf("Server Sending\n"); // TODO Print Stuff
 			pUartCisoCharacteristic->setValue(temp, size + 1);
 			pUartCisoCharacteristic->notify();
 			sent += size;

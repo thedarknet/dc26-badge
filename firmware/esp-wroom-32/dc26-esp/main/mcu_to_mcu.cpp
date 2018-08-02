@@ -192,10 +192,11 @@ int32_t MCUToMCUTask::processMessage(const uint8_t *data, uint32_t size) {
         	case darknet7::STMToESPAny_BLEPairWithDevice:
         	case darknet7::STMToESPAny_BLESendPINConfirmation:
         	case darknet7::STMToESPAny_BLESendDataToDevice:
-        	case darknet7::STMToESPAny_BLEDisconnect:
-			ESP_LOGI(LOGTAG, "sending to bluetooth task");
-			xQueueSend(getBLETask().getQueueHandle(), (void*)&m, (TickType_t) 0);
-			ESP_LOGI(LOGTAG, "after send to bluetooth task");
+			case darknet7::STMToESPAny_BLESendDNPairComplete:
+	        	case darknet7::STMToESPAny_BLEDisconnect:
+				ESP_LOGI(LOGTAG, "sending to bluetooth task");
+				xQueueSend(getBLETask().getQueueHandle(), (void*)&m, (TickType_t) 0);
+				ESP_LOGI(LOGTAG, "after send to bluetooth task");
 				break;
 			default:
 				break;

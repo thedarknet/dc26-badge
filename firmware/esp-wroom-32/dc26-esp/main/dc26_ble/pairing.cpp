@@ -5,6 +5,7 @@
 #include "pairing.h"
 #include "../lib/ble/BLEDevice.h"
 
+#include "../dc26.h"
 #include "../mcu_to_mcu.h"
 #include "../stm_to_esp_generated.h"
 #include "../esp_to_stm_generated.h"
@@ -56,31 +57,55 @@ void UartClientCallbacks::onDisconnect(BLEClient* client)
 
 
 
-
+char mesgbuf2[200];
+unsigned int midx2 = 0;
+unsigned int aliceMessage = 1;
 void UartCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 {
+	flatbuffers::FlatBufferBuilder fbb;
+	flatbuffers::Offset<darknet7::ESPToSTM> of;
 	std::string rxValue = pCharacteristic->getValue();
-	if (rxValue.length() > 0)
-	{	
-		const char *msgOrig = rxValue.c_str();
-		printf("Server Recevied: %s\n", msgOrig);
-
-		// TODO: Write to STM
-		flatbuffers::FlatBufferBuilder fbb;
-		uint8_t *data = nullptr;
-		MCUToMCUTask::Message* m;
-		flatbuffers::Offset<darknet7::STMToESPRequest> of;
-		flatbuffers::uoffset_t size;
-		auto sdata = fbb.CreateString(rxValue);
-		auto sendData = darknet7::CreateBLESendDataToDevice(fbb, sdata);
-		of = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice,
-			sendData.Union());
-		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, of);
-		size = fbb.GetSize();
-		data = fbb.GetBufferPointer();
-		m = new MCUToMCUTask::Message();
-		m->set(size, 0, data);
-		xQueueSendFromISR(pBTTask->getQueueHandle(), &m, (TickType_t) 0);
+	unsigned int length = rxValue.length();
+	const char* pData = rxValue.c_str();
+	printf("Server Recevied %s\n", pData); // TODO: print stuff
+	if (pData[0] == '0')
+	{
+		// clear mesgbuf2 and start from beginning
+		midx2 = 0;
+		memset(mesgbuf2, 0, 200);
+		memcpy(&mesgbuf2[midx2], &pData[1], length-1);
+		midx2 += (length-1);
+	}
+	else if (pData[0] == '1')
+	{
+		// continue copying, don't send
+		memcpy(&mesgbuf2[midx2], &pData[1], length-1);
+		midx2 += (length-1);
+	}
+	else if (pData[0] == '2')
+	{
+		memcpy(&mesgbuf2[midx2], &pData[1], length-1);
+		midx2 += (length-1);
+		// send MessageFromBob STM
+		auto sdata = fbb.CreateString(mesgbuf2, midx2);
+		if (aliceMessage == 1)
+		{
+			auto sendData = darknet7::CreateBLEMessageOneFromAlice(fbb, sdata);
+			of = darknet7::CreateESPToSTM(fbb, 0,
+				darknet7::ESPToSTMAny_BLEMessageOneFromAlice, sendData.Union());
+			darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+			getMCUToMCU().send(fbb);
+			aliceMessage += 1;
+		}
+		else if (aliceMessage == 2)
+		{
+			auto sendData = darknet7::CreateBLEMessageTwoFromAlice(fbb, sdata);
+			of = darknet7::CreateESPToSTM(fbb, 0,
+				darknet7::ESPToSTMAny_BLEMessageTwoFromAlice, sendData.Union());
+			darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+			getMCUToMCU().send(fbb);
+			aliceMessage += 1;
+		}
 	}
 }
 
@@ -88,6 +113,7 @@ void UartServerCallbacks::onConnect(BLEServer* server)
 {
 	if (!pBTTask->isActingClient)
 	{
+		aliceMessage = 1;
 		ESP_LOGI(PAIR_SVR_TAG, "connection received");
 		isConnected = true;
 		pBTTask->isActingServer = true;

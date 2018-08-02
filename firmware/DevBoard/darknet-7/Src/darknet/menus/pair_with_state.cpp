@@ -94,7 +94,6 @@ cmdc0de::StateBase::ReturnStateContext PairWithState::onRun()
 			auto r = darknet7::CreateBLESendPINConfirmation(fbb, darknet7::RESPONSE_SUCCESS_True);
 			auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendPINConfirmation, r.Union());
 			darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
-			nextState = DarkNet7::get().getDisplayMenuState();
 			MCUToMCU::get().send(fbb); // send the connect message
 		}
 	}
@@ -121,6 +120,7 @@ cmdc0de::StateBase::ReturnStateContext PairWithState::onRun()
 		auto r = darknet7::CreateBLESendDataToDevice(fbb, sdata);
 		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+		MCUToMCU::get().send(fbb);
 
 		InternalState = BOB_RECEIVE_TWO;
 	}
@@ -144,6 +144,7 @@ cmdc0de::StateBase::ReturnStateContext PairWithState::onRun()
 		auto r = darknet7::CreateBLESendDNPairComplete(fbb);
 		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDNPairComplete, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+		MCUToMCU::get().send(fbb);
 		InternalState = PAIRING_SUCCESS;
 	}
 	else if (InternalState == PAIRING_SUCCESS)
@@ -156,6 +157,7 @@ cmdc0de::StateBase::ReturnStateContext PairWithState::onRun()
 		auto r = darknet7::CreateBLEDisconnect(fbb);
 		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLEDisconnect, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+		MCUToMCU::get().send(fbb);
 		nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(), DarkNet7::BLE_PAIRING_FAILED,2000);
 	}
 	this->loops++;

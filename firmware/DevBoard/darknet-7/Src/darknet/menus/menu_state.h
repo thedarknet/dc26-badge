@@ -19,7 +19,7 @@ protected:
 private:
 	cmdc0de::GUIListData MenuList;
 	cmdc0de::GUIListItemData Items[12];
-	//etl::random_xorshift rand;
+	etl::random_xorshift rand;
 };
 
 

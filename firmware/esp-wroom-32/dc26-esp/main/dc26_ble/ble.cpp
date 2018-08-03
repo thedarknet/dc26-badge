@@ -418,7 +418,7 @@ void BluetoothTask::run(void * data)
 	MCUToMCUTask::Message* m = nullptr;
 	while (1)
 	{
-		loopsSinceScan += 1;
+		//loopsSinceScan += 1;
 		if (xQueueReceive(STMQueueHandle, &m, CmdQueueTimeout))
 		{
 			if (m != nullptr)

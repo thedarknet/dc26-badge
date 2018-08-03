@@ -29,7 +29,7 @@ MenuState::MenuState() :
 		Darknet7BaseState(), MenuList("Main Menu", Items, 0, 0, DarkNet7::get().getDisplay().getWidth(),
 				DarkNet7::get().getDisplay().getHeight()
 				, 0, (sizeof(Items) / sizeof(Items[0])))
-				//,rand()
+				,rand()
 {
 }
 
@@ -65,10 +65,12 @@ void MenuState::receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEInfectionDa
 
 ErrorType MenuState::onInit() {
 	// Infection Listener
-	//const MSGEvent<darknet7::BLEInfectionData> * si = 0;
-	//MCUToMCU::get().getBus().addListener(this, si, &MCUToMCU::get());
-	//rand.initialise(0x28347521);
-	//DarkNet7::get().getContacts().getSettings().setHealth(0x1); // FIXME: REMOVE THIS
+	/*
+	const MSGEvent<darknet7::BLEInfectionData> * si = 0;
+	MCUToMCU::get().getBus().addListener(this, si, &MCUToMCU::get());
+	rand.initialise(0x28347521);
+	DarkNet7::get().getContacts().getSettings().setHealth(0x1);
+	*/
 
 	Items[0].id = 0;
 	if (DarkNet7::get().getContacts().getSettings().isNameSet()) {

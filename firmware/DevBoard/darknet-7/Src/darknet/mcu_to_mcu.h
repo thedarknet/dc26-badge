@@ -43,7 +43,7 @@ public:
 	};
 public:
 	static MCUToMCU &get();
-	typedef cmdc0de::EventBus<3,10,5,3> UART_EVENT_BUS_TYPE;
+	typedef cmdc0de::EventBus<3,11,5,3> UART_EVENT_BUS_TYPE;
 public:
 	void init(UART_HandleTypeDef *);
 	bool send(const flatbuffers::FlatBufferBuilder &fbb);

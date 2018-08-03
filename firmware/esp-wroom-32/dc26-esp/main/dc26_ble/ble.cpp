@@ -67,7 +67,6 @@ static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 {
 	flatbuffers::FlatBufferBuilder fbb;
 	flatbuffers::Offset<darknet7::ESPToSTM> of;
-	printf("Client Received: %s\n", pData);
 	if (pData[0] == '0')
 	{
 		// clear mesgbuf and start from beginning
@@ -88,6 +87,10 @@ static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 		memcpy(&mesgbuf[midx], &pData[1], length-1);
 		midx += (length-1);
 		// send MessageFromBob STM
+		printf("Client Received:");
+		for (int i = 0; i < midx; i++)
+			printf("%02X", mesgbuf[i]);
+		printf("\n");
 		auto sdata = fbb.CreateString(mesgbuf, midx);
 		auto sendData = darknet7::CreateBLEMessageFromDevice(fbb, sdata);
 		of = darknet7::CreateESPToSTM(fbb, 0,
@@ -302,40 +305,30 @@ void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 	int sent = 0;
 	const char* buf = buffer.c_str();
 	uint8_t temp[23];
-	if (iUartClientCallbacks.isConnected)
+	printf("Sending:"); // TODO Print Stuff
+	for (int i = 0; i < len; i++)
+		printf("%02X", buf[i]);
+	printf("\n");
+	while (len > 0)
 	{
-		printf("Client Sending\n"); // TODO Print Stuff
-		while (len > 0)
+		size = (len > 22) ? 22 : len;
+		if (sent == 0 && len > 22)
+			temp[0] = '0';
+		else
+			temp[0] = (len > 22) ? '1' : '2';
+		memcpy(&temp[1], &buf[sent], size);
+		if (iUartClientCallbacks.isConnected)
 		{
-			size = (len > 22) ? 22 : len;
-			if (sent == 0)
-				temp[0] = '0';
-			else
-				temp[0] = (len > 22) ? '1' : '2';
-			memcpy(&temp[1], &buf[sent], size);
 			iUartClientCallbacks.pTxChar->writeValue(temp, size + 1);
-			sent += size;
-			len -= size;
 		}
-	}
-	else if (iUartServerCallbacks.isConnected)
-	{
-		printf("Server Sending\n"); // TODO Print Stuff
-		while (len > 0)
+		else if (iUartServerCallbacks.isConnected)
 		{
-			size = (len > 22) ? 22 : len;
-			if (sent == 0)
-				temp[0] = '0';
-			else
-				temp[0] = (len > 22) ? '1' : '2';
-			memcpy(&temp[1], &buf[sent], size);
 			pUartCisoCharacteristic->setValue(temp, size + 1);
 			pUartCisoCharacteristic->notify();
-			sent += size;
-			len -= sent;
 		}
+		sent += size;
+		len -= size;
 	}
-	
 	sendGenericResponse(sent);
 }
 

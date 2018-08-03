@@ -17,6 +17,13 @@ void PairWithState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLESecurity
 	return;
 }
 
+void PairWithState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEConnected>* mevt)
+{
+	MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
+	this->loops = 0;
+	return;
+}
+
 void PairWithState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEMessageFromDevice>* mevt)
 {
 	const MSGEvent<darknet7::BLEMessageFromDevice> * si = 0;
@@ -26,15 +33,16 @@ void PairWithState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEMessageF
 	this->MesgLen = tmesg->Length();
 	memcpy(&this->MesgBuf, tmesg->c_str(), this->MesgLen);
 	this->MesgBuf[MesgLen] = 0x0;
-	DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
-	DarkNet7::get().getDisplay().drawString(5,10,(const char *)"MESSAGE FROM ALICE", cmdc0de::RGBColor::BLUE);
 	if (this->aliceMessage == 1)
 	{
 		InternalState = BOB_SEND_ONE;
-		this->aliceMessage += 1;
+		this->aliceMessage = 2;
 	}
 	else if (this->aliceMessage == 2)
+	{
+		this->aliceMessage = 1;
 		InternalState = BOB_SEND_TWO;
+	}
 	this->loops = 0;
 	return;
 }
@@ -91,8 +99,12 @@ cmdc0de::StateBase::ReturnStateContext PairWithState::onRun()
 		}
 		else if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1))
 		{
-			const MSGEvent<darknet7::BLEMessageFromDevice> * dev = 0;
-			MCUToMCU::get().getBus().addListener(this, dev, &MCUToMCU::get());
+			DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
+			const MSGEvent<darknet7::BLEConnected> * dev1 = 0;
+			MCUToMCU::get().getBus().addListener(this, dev1, &MCUToMCU::get());
+			const MSGEvent<darknet7::BLEMessageFromDevice> * dev2 = 0;
+			MCUToMCU::get().getBus().addListener(this, dev2, &MCUToMCU::get());
+			this->loops = 0;
 			InternalState = BOB_RECEIVE;
 
 			//Accept
@@ -104,8 +116,10 @@ cmdc0de::StateBase::ReturnStateContext PairWithState::onRun()
 	}
 	else if (InternalState == BOB_RECEIVE)
 	{
-		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
-		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"BOB Receiving", cmdc0de::RGBColor::BLUE);
+		if (aliceMessage == 1)
+			DarkNet7::get().getDisplay().drawString(5,10,(const char *)"BOB Receiving 1", cmdc0de::RGBColor::BLUE);
+		else if (aliceMessage == 2)
+			DarkNet7::get().getDisplay().drawString(5,30,(const char *)"BOB Receiving 1", cmdc0de::RGBColor::BLUE);
 		if(this->loops > 300)
 		{
 			const MSGEvent<darknet7::BLEMessageFromDevice> * ra1 = 0;
@@ -115,13 +129,49 @@ cmdc0de::StateBase::ReturnStateContext PairWithState::onRun()
 	}
 	else if (InternalState == BOB_SEND_ONE)
 	{
-		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
-		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"BOB Sending First", cmdc0de::RGBColor::BLUE);
+		DarkNet7::get().getDisplay().drawString(5,20,(const char *)"BOB Sending First", cmdc0de::RGBColor::BLUE);
 		const MSGEvent<darknet7::BLEMessageFromDevice> * alice2 = 0;
 		MCUToMCU::get().getBus().addListener(this, alice2, &MCUToMCU::get());
 
 		// TODO: Send the data
-		auto sdata = fbb.CreateString((char *)"abcdefghijklmnopqrst", 20); // TODO: Get the data
+		/*
+		 if (bytesAvailable >= 40) {
+			//IRStopRX();
+			uint8_t *buf = 0;//IRGetBuff();
+			if (buf[0] == 1) {
+				AliceInitConvo *aic = (AliceInitConvo*) buf;
+				memcpy(&AIC,aic,sizeof(AIC));
+				uint8_t message_hash[SHA256_HASH_SIZE];
+				ShaOBJ messageHashCtx;
+				sha256_init(&messageHashCtx);
+				sha256_add(&messageHashCtx, (uint8_t*) &aic->AliceRadioID, sizeof(aic->AliceRadioID));
+				sha256_add(&messageHashCtx, (uint8_t*) &aic->AlicePublicKey, sizeof(aic->AlicePublicKey));
+				sha256_digest(&messageHashCtx, &message_hash[0]);
+				uint8_t signature[ContactStore::SIGNATURE_LENGTH];
+
+				uint8_t tmp[32 + 32 + 64];
+				SHA256_HashContext ctx = { { &init_SHA256, &update_SHA256, &finish_SHA256, 64, 32, &tmp[0] } };
+				uECC_sign_deterministic(rc.getContactStore().getMyInfo().getPrivateKey(), message_hash,
+						sizeof(message_hash), &ctx.uECC, signature, THE_CURVE);
+				BRTI.irmsgid = 2;
+				BRTI.BoBRadioID = rc.getContactStore().getMyInfo().getUniqueID();
+				memcpy(&BRTI.BoBPublicKey[0], rc.getContactStore().getMyInfo().getCompressedPublicKey(),
+						sizeof(BRTI.BoBPublicKey));
+				strncpy(&BRTI.BobAgentName[0], rc.getContactStore().getSettings().getAgentName(),
+						sizeof(BRTI.BobAgentName));
+				memcpy(&BRTI.SignatureOfAliceData[0], &signature[0], sizeof(BRTI.SignatureOfAliceData));
+				IRTxBuff((uint8_t*) &BRTI, sizeof(BRTI));
+				ReceiveInternalState = BOB_WAITING_FOR_SECOND_TRANSMIT;
+				TimeInState = HAL_GetTick();
+			}
+			IRStartRx();
+		} else {
+			//reset buffers!
+			ReceiveInternalState = BOB_WAITING_FOR_FIRST_TRANSMIT;
+		}
+		 */
+		// TODO: Get the data
+		auto sdata = fbb.CreateString((char *)"abcdefghijklmnopqrstabcdefghijklmnopqrstabcdefghijklmnopqrstabcdefghijklmnopqrst12345678", 88);
 		auto r = darknet7::CreateBLESendDataToDevice(fbb, sdata);
 		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
@@ -131,9 +181,56 @@ cmdc0de::StateBase::ReturnStateContext PairWithState::onRun()
 	}
 	else if (InternalState == BOB_SEND_TWO)
 	{
-		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
-		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"BOB Sending Complete", cmdc0de::RGBColor::BLUE);
-
+		DarkNet7::get().getDisplay().drawString(5,40,(const char *)"BOB Sending Complete", cmdc0de::RGBColor::BLUE);
+		/*
+		 *if (bytesAvailable >= sizeof(AliceToBobSignature)) {
+			uint8_t *buf = 0;//IRGetBuff();
+			if (buf[0] == 3) {
+				//IRStopRX();
+				AliceToBobSignature *atbs = (AliceToBobSignature*) buf;
+				uint8_t uncompressedPublicKey[ContactStore::PUBLIC_KEY_LENGTH];
+				uECC_decompress(&AIC.AlicePublicKey[0], &uncompressedPublicKey[0], THE_CURVE);
+				uint8_t msgHash[SHA256_HASH_SIZE];
+				ShaOBJ msgHashCtx;
+				sha256_init(&msgHashCtx);
+				uint16_t radioID = rc.getContactStore().getMyInfo().getUniqueID();
+				sha256_add(&msgHashCtx, (uint8_t*) &radioID, sizeof(uint16_t));
+				sha256_add(&msgHashCtx, (uint8_t*) rc.getContactStore().getMyInfo().getCompressedPublicKey(),
+						ContactStore::PUBLIC_KEY_COMPRESSED_LENGTH);
+				//verify alice's signature of my public key and unique id
+				sha256_digest(&msgHashCtx, &msgHash[0]);
+				if (uECC_verify(&uncompressedPublicKey[0], &msgHash[0], sizeof(msgHash), &atbs->signature[0],
+				THE_CURVE)) {
+					ContactStore::Contact c;
+					if(!rc.getContactStore().findContactByID(AIC.AliceRadioID,c)) {
+						char displayBuf[24];
+						//ok to add to contacts
+						if (rc.getContactStore().addContact(AIC.AliceRadioID, &AIC.AliceName[0], &AIC.AlicePublicKey[0],
+								&atbs->signature[0])) {
+							sprintf(&displayBuf[0], "New Contact: %s", &AIC.AliceName[0]);
+							//StateFactory::getEventState()->addMessage(&displayBuf[0]);
+						} else {
+							sprintf(&displayBuf[0], "Could not write contact. full?");
+							//StateFactory::getEventState()->addMessage(&displayBuf[0]);
+						}
+					} else {
+					}
+				}
+				//IRStartRx();
+			} else {
+				//reset buffers!
+				//IRStopRX();
+				//IRStartRx();
+			}
+			ReceiveInternalState = BOB_WAITING_FOR_FIRST_TRANSMIT;
+		} else {
+			if ((HAL_GetTick() - TimeInState) > TimeoutMS) {
+				TransmitInternalState = BOB_WAITING_FOR_FIRST_TRANSMIT;
+				//IRStopRX();
+				//IRStartRx();
+			}
+		}
+		 */
 		auto r = darknet7::CreateBLESendDNPairComplete(fbb);
 		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDNPairComplete, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);

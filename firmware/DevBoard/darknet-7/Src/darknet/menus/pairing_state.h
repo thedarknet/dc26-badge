@@ -33,7 +33,6 @@ public:
 public:
 	PairingState();
 	virtual ~PairingState();
-	void ListenForAlice();
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BadgesInArea>* mevt);
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEConnected>* mevt);
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEMessageFromDevice>* mevt);
@@ -52,6 +51,8 @@ private:
 	cmdc0de::GUIListItemData Items[8];
 	char ListBuffer[8][12];
 	char AddressBuffer[8][18];
+	char MesgBuf[200];
+	unsigned int MesgLen;
 
 	// Internal State information
 	INTERNAL_STATE InternalState;

@@ -413,9 +413,12 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 #define CmdQueueTimeout ((TickType_t) 1000 / portTICK_PERIOD_MS)
 void BluetoothTask::run(void * data)
 {
+	//static int loopsSinceScan = 0;
+	//static int scansSinceInfect = 0;
 	MCUToMCUTask::Message* m = nullptr;
 	while (1)
 	{
+		loopsSinceScan += 1;
 		if (xQueueReceive(STMQueueHandle, &m, CmdQueueTimeout))
 		{
 			if (m != nullptr)
@@ -427,11 +430,26 @@ void BluetoothTask::run(void * data)
 		else
 		{
 			// TODO: check how long since last scan, scan if beyond that time
-			// this is so we periodically attempt to get infected
-			// scan without filtering anything
-			//pScanCallbacks->reset();
-			//pScan->setActiveScan(true);
-			//pScan->start(1); // Do a very very short scan
+			/*
+			if (loopsSinceScan >= 60)
+			{
+				// this is so we periodically attempt to get infected
+				// scan without filtering anything
+				printf("scanning\n");
+				pScanCallbacks->reset();
+				pScan->setActiveScan(true);
+				pScan->start(5); // Do a very very short scan
+				scansSinceInfect += 1;
+				loopsSinceScan = 0;
+			}
+			if (scansSinceInfect >= 1)
+			{
+				// Send an infect message to the STM
+				printf("infecting\n");
+				this->getInfectionData();
+				scansSinceInfect = 0;
+			}
+			*/
 		}
 	}
 }

@@ -220,6 +220,11 @@ void MCUToMCU::process() {
 			this->getBus().emitSignal(this, mevt);
 			}
 			break;
+		case darknet7::ESPToSTMAny_BLEInfectionData: {
+			MSGEvent<darknet7::BLEInfectionData> mevt(msg->Msg_as_BLEInfectionData(), msg->msgInstanceID());
+			this->getBus().emitSignal(this, mevt);
+			}
+			break;
 		default:
 			break;
 		}

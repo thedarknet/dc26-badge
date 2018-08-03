@@ -11,7 +11,7 @@
 class MyScanCallbacks : public BLEAdvertisedDeviceCallbacks {
 public:
 	unsigned int detected;
-	uint16_t exposures;
+	uint16_t exposures = 0;
 	void reset(void);
 	uint16_t getExposures(void);
 	uint16_t getCures(void);
@@ -21,7 +21,7 @@ public:
 private:
 	uint8_t filter;
 	int min_RSSI;
-	uint16_t cures;
+	uint16_t cures = 0;
 	std::map<std::string,int> RSSIs; // TODO: type should be map
 	std::map<std::string,std::string> results; // TODO: type should be map
 	unsigned int getNumberOfResults();

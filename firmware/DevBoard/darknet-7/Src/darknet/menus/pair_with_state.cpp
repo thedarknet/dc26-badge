@@ -133,45 +133,30 @@ cmdc0de::StateBase::ReturnStateContext PairWithState::onRun()
 		const MSGEvent<darknet7::BLEMessageFromDevice> * alice2 = 0;
 		MCUToMCU::get().getBus().addListener(this, alice2, &MCUToMCU::get());
 
-		// TODO: Send the data
-		/*
-		 if (bytesAvailable >= 40) {
-			//IRStopRX();
-			uint8_t *buf = 0;//IRGetBuff();
-			if (buf[0] == 1) {
-				AliceInitConvo *aic = (AliceInitConvo*) buf;
-				memcpy(&AIC,aic,sizeof(AIC));
-				uint8_t message_hash[SHA256_HASH_SIZE];
-				ShaOBJ messageHashCtx;
-				sha256_init(&messageHashCtx);
-				sha256_add(&messageHashCtx, (uint8_t*) &aic->AliceRadioID, sizeof(aic->AliceRadioID));
-				sha256_add(&messageHashCtx, (uint8_t*) &aic->AlicePublicKey, sizeof(aic->AlicePublicKey));
-				sha256_digest(&messageHashCtx, &message_hash[0]);
-				uint8_t signature[ContactStore::SIGNATURE_LENGTH];
+		AliceInitConvo *aic = (AliceInitConvo*) MesgBuf;
+		memcpy(&AIC,aic,sizeof(AIC));
+		uint8_t message_hash[SHA256_HASH_SIZE];
+		ShaOBJ messageHashCtx;
+		sha256_init(&messageHashCtx);
+		sha256_add(&messageHashCtx, (uint8_t*) &aic->AliceRadioID, sizeof(aic->AliceRadioID));
+		sha256_add(&messageHashCtx, (uint8_t*) &aic->AlicePublicKey, sizeof(aic->AlicePublicKey));
+		sha256_digest(&messageHashCtx, &message_hash[0]);
+		uint8_t signature[ContactStore::SIGNATURE_LENGTH];
 
-				uint8_t tmp[32 + 32 + 64];
-				SHA256_HashContext ctx = { { &init_SHA256, &update_SHA256, &finish_SHA256, 64, 32, &tmp[0] } };
-				uECC_sign_deterministic(rc.getContactStore().getMyInfo().getPrivateKey(), message_hash,
-						sizeof(message_hash), &ctx.uECC, signature, THE_CURVE);
-				BRTI.irmsgid = 2;
-				BRTI.BoBRadioID = rc.getContactStore().getMyInfo().getUniqueID();
-				memcpy(&BRTI.BoBPublicKey[0], rc.getContactStore().getMyInfo().getCompressedPublicKey(),
-						sizeof(BRTI.BoBPublicKey));
-				strncpy(&BRTI.BobAgentName[0], rc.getContactStore().getSettings().getAgentName(),
-						sizeof(BRTI.BobAgentName));
-				memcpy(&BRTI.SignatureOfAliceData[0], &signature[0], sizeof(BRTI.SignatureOfAliceData));
-				IRTxBuff((uint8_t*) &BRTI, sizeof(BRTI));
-				ReceiveInternalState = BOB_WAITING_FOR_SECOND_TRANSMIT;
-				TimeInState = HAL_GetTick();
-			}
-			IRStartRx();
-		} else {
-			//reset buffers!
-			ReceiveInternalState = BOB_WAITING_FOR_FIRST_TRANSMIT;
-		}
-		 */
+		uint8_t tmp[32 + 32 + 64];
+		SHA256_HashContext ctx = { { &init_SHA256, &update_SHA256, &finish_SHA256, 64, 32, &tmp[0] } };
+		uECC_sign_deterministic(DarkNet7::get().getContacts().getMyInfo().getPrivateKey(), message_hash,
+				sizeof(message_hash), &ctx.uECC, signature, THE_CURVE);
+		BRTI.irmsgid = 2;
+		BRTI.BoBRadioID = DarkNet7::get().getContacts().getMyInfo().getUniqueID();
+		memcpy(&BRTI.BoBPublicKey[0], DarkNet7::get().getContacts().getMyInfo().getCompressedPublicKey(),
+				sizeof(BRTI.BoBPublicKey));
+		strncpy(&BRTI.BobAgentName[0], DarkNet7::get().getContacts().getSettings().getAgentName(),
+				sizeof(BRTI.BobAgentName));
+		memcpy(&BRTI.SignatureOfAliceData[0], &signature[0], sizeof(BRTI.SignatureOfAliceData));
+
 		// TODO: Get the data
-		auto sdata = fbb.CreateString((char *)"abcdefghijklmnopqrstabcdefghijklmnopqrstabcdefghijklmnopqrstabcdefghijklmnopqrst12345678", 88);
+		auto sdata = fbb.CreateString((char*)&BRTI, sizeof(BRTI));
 		auto r = darknet7::CreateBLESendDataToDevice(fbb, sdata);
 		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);

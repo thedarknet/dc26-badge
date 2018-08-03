@@ -174,13 +174,13 @@ StateBase::ReturnStateContext PairingState::onRun() {
 
 		//Make the Message
 		AIC.irmsgid = 0;
-		memcpy(&AIC.AlicePublicKey[0], "abcdefghijklmnopqrstuvwxy", //rc.getContactStore().getMyInfo().getCompressedPublicKey(),
+		memcpy(&AIC.AlicePublicKey[0], DarkNet7::get().getContacts().getMyInfo().getCompressedPublicKey(),
 				ContactStore::PUBLIC_KEY_COMPRESSED_LENGTH);
-		AIC.AliceRadioID = 0x1234; //rc.getContactStore().getMyInfo().getUniqueID();
-		strncpy(&AIC.AliceName[0], (const char*)"12345678901\0", 12); // rc.getContactStore().getSettings().getAgentName(), sizeof(AIC.AliceName));
-		auto sdata = fbb.CreateString((char*)&AIC.irmsgid, 40);
+		AIC.AliceRadioID = DarkNet7::get().getContacts().getMyInfo().getUniqueID();
+		strncpy(&AIC.AliceName[0], DarkNet7::get().getContacts().getSettings().getAgentName(), sizeof(AIC.AliceName));
 
 		//Send the message
+		auto sdata = fbb.CreateString((char*)&AIC, sizeof(AIC));
 		auto r = darknet7::CreateBLESendDataToDevice(fbb, sdata);
 		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
@@ -216,8 +216,6 @@ StateBase::ReturnStateContext PairingState::onRun() {
 		MCUToMCU::get().getBus().addListener(this,complete,&MCUToMCU::get());
 		DarkNet7::get().getDisplay().drawString(5,40,(const char *)"Sending Data 2", cmdc0de::RGBColor::BLUE);
 
-		// MesgBuf && MesgLen
-		/*
 		BobReplyToInit *brti = (BobReplyToInit*) MesgBuf;
 		//using signature validate our data that bob signed
 		uint8_t uncompressedPublicKey[ContactStore::PUBLIC_KEY_LENGTH];
@@ -225,12 +223,12 @@ StateBase::ReturnStateContext PairingState::onRun() {
 		uint8_t msgHash[SHA256_HASH_SIZE];
 		ShaOBJ msgHashCtx;
 		sha256_init(&msgHashCtx);
-		uint16_t radioID = rc.getContactStore().getMyInfo().getUniqueID();
+		uint16_t radioID = DarkNet7::get().getContacts().getMyInfo().getUniqueID();
 		sha256_add(&msgHashCtx, (uint8_t*) &radioID, sizeof(uint16_t));
-		sha256_add(&msgHashCtx, (uint8_t*) rc.getContactStore().getMyInfo().getCompressedPublicKey(),
+		sha256_add(&msgHashCtx, (uint8_t*) DarkNet7::get().getContacts().getMyInfo().getCompressedPublicKey(),
 				ContactStore::PUBLIC_KEY_COMPRESSED_LENGTH);
 		sha256_digest(&msgHashCtx, &msgHash[0]);
-		char displayBuf[24];
+
 		if (uECC_verify(&uncompressedPublicKey[0], &msgHash[0], sizeof(msgHash), &brti->SignatureOfAliceData[0], THE_CURVE))
 		{
 			uint8_t message_hash[SHA256_HASH_SIZE];
@@ -242,19 +240,22 @@ StateBase::ReturnStateContext PairingState::onRun() {
 			uint8_t tmp[32 + 32 + 64];
 			ATBS.irmsgid = 3;
 			SHA256_HashContext ctx = { { &init_SHA256, &update_SHA256, &finish_SHA256, 64, 32, tmp } };
-			uECC_sign_deterministic(rc.getContactStore().getMyInfo().getPrivateKey(), message_hash,
-					sizeof(message_hash), &ctx.uECC, &ATBS.signature[0], THE_CURVE);
+			uECC_sign_deterministic((const unsigned char*)DarkNet7::get().getContacts().getMyInfo().getPrivateKey(),
+					message_hash, sizeof(message_hash), &ctx.uECC, &ATBS.signature[0], THE_CURVE);
 
 			//Add to contacts
-			if(!rc.getContactStore().findContactByID(brti->BoBRadioID,c)) {
-				rc.getContactStore().addContact(brti->BoBRadioID, &brti->BobAgentName[0], &brti->BoBPublicKey[0], &brti->SignatureOfAliceData[0]);
+			ContactStore::Contact c;
+			if(!DarkNet7::get().getContacts().findContactByID(brti->BoBRadioID,c)) {
+				DarkNet7::get().getContacts().addContact(brti->BoBRadioID, &brti->BobAgentName[0],
+						&brti->BoBPublicKey[0], &brti->SignatureOfAliceData[0]);
 			}
-		} else {
-			sprintf(&displayBuf[0], "Signature Check Failed with %s", &brti->BobAgentName[0]);
 		}
-		*/
+		else
+		{
+		//	sprintf(&displayBuf[0], "Signature Check Failed with %s", &brti->BobAgentName[0]);
+		}
 
-		auto sdata2 = fbb.CreateString((char *)"bbcdefghijklmnopqrstuvwxyz12345678901234567890ABC", 49);
+		auto sdata2 = fbb.CreateString((char *)&ATBS, sizeof(ATBS));
 		auto r = darknet7::CreateBLESendDataToDevice(fbb, sdata2);
 		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDataToDevice, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
@@ -286,28 +287,6 @@ StateBase::ReturnStateContext PairingState::onRun() {
 	}
 	this->timesRunCalledSinceReset += 1;
 	return ReturnStateContext(nextState);
-	/*
-	static const char *msg1 = "Init convo complete.";
-	static const char *msg2 = "Listening for Bob";
-	static const char *msg3 = "Sent final msg to Bob";
-	uint32_t bytesAvailable = 0;//IRBytesAvailable();
-	if (TransmitInternalState == ALICE_INIT_CONVERSATION) {
-
-	} else if (TransmitInternalState == ALICE_RECEIVE_ONE) {
-
-		}
-		if ((HAL_GetTick() - TimeInState) > TimeoutMS) {
-			CurrentRetryCount++;
-			TransmitInternalState = ALICE_INIT_CONVERSATION;
-			IRStopRX();
-			if (CurrentRetryCount >= RetryCount) {
-				return ReturnStateContext(
-						StateFactory::getDisplayMessageState(StateFactory::getMenuState(), "Failed to pair", 5000));
-			}
-		}
-	}
-	*/
-	//return ReturnStateContext(this);
 }
 
 ErrorType PairingState::onShutdown() {

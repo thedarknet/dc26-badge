@@ -43,6 +43,9 @@ private:
 	char MesgBuf[200];
 	unsigned int MesgLen;
 	unsigned char aliceMessage = 1;
+	AliceInitConvo AIC;
+	BobReplyToInit BRTI;
+	AliceToBobSignature ATBS;
 };
 
 #endif

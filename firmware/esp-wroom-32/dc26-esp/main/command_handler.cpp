@@ -6,17 +6,19 @@
 #include "mcu_to_mcu.h"
 #include "dc26.h"
 #include "dc26_ble/ble.h"
+#include "npc_interact.h"
 
+static NPCInteractionTask NPCITask("NPCInteractTask");
 static HttpServer Port80WebServer;
 
 class MyWiFiEventHandler: public WiFiEventHandler {
 public:
 	const char *logTag = "MyWiFiEventHandler";
-	static const uint16_t MAX_APS = 15;
 	MyWiFiEventHandler() : APStarted(false), scanMsgID(0), WifiFilter(darknet7::WiFiScanFilter_ALL) {}
 public:
 	virtual esp_err_t staGotIp(system_event_sta_got_ip_t event_sta_got_ip) {
 		ESP_LOGD(logTag, "MyWiFiEventHandler(Class): staGotIp");
+		IP2STR(&event_sta_got_ip.ip_info.ip);
 		return ESP_OK;
 	}
 	virtual esp_err_t apStart() {
@@ -36,6 +38,8 @@ public:
 		return ESP_OK;
 	}
 	virtual esp_err_t staConnected(system_event_sta_connected_t info) {
+		std::string s((const char *)&info.ssid[0],info.ssid_len);
+		ESP_LOGI(logTag,"Connected to: %s on channel %d",s.c_str(), (int)info.channel);
 		return ESP_OK;
 	}
 	virtual esp_err_t staDisconnected(system_event_sta_disconnected_t info) {
@@ -129,12 +133,17 @@ bool CmdHandlerTask::init() {
 	if (InCommingQueueHandle == nullptr) {
 		ESP_LOGI(LOGTAG, "Failed creating incomming queue");
 	}
+	NPCITask.start();
 	WiFiEventHandler *handler = new MyWiFiEventHandler();
 	wifi.setWifiEventHandler(handler);
 	return wifi.init();
 }
 
 CmdHandlerTask::~CmdHandlerTask() {
+}
+
+void CmdHandlerTask::onStop() {
+	NPCITask.stop();
 }
 
 wifi_auth_mode_t convertAuthMode(darknet7::WifiMode m) {
@@ -240,7 +249,15 @@ void CmdHandlerTask::run(void *data) {
 					}
 				}
 				break;
+			case darknet7::STMToESPAny_WiFiNPCInteract: {
+					ESP_LOGI(LOGTAG, "processing wifi npc interaction");
+					//MyWiFiEventHandler *eh = (MyWiFiEventHandler*)wifi.getWifiEventHandler();
+					const darknet7::WiFiNPCInteract * ws = msg->Msg_as_WiFiNPCInteract();
+					wifi.connect(ws->bssid().data());
+				}
+				break;
 			default:
+				ESP_LOGI(LOGTAG, "Default case in command handler...");
 				break;
 			}
 			delete m;

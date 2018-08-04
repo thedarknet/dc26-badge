@@ -2,13 +2,14 @@
 #include "images.h"
 
 
-#ifdef NOIMAGE
-static const cmdc0de::DCImage logo2 = {
+#if 0
+static const cmdc0de::DCImage logo3 = {
   1, 1, 2,
   "\000\000"
 };
 #else
-static const cmdc0de::DCImage logo2 =  {
+
+static const cmdc0de::DCImage logo3 =  {
   96, 96, 2,
   "\270\375\270\375\270\375\270\375\270\375\270\375\270\375\270\375\270\375"
   "\270\375\270\375\270\375\270\375\270\375\270\375\270\375\270\375\270\375"
@@ -872,6 +873,6 @@ static const cmdc0de::DCImage logo2 =  {
 };
 
 #endif
-const cmdc0de::DCImage &getLogo2() {
-	return logo2;
+const cmdc0de::DCImage &getLogo3() {
+	return logo3;
 }

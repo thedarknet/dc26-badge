@@ -199,7 +199,7 @@ ErrorType DarkNet7::onInit() {
 	GUI gui(&Display);
 	gui.drawList(&DrawList);
 	Display.swap();
-	HAL_Delay(1000);
+	HAL_Delay(500);
 	if(MyContacts.getMyInfo().init()) {
 		items[1].set(1,"Flash INIT");
 	} else {
@@ -209,10 +209,18 @@ ErrorType DarkNet7::onInit() {
 	DrawList.selectedItem++;
 	gui.drawList(&DrawList);
 	Display.swap();
-	HAL_Delay(1000);
+	HAL_Delay(500);
 	MyContacts.getSettings().init();
 	Display.fillScreen(cmdc0de::RGBColor::BLACK);
 	Display.swap();
+	Display.drawImage(32, 16,getLogo1());
+	Display.swap();
+	HAL_Delay(1000);
+	Display.drawImage(32, 16,getLogo2());
+	Display.swap();
+	HAL_Delay(1000);
+
+
 
 #if DEBUG_WHY_CANT_CHANGE_ROTATION
 	//Display.setRotation(cmdc0de::DisplayDevice::LANDSCAPE_TOP_LEFT,true);

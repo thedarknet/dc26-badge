@@ -40,7 +40,13 @@ bool MySecurity::onConfirmPIN(uint32_t pass_key)
 
 	// Client side doesn't like being interrupted like this, just have server confirm
 	if (pBTTask->isActingClient)
+	{
 		return true;
+	}
+	else
+	{
+		pBTTask->pScan->stop(); // potential race conditiong O_O
+	}
 
 	// Send to STM, get back confirmation
 	flatbuffers::FlatBufferBuilder fbb;

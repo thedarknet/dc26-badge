@@ -44,6 +44,7 @@ table BLESecurityConfirm {
 }
 
 table BLEConnected {
+	isAlice:bool;
 }
 
 table BLEMessageFromDevice {

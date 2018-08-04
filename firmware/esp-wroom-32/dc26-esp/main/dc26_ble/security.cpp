@@ -38,10 +38,9 @@ bool MySecurity::onConfirmPIN(uint32_t pass_key)
 	ESP_LOGI(SECTAG, "onConfirmPin: %s", dmsg->Msg);
 	xQueueSendFromISR(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
 
+	// Client side doesn't like being interrupted like this, just have server confirm
 	if (pBTTask->isActingClient)
 		return true;
-
-	this->confirmed = false;
 
 	// Send to STM, get back confirmation
 	flatbuffers::FlatBufferBuilder fbb;
@@ -51,13 +50,16 @@ bool MySecurity::onConfirmPIN(uint32_t pass_key)
 	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
 	getMCUToMCU().send(fbb);
 
+	this->confirmed = false;
 	// Wait for the confirmation to come through for about 15 seconds
 	while ((this->confirmed == false) && (waited < 15))
 	{
+		ESP_LOGI(SECTAG, "waiting: %d\n", this->confirmed);
 		vTaskDelay(1000 / portTICK_PERIOD_MS);
 		waited++;
 	}
 
+	ESP_LOGI(SECTAG, "finished: %d\n", this->confirmed);
 	return this->confirmed;
 }
 
@@ -89,9 +91,10 @@ void MySecurity::onAuthenticationComplete(esp_ble_auth_cmpl_t auth_cmpl)
 			ESP_LOGI(SECTAG, "size: %d", length);
 		}
 	}
-	// TODO: Send Generic Response
+
+	printf("Acting client: %d\n", pBTTask->isActingClient);
 	flatbuffers::FlatBufferBuilder fbb;
-	auto con = darknet7::CreateBLEConnected(fbb);
+	auto con = darknet7::CreateBLEConnected(fbb,pBTTask->isActingClient);
 	flatbuffers::Offset<darknet7::ESPToSTM> of = darknet7::CreateESPToSTM(fbb, 0, 
 		darknet7::ESPToSTMAny_BLEConnected, con.Union());
 	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);

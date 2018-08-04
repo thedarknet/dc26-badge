@@ -20,8 +20,6 @@ class TestState;
 class SendMsgState;
 class SettingState;
 class PairingState;
-//class PairWithState; // Why doesn't this work?
-#include "menus/pair_with_state.h"
 class AddressState;
 class Menu3D;
 class GameOfLife;
@@ -91,7 +89,6 @@ public:
 	SendMsgState *getSendMsgState();
 	SettingState *getSettingState();
 	PairingState *getPairingState();
-	PairWithState *getPairWithState();
 	AddressState *getAddressBookState();
 	Menu3D *get3DState();
 	GameOfLife *getGameOfLifeState();

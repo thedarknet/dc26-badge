@@ -645,8 +645,15 @@ inline flatbuffers::Offset<BLESecurityConfirm> CreateBLESecurityConfirm(
 }
 
 struct BLEConnected FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_ISALICE = 4
+  };
+  bool isAlice() const {
+    return GetField<uint8_t>(VT_ISALICE, 0) != 0;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_ISALICE) &&
            verifier.EndTable();
   }
 };
@@ -654,6 +661,9 @@ struct BLEConnected FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct BLEConnectedBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_isAlice(bool isAlice) {
+    fbb_.AddElement<uint8_t>(BLEConnected::VT_ISALICE, static_cast<uint8_t>(isAlice), 0);
+  }
   explicit BLEConnectedBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -667,8 +677,10 @@ struct BLEConnectedBuilder {
 };
 
 inline flatbuffers::Offset<BLEConnected> CreateBLEConnected(
-    flatbuffers::FlatBufferBuilder &_fbb) {
+    flatbuffers::FlatBufferBuilder &_fbb,
+    bool isAlice = false) {
   BLEConnectedBuilder builder_(_fbb);
+  builder_.add_isAlice(isAlice);
   return builder_.Finish();
 }
 

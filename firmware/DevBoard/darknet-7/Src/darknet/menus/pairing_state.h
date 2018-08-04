@@ -34,17 +34,21 @@ public:
 	PairingState();
 	virtual ~PairingState();
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BadgesInArea>* mevt);
+	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLESecurityConfirm>* mevt);
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEConnected>* mevt);
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEMessageFromDevice>* mevt);
 	void receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLEPairingComplete>* mevt);
 protected:
 	enum INTERNAL_STATE { NONE, FETCHING_DATA, DISPLAY_DATA,
-							CONNECTING,
-							ALICE_SEND_ONE, ALICE_RECEIVE, ALICE_SEND_TWO,
-							PAIRING_COMPLETE, PAIRING_FAILED };
+							INITIATING_CONNECTION, CONNECTING, CONFIRMING,
+							ALICE_SEND_ONE, ALICE_SEND_TWO,
+							BOB_SEND_ONE, BOB_SEND_TWO,
+							RECEIVE_DATA,
+							PAIRING_SUCCESS, PAIRING_COMPLETE, PAIRING_FAILED };
 	virtual cmdc0de::ErrorType onInit();
 	virtual cmdc0de::StateBase::ReturnStateContext onRun();
 	virtual cmdc0de::ErrorType onShutdown();
+	void CleanUp();
 private:
 	// Badge:Address list
 	cmdc0de::GUIListData BadgeList;
@@ -67,7 +71,11 @@ private:
 	AliceInitConvo AIC;
 	BobReplyToInit BRTI;
 	AliceToBobSignature ATBS;
-	unsigned char bobMessage = 0;
+	unsigned char msgId = 0;
+	bool gotBadgeList = false;
+	bool securityConfirmed = false;
+	bool bleConnected = false;
+	bool isAlice = false;
 };
 
 #endif

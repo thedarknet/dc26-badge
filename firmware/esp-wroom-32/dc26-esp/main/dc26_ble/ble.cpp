@@ -86,11 +86,13 @@ static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 		// finished copying
 		memcpy(&mesgbuf[midx], &pData[1], length-1);
 		midx += (length-1);
-		// send MessageFromBob STM
-		printf("Client Received:");
+
+		printf("Client Received:"); // TODO: Remove this
 		for (int i = 0; i < midx; i++)
 			printf("%02X", mesgbuf[i]);
 		printf("\n");
+
+		// send MessageFromBob STM
 		auto sdata = fbb.CreateString(mesgbuf, midx);
 		auto sendData = darknet7::CreateBLEMessageFromDevice(fbb, sdata);
 		of = darknet7::CreateESPToSTM(fbb, 0,
@@ -166,11 +168,12 @@ void BluetoothTask::refreshAdvertisementData()
 	}
 
 	// Setup data
+	std::string mandata(this->man_buf, 7);
 	BLEAdvertisementData adv_data;
 	adv_data.setAppearance(0x26DC);
 	adv_data.setFlags(0x6);
 	adv_data.setName(adv_name);
-	adv_data.setManufacturerData(adv_manufacturer);
+	adv_data.setManufacturerData(mandata);
 	pAdvertising->setAdvertisementData(adv_data);
 
 	// Restart if we were already advertising
@@ -183,7 +186,7 @@ void BluetoothTask::refreshAdvertisementData()
 void BluetoothTask::setDeviceType(uint8_t devtype)
 {
 	// third byte of the adv_menufacturer device is the device type
-	this->adv_manufacturer[2] = (char)devtype;
+	this->man_buf[2] = (char)devtype;
 	sendGenericResponse(true);
 }
 
@@ -192,13 +195,14 @@ void BluetoothTask::setDeviceName(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESetDeviceName* devName = m->Msg_as_BLESetDeviceName();
 	this->adv_name = devName->name()->str();
+	// TODO: Set badge name from flash
 	this->refreshAdvertisementData();
 	sendGenericResponse(true);
 }
 
 void BluetoothTask::getInfectionData()
 {
-	uint16_t infections = (adv_manufacturer[3] << 8) | (adv_manufacturer[4]);
+	uint16_t infections = (man_buf[3] << 8) | (man_buf[4]);
 	uint16_t exposures = pScanCallbacks->getExposures();
 	uint16_t cures = pScanCallbacks->getCures();
 	flatbuffers::FlatBufferBuilder fbb;
@@ -222,8 +226,8 @@ void BluetoothTask::setInfectionData(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESetInfectionData* msg = m->Msg_as_BLESetInfectionData();
 	uint16_t idata = msg->vectors();
-	this->adv_manufacturer[3] = (char)((idata >> 8) & 0xFF);
-	this->adv_manufacturer[4] = (char)(idata & 0xFF);
+	this->man_buf[3] = (char)((idata >> 8) & 0xFF);
+	this->man_buf[4] = (char)(idata & 0xFF);
 	this->refreshAdvertisementData();
 	sendGenericResponse(true);
 }
@@ -232,8 +236,8 @@ void BluetoothTask::setCureData(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESetCureData* msg = m->Msg_as_BLESetCureData();
 	uint16_t cdata = msg->vectors();
-	this->adv_manufacturer[5] = (char)((cdata >> 8) & 0xFF);
-	this->adv_manufacturer[6] = (char)(cdata & 0xFF);
+	this->man_buf[5] = (char)((cdata >> 8) & 0xFF);
+	this->man_buf[6] = (char)(cdata & 0xFF);
 	this->refreshAdvertisementData();
 	sendGenericResponse(true);
 }
@@ -298,17 +302,18 @@ void BluetoothTask::sendPINConfirmation(const darknet7::STMToESPRequest* m)
 void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESendDataToDevice* msg = m->Msg_as_BLESendDataToDevice();
-	// TODO: Check if null bytes work
 	std::string buffer = msg->data()->str();
 	int len = buffer.length();
 	int size = 0;
 	int sent = 0;
 	const char* buf = buffer.c_str();
 	uint8_t temp[23];
-	printf("Sending:"); // TODO Print Stuff
+
+	printf("Sending:"); // TODO: Remove this
 	for (int i = 0; i < len; i++)
 		printf("%02X", buf[i]);
 	printf("\n");
+
 	while (len > 0)
 	{
 		size = (len > 22) ? 22 : len;
@@ -413,12 +418,11 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 #define CmdQueueTimeout ((TickType_t) 1000 / portTICK_PERIOD_MS)
 void BluetoothTask::run(void * data)
 {
-	//static int loopsSinceScan = 0;
-	//static int scansSinceInfect = 0;
+	static int loopsSinceScan = 0;
 	MCUToMCUTask::Message* m = nullptr;
 	while (1)
 	{
-		//loopsSinceScan += 1;
+		loopsSinceScan += 1;
 		if (xQueueReceive(STMQueueHandle, &m, CmdQueueTimeout))
 		{
 			if (m != nullptr)
@@ -429,27 +433,17 @@ void BluetoothTask::run(void * data)
 		}
 		else
 		{
-			// TODO: check how long since last scan, scan if beyond that time
-			/*
 			if (loopsSinceScan >= 60)
 			{
 				// this is so we periodically attempt to get infected
 				// scan without filtering anything
-				printf("scanning\n");
 				pScanCallbacks->reset();
 				pScan->setActiveScan(true);
-				pScan->start(5); // Do a very very short scan
-				scansSinceInfect += 1;
+				pScan->start(1); // Do a very very short scan
 				loopsSinceScan = 0;
-			}
-			if (scansSinceInfect >= 1)
-			{
-				// Send an infect message to the STM
-				printf("infecting\n");
+				// send the infection data back to the STM
 				this->getInfectionData();
-				scansSinceInfect = 0;
 			}
-			*/
 		}
 	}
 }
@@ -465,6 +459,7 @@ bool BluetoothTask::init()
 
 	STMQueueHandle = xQueueCreateStatic(STM_MSG_QUEUE_SIZE, STM_MSG_ITEM_SIZE,
 										fromSTMBuffer, &STMQueue);
+	// TODO: Get badge name from flash
 	BLEDevice::init("DNDevice");
 	BLEDevice::setMTU(43);
 

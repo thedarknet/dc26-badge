@@ -66,7 +66,6 @@ void UartCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 	if (pData[0] == '0')
 	{
 		// clear mesgbuf2 and start from beginning
-		printf("DOODLE\n");
 		midx2 = 0;
 		memset(mesgbuf2, 0, 200);
 		memcpy(&mesgbuf2[midx2], &pData[1], length-1);
@@ -75,21 +74,22 @@ void UartCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 	else if (pData[0] == '1')
 	{
 		// continue copying, don't send
-		printf("BUG\n");
 		memcpy(&mesgbuf2[midx2], &pData[1], length-1);
 		midx2 += (length-1);
 	}
 	else if (pData[0] == '2')
 	{
-		printf("DINGUS\n");
 		memcpy(&mesgbuf2[midx2], &pData[1], length-1);
 		midx2 += (length-1);
 		// send MessageFromBob STM
 		mesgbuf2[midx2] = 0x0;
-		printf("Received This From Alice:");
+
+		printf("Server Received:");
 		for (int i = 0; i < midx2; i++)
 			printf("%02X", mesgbuf2[i]); // TODO: print stuff
 		printf("\n");
+
+
 		auto sdata = fbb.CreateString(mesgbuf2, midx2);
 		auto sendData = darknet7::CreateBLEMessageFromDevice(fbb, sdata);
 		of = darknet7::CreateESPToSTM(fbb, 0,

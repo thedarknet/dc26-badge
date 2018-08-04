@@ -22,8 +22,8 @@ private:
 	uint8_t filter;
 	int min_RSSI;
 	uint16_t cures = 0;
-	std::map<std::string,int> RSSIs; // TODO: type should be map
-	std::map<std::string,std::string> results; // TODO: type should be map
+	std::map<std::string,int> RSSIs;
+	std::map<std::string,std::string> results;
 	unsigned int getNumberOfResults();
 	void filterBadges(BLEAdvertisedDevice device);
 	void filterNPCs(BLEAdvertisedDevice device);

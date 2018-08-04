@@ -37,28 +37,26 @@ bool MySecurity::onConfirmPIN(uint32_t pass_key)
 	sprintf(dmsg->Msg, "%u", pass_key);
 	ESP_LOGI(SECTAG, "onConfirmPin: %s", dmsg->Msg);
 	xQueueSendFromISR(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
-	
+
 	if (pBTTask->isActingClient)
 		return true;
 
 	this->confirmed = false;
 
-	// TODO: Send to STM, get back confirmation
+	// Send to STM, get back confirmation
 	flatbuffers::FlatBufferBuilder fbb;
 	flatbuffers::Offset<darknet7::ESPToSTM> of;
 	auto c = darknet7::CreateBLESecurityConfirm(fbb);
 	of = darknet7::CreateESPToSTM(fbb, 0, darknet7::ESPToSTMAny_BLESecurityConfirm, c.Union());
 	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
 	getMCUToMCU().send(fbb);
-	
 
-	// Wait for the confirmation to come through
+	// Wait for the confirmation to come through for about 15 seconds
 	while ((this->confirmed == false) && (waited < 15))
 	{
 		vTaskDelay(1000 / portTICK_PERIOD_MS);
 		waited++;
 	}
-	printf("Client Confirmed? %d\n", this->confirmed);
 
 	return this->confirmed;
 }

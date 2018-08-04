@@ -1,6 +1,5 @@
 #include "menu_state.h"
 #include "../libstm32/display/display_device.h"
-#include "../libstm32/etl/src/random.h"
 #include "../darknet7.h"
 #include "test_state.h"
 #include "setting_state.h"
@@ -29,7 +28,6 @@ MenuState::MenuState() :
 		Darknet7BaseState(), MenuList("Main Menu", Items, 0, 0, DarkNet7::get().getDisplay().getWidth(),
 				DarkNet7::get().getDisplay().getHeight()
 				, 0, (sizeof(Items) / sizeof(Items[0])))
-				,rand()
 {
 }
 
@@ -37,41 +35,8 @@ MenuState::~MenuState() {
 
 }
 
-void MenuState::receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEInfectionData>* mevt) {
-	/*
-	uint16_t exposures = mevt->InnerMsg->exposures();
-	uint16_t infections = 0;
-	// Apply infection rates here
-	if (exposures & 0x2)
-		infections |= (rand.range(0,99) < 12) ? (0x2) : 0;
-	if (exposures & 0x4)
-		infections |= (rand.range(0,99) < 90) ? (0x4) : 0;
-	if (exposures & 0x8)
-		infections |= (rand.range(0,99) < 50) ? (0x8) : 0;
-	if (exposures & 0x10)
-		infections |= (rand.range(0,99) < 13) ? (0x10) : 0;
-	if (exposures & 0x20)
-		infections |= (rand.range(0,99) < 50) ? (0x20) : 0;
-	if (exposures & 0x40)
-		infections |= (rand.range(0,99) < 20) ? (0x40) : 0;
-	if (exposures & 0x80)
-		infections |= (rand.range(0,99) < 50) ? (0x80) : 0;
-	if (exposures & 0x100)
-		infections |= (rand.range(0,99) < 30) ? (0x100) : 0;
-	DarkNet7::get().getContacts().getSettings().setHealth(infections);
-	*/
-	return;
-}
 
 ErrorType MenuState::onInit() {
-	// Infection Listener
-	/*
-	const MSGEvent<darknet7::BLEInfectionData> * si = 0;
-	MCUToMCU::get().getBus().addListener(this, si, &MCUToMCU::get());
-	rand.initialise(0x28347521);
-	DarkNet7::get().getContacts().getSettings().setHealth(0x1);
-	*/
-
 	Items[0].id = 0;
 	if (DarkNet7::get().getContacts().getSettings().isNameSet()) {
 		Items[0].text = (const char *) "Settings";
@@ -169,6 +134,7 @@ cmdc0de::StateBase::ReturnStateContext MenuState::onRun() {
 			}
 		}
 	}
+
 	if (DarkNet7::get().getButtonInfo().wasAnyButtonReleased()) {
 		DarkNet7::get().getGUI().drawList(&this->MenuList);
 	}

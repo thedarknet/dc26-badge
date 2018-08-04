@@ -2,6 +2,9 @@
 #define KEY_STORE_H
 
 #include <stm32f4xx_hal.h>
+#include "mcu_to_mcu.h"
+#include "messaging/stm_to_esp_generated.h"
+#include "messaging/esp_to_stm_generated.h"
 
 class ContactStore {
 public:
@@ -90,7 +93,7 @@ public:
 		Avian Flu (Bit: 1)		Wireless	AGTAGAAACAAGG		Recurring		12%
 		Measles (Bit: 2)		Wireless	GTCAGTTCCACAT		Curable			90%
 		Tetanus (Bit: 3)		BLE GATT	GAGGTGCAGCTGG		Recurring		50%
-		Polio (Bit: 4)			BLE GATT	ATTCTAACCATGG		“Curable”		13%
+		Polio (Bit: 4)			BLE GATT	ATTCTAACCATGG		Curable			13%
 		Plague (Bit: 5)			BLE GATT	AAGAGTATAATCG / DN Table Curable	50%
 		Toxoplasmosis (Bit: 6)  BLE GATT	CCTAAACCCTGAA		Recurring		20%
 		Chlamydia (Bit: 7) 		Add-On		GTATTAGTATTTG		Curable			50%
@@ -122,6 +125,7 @@ public:
 		};
 	public:
 		SettingsInfo(uint8_t sector, uint32_t offSet, uint8_t endSector);
+		void receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEInfectionData>* mevt);
 		bool init();
 		uint32_t getVersion();
 		uint8_t setNumContacts(uint8_t n);
@@ -138,6 +142,7 @@ public:
 		bool setAgentname(const char name[AGENT_NAME_LENGTH]);
 		void resetToFactory();
 		bool setHealth(uint16_t v);
+		uint16_t getHealth();
 		bool isInfectedWith(uint16_t v);
 		bool cure(uint16_t v);
 	protected:

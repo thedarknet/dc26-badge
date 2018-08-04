@@ -33,9 +33,8 @@ public:
 	// Advertisement data
 	bool advertising_enabled = false;
 	std::string adv_name = "DN1";
-	std::string adv_manufacturer = "DNA\0\0\0\0"; //DN-devType-Infection-Cure
+	char man_buf[7]= {'D','N','A','\0','\0','\0','\0'};
 
-	// Security stuff -- FIXME: remove actingClient/Server
 	bool isActingClient = false;
 	bool isActingServer = false;
 

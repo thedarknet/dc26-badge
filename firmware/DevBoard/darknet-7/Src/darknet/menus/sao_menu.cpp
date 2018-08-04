@@ -48,7 +48,7 @@ StateBase::ReturnStateContext SAO::onRun() {
 		   * retries 2
 		   * timeout 2
 		   */
-		  result = HAL_I2C_IsDeviceReady(&hi2c3, (uint16_t)(i<<1), 2, 2);
+		  result = HAL_I2C_IsDeviceReady(&hi2c3, (uint16_t)(i<<1), 2, 200);
 		  if (result == HAL_OK) {
 			  Address = (uint16_t)(i<<1);
 		  }
@@ -57,7 +57,7 @@ StateBase::ReturnStateContext SAO::onRun() {
 	} else {
 		DarkNet7::get().getDisplay().fillScreen(RGBColor::BLACK);
 		if(Address==NOADDRESS) {
-			DarkNet7::get().getDisplay().drawString(0,20,(const char *)"No Shitty Add on Badge found!",RGBColor::RED, RGBColor::BLACK, 1, true);
+			DarkNet7::get().getDisplay().drawString(0,20,(const char *)"No Shitty Add on\nBadge found!",RGBColor::RED, RGBColor::BLACK, 1, true);
 		} else {
 			char buf[24];
 			DarkNet7::get().getDisplay().drawString(0,20,(const char *)"Shitty Add on Badge found!", RGBColor::BLUE, RGBColor::BLACK, 1, true);

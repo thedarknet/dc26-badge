@@ -133,7 +133,11 @@ bool CmdHandlerTask::init() {
 	if (InCommingQueueHandle == nullptr) {
 		ESP_LOGI(LOGTAG, "Failed creating incomming queue");
 	}
-	NPCITask.start();
+	if(NPCITask.init()) {
+		NPCITask.start();
+	} else {
+		ESP_LOGE(LOGTAG, "NPC interact task not init'ed");
+	}
 	WiFiEventHandler *handler = new MyWiFiEventHandler();
 	wifi.setWifiEventHandler(handler);
 	return wifi.init();
@@ -253,7 +257,7 @@ void CmdHandlerTask::run(void *data) {
 					ESP_LOGI(LOGTAG, "processing wifi npc interaction");
 					//MyWiFiEventHandler *eh = (MyWiFiEventHandler*)wifi.getWifiEventHandler();
 					const darknet7::WiFiNPCInteract * ws = msg->Msg_as_WiFiNPCInteract();
-					wifi.connect(ws->bssid().data());
+					//wifi.connect(ws->bssid()->data());
 				}
 				break;
 			default:

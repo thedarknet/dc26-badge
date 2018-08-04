@@ -228,6 +228,9 @@ ErrorType DarkNet7::onInit() {
 	Display.drawImage(32, 16,getLogo2());
 	Display.swap();
 	HAL_Delay(1000);
+	Display.drawImage(32, 16,getLogo3());
+	Display.swap();
+	HAL_Delay(1000);
 
 
 

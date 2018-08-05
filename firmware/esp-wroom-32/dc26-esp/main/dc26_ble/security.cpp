@@ -17,6 +17,7 @@ const char *SECTAG = "SecurityCallbacks";
 uint32_t MySecurity::onPassKeyRequest()
 {
 	ESP_LOGI(SECTAG, "PassKeyRequest ********************");
+	this->success = false;
 	// TODO
 	return 123456;
 }
@@ -24,6 +25,7 @@ uint32_t MySecurity::onPassKeyRequest()
 void MySecurity::onPassKeyNotify(uint32_t pass_key)
 {
 	ESP_LOGI(SECTAG, "The passkey Notify number:%d", pass_key);
+	this->success = false;
 	return;
 }
 
@@ -31,6 +33,7 @@ void MySecurity::onPassKeyNotify(uint32_t pass_key)
 bool MySecurity::onConfirmPIN(uint32_t pass_key)
 {
 	unsigned int waited = 0;
+	this->success = false;
 	DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
 	memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
 
@@ -72,6 +75,7 @@ bool MySecurity::onConfirmPIN(uint32_t pass_key)
 bool MySecurity::onSecurityRequest()
 {
 	ESP_LOGI(SECTAG, "On Security Request");
+	this->success = false;
 	return true;
 }
 
@@ -96,13 +100,15 @@ void MySecurity::onAuthenticationComplete(esp_ble_auth_cmpl_t auth_cmpl)
 			esp_ble_gap_get_whitelist_size(&length);
 			ESP_LOGI(SECTAG, "size: %d", length);
 		}
+		flatbuffers::FlatBufferBuilder fbb;
+		auto con = darknet7::CreateBLEConnected(fbb, auth_cmpl.success, pBTTask->isActingClient);
+		flatbuffers::Offset<darknet7::ESPToSTM> of = darknet7::CreateESPToSTM(fbb, 0, 
+			darknet7::ESPToSTMAny_BLEConnected, con.Union());
+		darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+		getMCUToMCU().send(fbb);
 	}
 
 	printf("Acting client: %d\n", pBTTask->isActingClient);
-	flatbuffers::FlatBufferBuilder fbb;
-	auto con = darknet7::CreateBLEConnected(fbb,pBTTask->isActingClient);
-	flatbuffers::Offset<darknet7::ESPToSTM> of = darknet7::CreateESPToSTM(fbb, 0, 
-		darknet7::ESPToSTMAny_BLEConnected, con.Union());
-	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
-	getMCUToMCU().send(fbb);
+	this->success = true;
+	vTaskDelay(3000 / portTICK_PERIOD_MS);
 }

@@ -25,15 +25,6 @@
 #include "scanning.h"
 #include "./security.h"
 
-#ifdef IS_CLIENT
-bool isClient = true;
-bool firstSend = true;
-#else
-bool isClient = false;
-bool firstSend = false;
-#endif // IS_CLIENT
-
-
 const char *BluetoothTask::LOGTAG = "BluetoothTask";
 
 // We need a global reference so that we can access the callback message queue
@@ -280,14 +271,26 @@ void BluetoothTask::pairWithDevice(const darknet7::STMToESPRequest* m)
 	std::string addr = msg->addr()->str();
 	BLEAddress remoteAddr = BLEAddress(addr);
 	this->isActingClient = true;
-	pClient->connect(remoteAddr);
 
-	pMySecurity->msgInstanceID = m->msgInstanceID();	
+	pMySecurity->success = false;
+	pClient->connect(remoteAddr);
+	pMySecurity->msgInstanceID = m->msgInstanceID();
+	
+	iUartClientCallbacks.pClient = pClient;
+	bool success = false;
 	if (pClient->isConnected())
 	{
 		iUartClientCallbacks.afterConnect();
 		iUartClientCallbacks.pRxChar->registerForNotify(&notifyCallback);
+		success = true;
 	}
+	
+	flatbuffers::FlatBufferBuilder fbb;
+	auto con = darknet7::CreateBLEConnected(fbb, success, this->isActingClient);
+	flatbuffers::Offset<darknet7::ESPToSTM> of = darknet7::CreateESPToSTM(fbb, 0,
+	darknet7::ESPToSTMAny_BLEConnected, con.Union());
+	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+	getMCUToMCU().send(fbb);
 
 	sendGenericResponse(pClient->isConnected());
 }
@@ -310,10 +313,6 @@ void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 	const char* buf = buffer.c_str();
 	uint8_t temp[23];
 
-	printf("Sending:"); // TODO: Remove this
-	for (int i = 0; i < len; i++)
-		printf("%02X", buf[i]);
-	printf("\n");
 
 	while (len > 0)
 	{
@@ -325,10 +324,21 @@ void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 		memcpy(&temp[1], &buf[sent], size);
 		if (iUartClientCallbacks.isConnected)
 		{
-			iUartClientCallbacks.pTxChar->writeValue(temp, size + 1);
+			printf("Sending:"); // TODO: Remove this
+			for (int i = 0; i < 23; i++)
+				printf("%02X", temp[i]);
+			printf("\n");
+			if (iUartClientCallbacks.setup)
+			{
+				iUartClientCallbacks.pTxChar->writeValue(temp, size + 1);
+			}
 		}
 		else if (iUartServerCallbacks.isConnected)
 		{
+			printf("Sending:"); // TODO: Remove this
+			for (int i = 0; i < 23; i++)
+				printf("%02X", temp[i]);
+			printf("\n");
 			pUartCisoCharacteristic->setValue(temp, size + 1);
 			pUartCisoCharacteristic->notify();
 		}

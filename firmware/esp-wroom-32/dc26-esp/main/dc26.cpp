@@ -116,7 +116,7 @@ void init() {
 
 void app_main()
 {
-	nvs_flash_erase(); // FIXME:  Remove this
+	nvs_flash_erase();
 	nvs_flash_init();
 	init();
 	ESPDisplayTask.init();

@@ -5,6 +5,8 @@
 #include "pairing.h"
 #include "../lib/ble/BLEDevice.h"
 
+#include "nvs_flash.h"
+
 #include "../dc26.h"
 #include "../mcu_to_mcu.h"
 #include "../stm_to_esp_generated.h"
@@ -16,6 +18,7 @@ const char *PAIR_SVR_TAG = "BTPairingServer";
 
 void UartClientCallbacks::onConnect(BLEClient* client)
 {
+	this->setup = false;
 	ESP_LOGI(PAIR_CLIENT_TAG, "connected to server");
 	isConnected = true;
 	pClient = client;
@@ -24,6 +27,7 @@ void UartClientCallbacks::onConnect(BLEClient* client)
 void UartClientCallbacks::afterConnect()
 {
 	// Obtain a reference to the service we are after in the remote BLE server.
+	ESP_LOGI(PAIR_CLIENT_TAG, "Setup starting");
 	pRemoteService = pClient->getService(uartServiceUUID);
 	if (pRemoteService == nullptr) {
 		ESP_LOGE(PAIR_CLIENT_TAG, "service finding error");
@@ -31,7 +35,6 @@ void UartClientCallbacks::afterConnect()
 	}
 
 	// get the characteristic for the CLIENT to RECEIVE (TX)
-	vTaskDelay(1000 / portTICK_PERIOD_MS);
 	pRxChar = pRemoteService->getCharacteristic(uartCisoUUID);
 	if (pRxChar == nullptr) {
 		ESP_LOGE(PAIR_CLIENT_TAG, "first char finding error");
@@ -46,10 +49,12 @@ void UartClientCallbacks::afterConnect()
 	}
 	
 	ESP_LOGI(PAIR_CLIENT_TAG, "Setup Complete");
+	this->setup = true;
 }
 
 void UartClientCallbacks::onDisconnect(BLEClient* client)
 {
+	nvs_flash_erase();
 	ESP_LOGI(PAIR_CLIENT_TAG, "disconnected");
 	pBTTask->isActingClient = false;
 	isConnected = false;
@@ -113,8 +118,10 @@ void UartServerCallbacks::onConnect(BLEServer* server)
 
 void UartServerCallbacks::onDisconnect(BLEServer* server)
 {
+	nvs_flash_erase();
 	if (this->isConnected)
 	{
+		//BTM_SecDeleteDevice(this->connectedAddr);
 		ESP_LOGI(PAIR_SVR_TAG, "connection dropped");
 		isConnected = false;
 	}

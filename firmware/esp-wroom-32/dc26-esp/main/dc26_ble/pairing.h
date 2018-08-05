@@ -39,6 +39,7 @@ public:
 	BLERemoteCharacteristic *pTxChar;
 	BLERemoteCharacteristic *pRxChar;
 	bool isConnected = false;
+	bool setup = false;
 public:
 	void onConnect(BLEClient* client);
 	void afterConnect();

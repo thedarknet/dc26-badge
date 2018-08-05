@@ -11,6 +11,7 @@ public:
 	BluetoothTask *pBTTask = nullptr;
 	bool confirmed = false;
 	uint32_t msgInstanceID = 0;
+	bool success = false;
 
 	virtual uint32_t onPassKeyRequest();
 	virtual void onPassKeyNotify(uint32_t pass_key);

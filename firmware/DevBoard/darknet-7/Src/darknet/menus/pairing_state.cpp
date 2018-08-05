@@ -59,6 +59,12 @@ ErrorType PairingState::onInit() {
 	const MSGEvent<darknet7::BLEConnected> * si3 = 0;
 	MCUToMCU::get().getBus().addListener(this, si3, &MCUToMCU::get());
 
+	const MSGEvent<darknet7::BLEMessageFromDevice> * dev2 = 0;
+	MCUToMCU::get().getBus().addListener(this, dev2, &MCUToMCU::get());
+
+	const MSGEvent<darknet7::BLEPairingComplete> * si5 = 0;
+	MCUToMCU::get().getBus().addListener(this, si5, &MCUToMCU::get());
+
 	DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
 	DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Scanning for Badges", cmdc0de::RGBColor::BLUE);
 
@@ -92,24 +98,21 @@ void PairingState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BadgesInArea
 			InternalState = DISPLAY_DATA;
 			this->timesRunCalledSinceReset = 0;
 		}
-		MCUToMCU::get().getBus().removeListener(this, mevt, &MCUToMCU::get());
 	}
 	return;
 }
 
 void PairingState::receiveSignal(MCUToMCU*,const MSGEvent<darknet7::BLESecurityConfirm>* mevt)
 {
-	this->securityConfirmed = true;
-	const MSGEvent<darknet7::BLESecurityConfirm> * si = 0;
-	MCUToMCU::get().getBus().removeListener(this,si,&MCUToMCU::get());
 	InternalState = CONNECTING;
 	return;
 }
 
 void PairingState::receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEConnected>* mevt) {
-	this->bleConnected = true;
-	MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
 	DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
+	bool success = mevt->InnerMsg->success();
+	if(!success)
+		InternalState = PAIRING_FAILED;
 	this->isAlice = mevt->InnerMsg->isAlice();
 	this->msgId = 1;
 	if (this->isAlice)
@@ -129,26 +132,19 @@ void PairingState::receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEMessageF
 	this->MesgBuf[MesgLen] = 0x0;
 	AliceInitConvo* AIC = (AliceInitConvo*) &this->MesgBuf;
 	if (AIC->irmsgid == ALICE_SEND_ONE)
-	{
 		InternalState = BOB_SEND_ONE;
-	}
 	else if (AIC->irmsgid == ALICE_SEND_TWO)
-	{
 		InternalState = BOB_SEND_TWO;
-		MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get()); // No more data to get
-	}
 	else if (AIC->irmsgid == BOB_SEND_ONE)
-	{
 		InternalState = ALICE_SEND_TWO;
-		MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get()); // No more data to get
-	}
+	else
+		InternalState = PAIRING_FAILED;
 	this->msgId = 2;
 	this->timesRunCalledSinceReset = 0;
 	return;
 }
 
 void PairingState::receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEPairingComplete>* mevt) {
-	MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
 	InternalState = PAIRING_COMPLETE;
 	this->timesRunCalledSinceReset = 0;
 	return;
@@ -156,23 +152,16 @@ void PairingState::receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEPairingC
 
 void PairingState::CleanUp()
 {
-	if (!this->gotBadgeList)
-	{
-		const MSGEvent<darknet7::BadgesInArea> *mevt=0;
-		MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
-	}
-
-	if (!this->securityConfirmed)
-	{
-		const MSGEvent<darknet7::BLESecurityConfirm> * si2 = 0;
-		MCUToMCU::get().getBus().removeListener(this, si2, &MCUToMCU::get());
-	}
-	if (!this->bleConnected)
-	{
-		// TODO
-		const MSGEvent<darknet7::BLEConnected> * si3 = 0;
-		MCUToMCU::get().getBus().removeListener(this, si3, &MCUToMCU::get());
-	}
+	const MSGEvent<darknet7::BadgesInArea> *mevt=0;
+	MCUToMCU::get().getBus().removeListener(this,mevt,&MCUToMCU::get());
+	const MSGEvent<darknet7::BLESecurityConfirm> * si2 = 0;
+	MCUToMCU::get().getBus().removeListener(this, si2, &MCUToMCU::get());
+	const MSGEvent<darknet7::BLEConnected> * si3 = 0;
+	MCUToMCU::get().getBus().removeListener(this, si3, &MCUToMCU::get());
+	const MSGEvent<darknet7::BLEMessageFromDevice> * si4 = 0;
+	MCUToMCU::get().getBus().removeListener(this, si4, &MCUToMCU::get());
+	const MSGEvent<darknet7::BLEPairingComplete> * si5 = 0;
+	MCUToMCU::get().getBus().removeListener(this, si5, &MCUToMCU::get());
 }
 
 StateBase::ReturnStateContext PairingState::onRun() {
@@ -216,10 +205,7 @@ StateBase::ReturnStateContext PairingState::onRun() {
 		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
 		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Connecting", cmdc0de::RGBColor::BLUE);
 		if (this->timesRunCalledSinceReset > 500)
-		{
-			this->CleanUp();
-			nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),DarkNet7::get().NO_DATA_FROM_ESP,2000);
-		}
+			this->InternalState = PAIRING_FAILED;
 	}
 	else if (InternalState == CONNECTING)
 	{
@@ -238,11 +224,7 @@ StateBase::ReturnStateContext PairingState::onRun() {
 		}
 		else if(DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1))
 		{
-			DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
-			const MSGEvent<darknet7::BLEConnected> * dev1 = 0;
-			MCUToMCU::get().getBus().addListener(this, dev1, &MCUToMCU::get());
-			const MSGEvent<darknet7::BLEMessageFromDevice> * dev2 = 0;
-			MCUToMCU::get().getBus().addListener(this, dev2, &MCUToMCU::get());
+			DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);;
 
 			InternalState = CONFIRMING;
 
@@ -260,11 +242,12 @@ StateBase::ReturnStateContext PairingState::onRun() {
 	}
 	else if (InternalState == ALICE_SEND_ONE)
 	{
+		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
+		DarkNet7::get().getDisplay().drawString(5,20,(const char *)"Waiting", cmdc0de::RGBColor::BLUE);
+		// Wait for 1/2 a second until BOB is probably set up
+		HAL_Delay(1000);
+		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
 		DarkNet7::get().getDisplay().drawString(5,20,(const char *)"Alice Send 1", cmdc0de::RGBColor::BLUE);
-		// Add the listener for Bob Message 1
-		const MSGEvent<darknet7::BLEMessageFromDevice> * frombob = 0;
-		MCUToMCU::get().getBus().addListener(this, frombob, &MCUToMCU::get());
-
 		//Make the Message
 		AIC.irmsgid = ALICE_SEND_ONE;
 		memcpy(&AIC.AlicePublicKey[0], DarkNet7::get().getContacts().getMyInfo().getCompressedPublicKey(),
@@ -284,8 +267,6 @@ StateBase::ReturnStateContext PairingState::onRun() {
 	}
 	else if (InternalState == ALICE_SEND_TWO)
 	{
-		const MSGEvent<darknet7::BLEPairingComplete> *complete = 0;
-		MCUToMCU::get().getBus().addListener(this,complete,&MCUToMCU::get());
 		DarkNet7::get().getDisplay().drawString(5,40,(const char *)"Alice Data 2", cmdc0de::RGBColor::BLUE);
 
 		BobReplyToInit *brti = (BobReplyToInit*) MesgBuf;
@@ -339,8 +320,6 @@ StateBase::ReturnStateContext PairingState::onRun() {
 	else if (InternalState == BOB_SEND_ONE)
 	{
 		DarkNet7::get().getDisplay().drawString(5,20,(const char *)"BOB Send 1", cmdc0de::RGBColor::BLUE);
-		const MSGEvent<darknet7::BLEMessageFromDevice> * alice2 = 0;
-		MCUToMCU::get().getBus().addListener(this, alice2, &MCUToMCU::get());
 
 		AliceInitConvo *aic = (AliceInitConvo*) MesgBuf;
 		memcpy(&AIC,aic,sizeof(AIC));
@@ -391,8 +370,8 @@ StateBase::ReturnStateContext PairingState::onRun() {
 		if (uECC_verify(&uncompressedPublicKey[0], &msgHash[0], sizeof(msgHash), &atbs->signature[0], THE_CURVE))
 		{
 			ContactStore::Contact c;
-			if(!DarkNet7::get().getContacts().findContactByID(AIC.AliceRadioID,c) &&
-				(DarkNet7::get().getContacts().addContact(AIC.AliceRadioID, &AIC.AliceName[0], &AIC.AlicePublicKey[0], &atbs->signature[0])))
+			if ((DarkNet7::get().getContacts().findContactByID(AIC.AliceRadioID,c) ||
+				DarkNet7::get().getContacts().addContact(AIC.AliceRadioID, &AIC.AliceName[0], &AIC.AlicePublicKey[0], &atbs->signature[0])))
 			{
 				DarkNet7::get().getDisplay().drawString(5,40,(const char *)"BOB Send Complete", cmdc0de::RGBColor::BLUE);
 				auto r = darknet7::CreateBLESendDNPairComplete(fbb);
@@ -416,19 +395,7 @@ StateBase::ReturnStateContext PairingState::onRun() {
 			else
 				DarkNet7::get().getDisplay().drawString(5,50,(const char *)"Alice Receive 2", cmdc0de::RGBColor::BLUE);
 			if (this->timesRunCalledSinceReset > 500)
-			{
-				if (this->msgId == 1)
-				{
-					const MSGEvent<darknet7::BLEMessageFromDevice> *removebob=0;
-					MCUToMCU::get().getBus().removeListener(this,removebob,&MCUToMCU::get());
-				}
-				else if (this->msgId == 2)
-				{
-					const MSGEvent<darknet7::BLEPairingComplete> *removebob=0;
-					MCUToMCU::get().getBus().removeListener(this,removebob,&MCUToMCU::get());
-				}
 				InternalState = PAIRING_FAILED;
-			}
 		}
 		else
 		{
@@ -436,18 +403,12 @@ StateBase::ReturnStateContext PairingState::onRun() {
 				DarkNet7::get().getDisplay().drawString(5,10,(const char *)"BOB Receiving 1", cmdc0de::RGBColor::BLUE);
 			else if (this->msgId == 2)
 				DarkNet7::get().getDisplay().drawString(5,30,(const char *)"BOB Receiving 2", cmdc0de::RGBColor::BLUE);
-			if(this->timesRunCalledSinceReset > 300)
-			{
-				const MSGEvent<darknet7::BLEMessageFromDevice> * ra1 = 0;
-				MCUToMCU::get().getBus().removeListener(this, ra1, &MCUToMCU::get());
+			if(this->timesRunCalledSinceReset > 500)
 				InternalState = PAIRING_FAILED;
-			}
 		}
 	}
 	else if (InternalState == PAIRING_COMPLETE)
 	{
-		const MSGEvent<darknet7::BLEMessageFromDevice> * si = 0;
-		MCUToMCU::get().getBus().removeListener(this,si,&MCUToMCU::get());
 		auto r = darknet7::CreateBLEDisconnect(fbb);
 		this->ESPRequestID = DarkNet7::get().nextSeq();
 		auto e = darknet7::CreateSTMToESPRequest(fbb, ESPRequestID, darknet7::STMToESPAny_BLEDisconnect, r.Union());
@@ -458,17 +419,17 @@ StateBase::ReturnStateContext PairingState::onRun() {
 	else if (InternalState == PAIRING_SUCCESS)
 	{
 		// We don't want to disconnect as bob, Alice initiates that when she receives the final message. Report success
+		this->CleanUp();
 		nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(), DarkNet7::BLE_PAIRING_SUCCESS,2000);
 	}
 	else if (InternalState == PAIRING_FAILED)
 	{
-		const MSGEvent<darknet7::BLEMessageFromDevice> * si = 0;
-		MCUToMCU::get().getBus().removeListener(this,si,&MCUToMCU::get());
 		auto r = darknet7::CreateBLEDisconnect(fbb);
 		this->ESPRequestID = DarkNet7::get().nextSeq();
 		auto e = darknet7::CreateSTMToESPRequest(fbb, ESPRequestID, darknet7::STMToESPAny_BLEDisconnect, r.Union());
 		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
 		MCUToMCU::get().send(fbb);
+		this->CleanUp();
 		nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(),DarkNet7::get().BLE_PAIRING_FAILED,2000);
 	}
 	this->timesRunCalledSinceReset += 1;

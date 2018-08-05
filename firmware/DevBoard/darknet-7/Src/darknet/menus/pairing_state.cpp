@@ -123,6 +123,7 @@ void PairingState::receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEConnecte
 
 void PairingState::receiveSignal(MCUToMCU*, const MSGEvent<darknet7::BLEMessageFromDevice>* mevt) {
 	const flatbuffers::String* tmesg = mevt->InnerMsg->data();
+	memset(&this->MesgBuf, 0, sizeof(MesgBuf));
 	this->MesgLen = tmesg->Length();
 	memcpy(&this->MesgBuf, tmesg->c_str(), this->MesgLen);
 	this->MesgBuf[MesgLen] = 0x0;
@@ -375,12 +376,36 @@ StateBase::ReturnStateContext PairingState::onRun() {
 	}
 	else if (InternalState == BOB_SEND_TWO)
 	{
-		DarkNet7::get().getDisplay().drawString(5,40,(const char *)"BOB Send Complete", cmdc0de::RGBColor::BLUE);
-		auto r = darknet7::CreateBLESendDNPairComplete(fbb);
-		auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDNPairComplete, r.Union());
-		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
-		MCUToMCU::get().send(fbb);
-		InternalState = PAIRING_SUCCESS; // Don't initiate the disconnect as Bob
+		AliceToBobSignature *atbs = (AliceToBobSignature*) &this->MesgBuf;
+		uint8_t uncompressedPublicKey[ContactStore::PUBLIC_KEY_LENGTH];
+		uECC_decompress(&AIC.AlicePublicKey[0], &uncompressedPublicKey[0], THE_CURVE);
+		uint8_t msgHash[SHA256_HASH_SIZE];
+		ShaOBJ msgHashCtx;
+		sha256_init(&msgHashCtx);
+		uint16_t radioID = DarkNet7::get().getContacts().getMyInfo().getUniqueID();
+		sha256_add(&msgHashCtx, (uint8_t*) &radioID, sizeof(uint16_t));
+		sha256_add(&msgHashCtx, (uint8_t*) DarkNet7::get().getContacts().getMyInfo().getCompressedPublicKey(),
+		ContactStore::PUBLIC_KEY_COMPRESSED_LENGTH);
+		//verify alice's signature of my public key and unique id
+		sha256_digest(&msgHashCtx, &msgHash[0]);
+		if (uECC_verify(&uncompressedPublicKey[0], &msgHash[0], sizeof(msgHash), &atbs->signature[0], THE_CURVE))
+		{
+			ContactStore::Contact c;
+			if(!DarkNet7::get().getContacts().findContactByID(AIC.AliceRadioID,c) &&
+				(DarkNet7::get().getContacts().addContact(AIC.AliceRadioID, &AIC.AliceName[0], &AIC.AlicePublicKey[0], &atbs->signature[0])))
+			{
+				DarkNet7::get().getDisplay().drawString(5,40,(const char *)"BOB Send Complete", cmdc0de::RGBColor::BLUE);
+				auto r = darknet7::CreateBLESendDNPairComplete(fbb);
+				auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDNPairComplete, r.Union());
+				darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+				MCUToMCU::get().send(fbb);
+				InternalState = PAIRING_SUCCESS; // Don't initiate the disconnect as Bob
+			}
+			else
+				InternalState = PAIRING_FAILED;
+		}
+		else
+			InternalState = PAIRING_FAILED;
 	}
 	else if (InternalState == RECEIVE_DATA)
 	{

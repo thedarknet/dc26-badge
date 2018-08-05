@@ -18,7 +18,7 @@ using cmdc0de::StateBase;
 
 
 MCUInfoState::MCUInfoState() : Darknet7BaseState(),
-	BadgeInfoList("MCU Info:", Items, 0, 0, 160, 128, 0, (sizeof(Items) / sizeof(Items[0])))
+	BadgeInfoList("MCU Info:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0])))
 	, ESPRequestID(0), InternalState(NONE) {
 
 }

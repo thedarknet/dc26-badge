@@ -1,7 +1,7 @@
 /* GIMP RGB C-Source image dump (dc_zia_96-sized.c) */
 #include "images.h"
 
-#if 0
+#ifdef NOIMAGES
 static const cmdc0de::DCImage logo3 = {
   1, 1, 2,
   "\000\000"

@@ -2,7 +2,7 @@
 #include "images.h"
 
 
-#ifdef NOIMAGE
+#ifdef NOIMAGES
 static const cmdc0de::DCImage logo2 = {
   1, 1, 2,
   "\000\000"

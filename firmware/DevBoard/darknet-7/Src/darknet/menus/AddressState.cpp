@@ -10,7 +10,7 @@ using cmdc0de::StateBase;
 AddressState::AddressState() :
 		Darknet7BaseState(), AddressList((const char *) "Address Book", Items, 0, 0, 128, 64, 0,
 				sizeof(Items) / sizeof(Items[0])), CurrentContactList(), ContactDetails(
-				(const char *) "Contact Details: ", DetailItems, 0, 0, 128, 64, 0,
+				(const char *) "Contact Details: ", DetailItems, 0, 0, DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT/2, 0,
 				sizeof(DetailItems) / sizeof(DetailItems[0])), Index(0), DisplayList(0) {
 
 }

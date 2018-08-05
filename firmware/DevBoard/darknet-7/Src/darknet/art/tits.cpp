@@ -1,6 +1,12 @@
 /* GIMP RGB C-Source image dump (tits.c) */
 #include "images.h"
 
+#ifdef NOIMAGES
+static const cmdc0de::DCImage Logo1 = {
+  1, 1, 2,
+  "\000\000"
+};
+#else
 static const cmdc0de::DCImage Logo1 =
 		{ 96, 96, 2,
 				"\21\40\21\40\21\40\21\40\21\40\21\40\21\40\21\40\21\40\21\40\21\40\21\40"
@@ -733,6 +739,7 @@ static const cmdc0de::DCImage Logo1 =
 						"\40\21\40\21\40\21\40\21\40\21\40\21\40\21\40\21\40\21\40\21\40\21\40\21"
 						"\40\21\40\21\40\21\40\21\40\21\40"
 };
+#endif
 
 const cmdc0de::DCImage &getLogo1() {
 	return Logo1;

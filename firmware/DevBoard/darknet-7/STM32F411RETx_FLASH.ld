@@ -46,7 +46,7 @@ flash size = 512kbytes
         #  1: 0x00004000 (0x4000 16kB) not protected - data for settings
         #  2: 0x00008000 (0x4000 16kB) not protected - data for address
         #  3: 0x0000c000 (0x4000 16kB) not protected - data 
-        #  4: 0x00010000 (0x10000 64kB) not protected - data resources
+        #  4: 0x00010000 (0x10000 64kB) not protected - program
         #  5: 0x00020000 (0x20000 128kB) not protected - program
         #  6: 0x00040000 (0x20000 128kB) not protected - program
         #  7: 0x00060000 (0x20000 128kB) not protected - program

@@ -31,7 +31,7 @@ private:
 	char ListBuffer[7][48]; //height then width
 	INTERNAL_STATE InternalState;
 public:
-	NPCInteract() : Darknet7BaseState(), RequestID(0), DisplayList("NPC Interaction:", Items, 0, 0, 160, 128, 0, (sizeof(Items) / sizeof(Items[0]))), InternalState(NONE) {
+	NPCInteract() : Darknet7BaseState(), RequestID(0), DisplayList("NPC Interaction:", Items, 0, 0, DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT, 0, (sizeof(Items) / sizeof(Items[0]))), InternalState(NONE) {
 
 	}
 	virtual ~NPCInteract() {}

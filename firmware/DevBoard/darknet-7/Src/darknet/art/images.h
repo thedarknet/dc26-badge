@@ -5,5 +5,8 @@
 
 const cmdc0de::DCImage &getLogo1();
 const cmdc0de::DCImage &getLogo2();
+const cmdc0de::DCImage &getLogo3();
+
+//const cmdc0de::DCImage &getLogoTest();
 
 #endif

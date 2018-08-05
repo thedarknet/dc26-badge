@@ -21,7 +21,6 @@ PairingState::PairingState() : Darknet7BaseState()
 	, timesRunCalledSinceReset(0), TimeoutMS(1000), RetryCount(3), CurrentRetryCount(0)
 	, TimeInState(0), msgId(1), gotBadgeList(false), securityConfirmed(false), bleConnected(false)
 	, isAlice(false){
-
 }
 
 PairingState::~PairingState() {

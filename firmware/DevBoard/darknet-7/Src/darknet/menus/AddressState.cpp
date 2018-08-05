@@ -1,6 +1,8 @@
 #include "AddressState.h"
 #include "SendMsgState.h"
 #include "../darknet7.h"
+#include "menu_state.h"
+#include "gui_list_processor.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::RGBColor;
@@ -10,7 +12,7 @@ using cmdc0de::StateBase;
 AddressState::AddressState() :
 		Darknet7BaseState(), AddressList((const char *) "Address Book", Items, 0, 0, 128, 64, 0,
 				sizeof(Items) / sizeof(Items[0])), CurrentContactList(), ContactDetails(
-				(const char *) "Contact Details: ", DetailItems, 0, 0, 128, 64, 0,
+				(const char *) "Contact Details: ", DetailItems, 0, 0, DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT/2, 0,
 				sizeof(DetailItems) / sizeof(DetailItems[0])), Index(0), DisplayList(0) {
 
 }
@@ -69,6 +71,11 @@ void AddressState::setNext4Items(uint16_t startAt) {
 StateBase::ReturnStateContext AddressState::onRun() {
 	//uint8_t pin = rc.getKB().getLastKeyReleased();
 	StateBase *nextState = this;
+	if(!GUIListProcessor::process(&AddressList,AddressList.ItemsCount)) {
+		if(DarkNet7::get().getButtonInfo().wereTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+			nextState = DarkNet7::get().getDisplayMenuState();
+		}
+	}
 /*
 	//then we are in address mode
 	if (DetailItems[0].id == 0) {

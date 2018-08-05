@@ -36,6 +36,7 @@
 #include "menus/scan.h"
 #include "menus/sao_menu.h"
 #include "art/images.h"
+//#include "ws2812b.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::DisplayST7735;
@@ -68,7 +69,8 @@ const char *DarkNet7::BLE_PAIRING_FAILED = "Failed to Pair.";
 DarkNet7 *DarkNet7::mSelf = 0;
 
 DarkNet7::ButtonInfo::ButtonInfo() :
-		ButtonState(0),LastButtonState(0) {
+		ButtonState(0),LastButtonState(0), LastTickButtonPushed(0) {
+	LastTickButtonPushed = HAL_GetTick();
 }
 
 void DarkNet7::ButtonInfo::reset() {
@@ -123,6 +125,13 @@ void DarkNet7::ButtonInfo::processButtons() {
 	if (HAL_GPIO_ReadPin(BUTTON_FIRE1_GPIO_Port, BUTTON_FIRE1_Pin) == GPIO_PIN_RESET) {
 		ButtonState|=BUTTON_FIRE1;
 	}
+	if(ButtonState!=0) {
+		LastTickButtonPushed = HAL_GetTick();
+	}
+}
+
+uint32_t DarkNet7::ButtonInfo::lastTickButtonPushed() {
+	return LastTickButtonPushed;
 }
 
 DarkNet7 &DarkNet7::get() {
@@ -203,7 +212,7 @@ ErrorType DarkNet7::onInit() {
 	GUI gui(&Display);
 	gui.drawList(&DrawList);
 	Display.swap();
-	HAL_Delay(1000);
+	HAL_Delay(500);
 	if(MyContacts.getMyInfo().init()) {
 		items[1].set(1,"Flash INIT");
 	} else {
@@ -213,10 +222,24 @@ ErrorType DarkNet7::onInit() {
 	DrawList.selectedItem++;
 	gui.drawList(&DrawList);
 	Display.swap();
-	HAL_Delay(1000);
+	HAL_Delay(500);
 	MyContacts.getSettings().init();
 	Display.fillScreen(cmdc0de::RGBColor::BLACK);
 	Display.swap();
+	Display.drawImage(32, 16,getLogo1());
+	Display.swap();
+	HAL_Delay(1000);
+	Display.drawImage(32, 16,getLogo2());
+	Display.swap();
+	HAL_Delay(1000);
+	Display.drawImage(32, 16,getLogo3());
+	Display.swap();
+	HAL_Delay(1000);
+
+
+
+	//HAL_GPIO_WritePin(GPIO_APA106_DATA_GPIO_Port,GPIO_APA106_DATA_Pin,GPIO_PIN_RESET);
+	//HAL_GPIO_WritePin(GPIO_APA106_DATA_GPIO_Port,GPIO_APA106_DATA_Pin,GPIO_PIN_SET);
 
 #if DEBUG_WHY_CANT_CHANGE_ROTATION
 	//Display.setRotation(cmdc0de::DisplayDevice::LANDSCAPE_TOP_LEFT,true);
@@ -273,6 +296,8 @@ ErrorType DarkNet7::onInit() {
 		 }
 	 }
 #endif
+
+	//darknet7_led_init();
 	return et;
 }
 
@@ -288,23 +313,19 @@ ErrorType DarkNet7::onRun() {
 
 	cmdc0de::StateBase::ReturnStateContext rsc = getCurrentState()->run();
 	Display.swap();
+	//handleLEDS();
 
 	if (rsc.Err.ok()) {
 		if (getCurrentState() != rsc.NextMenuToRun) {
 			//on state switches reset keyboard and give a 1 second pause on reading from keyboard.
 			MyButtons.reset();
 			setCurrentState(rsc.NextMenuToRun);
+		} else {
+			if (getCurrentState() != DarkNet7::get().getGameOfLifeState()
+					&& (HAL_GetTick()-MyButtons.lastTickButtonPushed())>(DarkNet7::get().getContacts().getSettings().getScreenSaverTime()*1000*60)) {
+				setCurrentState(DarkNet7::get().getGameOfLifeState());
+			}
 		}
-		//if (CurrentState != StateFactory::getGameOfLifeState()
-		//		&& (tick > KB.getLastPinSelectedTick())
-		//		&& (tick - KB.getLastPinSelectedTick()
-		//				> (1000 * 60
-		//						* rc.getContactStore().getSettings().getScreenSaverTime()))) {
-		//	CurrentState->shutdown();
-		//	CurrentState = StateFactory::getGameOfLifeState();
-		//} else {
-		//	CurrentState = rsc.NextMenuToRun;
-		//}
 	} else {
 		//setCurrentState(StateCollection::getDisplayMessageState(
 		//		StateCollection::getDisplayMenuState(), (const char *)"Run State Error....", uint16_t (2000)));

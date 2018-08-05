@@ -20,6 +20,7 @@ public:
 public:
 	virtual void run(void *data);
 	virtual ~CmdHandlerTask();
+	virtual void onStop();
 protected:
 	QueueHandle_t InCommingQueueHandle = nullptr;
 	WIFI wifi;

@@ -9,6 +9,7 @@
 #include "../darknet7.h"
 #include "../libstm32/crypto/sha256.h"
 #include "menu_state.h"
+#include "gui_list_processor.h"
 
 using cmdc0de::RGBColor;
 using cmdc0de::ErrorType;
@@ -77,8 +78,10 @@ ErrorType BadgeInfoState::onInit() {
 StateBase::ReturnStateContext BadgeInfoState::onRun() {
 
 	StateBase *nextState = this;
-	if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_FIRE1)) {
-		nextState = DarkNet7::get().getDisplayMenuState();
+	if(!GUIListProcessor::process(&BadgeInfoList,BadgeInfoList.ItemsCount)) {
+		if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID)) {
+			nextState = DarkNet7::get().getDisplayMenuState();
+		}
 	}
 	return ReturnStateContext(nextState);
 }

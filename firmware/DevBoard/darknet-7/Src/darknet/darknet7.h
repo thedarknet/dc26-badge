@@ -75,12 +75,14 @@ public:
 		bool wereAnyOfTheseButtonsReleased(const int32_t &b);
 		bool wasAnyButtonReleased();
 		void reset();
+		uint32_t lastTickButtonPushed();
 	protected:
 		void processButtons();
 		friend class DarkNet7;
 	private:
 		uint8_t ButtonState;
 		uint8_t LastButtonState;
+		uint32_t LastTickButtonPushed;
 	};
 public:
 	cmdc0de::DisplayMessageState *getDisplayMessageState(cmdc0de::StateBase *bm, const char *message, uint16_t timeToDisplay);

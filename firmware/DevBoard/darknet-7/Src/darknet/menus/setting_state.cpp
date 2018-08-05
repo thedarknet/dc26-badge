@@ -19,7 +19,7 @@ using cmdc0de::StateBase;
 using cmdc0de::RGBColor;
 
 SettingState::SettingState() : Darknet7BaseState(), SettingList((const char *) "MENU", Items, 0, 0,
-				128, 160, 0, sizeof(Items) / sizeof(Items[0])), AgentName(), SubState(0), MiscCounter(0), VKB(), IHC(&AgentName[0],sizeof(AgentName)) {
+		DarkNet7::DISPLAY_WIDTH, DarkNet7::DISPLAY_HEIGHT, 0, sizeof(Items) / sizeof(Items[0])), AgentName(), SubState(0), MiscCounter(0), VKB(), IHC(&AgentName[0],sizeof(AgentName)) {
 
 	memset(&AgentName[0], 0, sizeof(AgentName));
 	Items[0].id = 0;

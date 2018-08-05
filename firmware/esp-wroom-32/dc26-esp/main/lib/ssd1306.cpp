@@ -201,13 +201,13 @@ char SSD1306_Putc(char ch, FontDef_t* Font, uint8_t color) {
 	b = 0;
 	/* Go through font */
 	for (i = 0; i < Font->FontHeight; i++) {
+		b = Font->data[(ch - 32) * Font->FontHeight + i];
 		for (j = 0; j < Font->FontWidth; j++) {
-			if ((Font->data[ch * Font->CharBytes + b / 8] >> b % 8) & 1) {
-				SSD1306_DrawPixel(SSD1306.CurrentX + j, (SSD1306.CurrentY + i), (uint8_t) color);
+			if ((b << j) & 0x8000) {
+				SSD1306_DrawPixel(SSD1306.CurrentX + j, (SSD1306.CurrentY + i), color);
 			} else {
-				SSD1306_DrawPixel(SSD1306.CurrentX + j, (SSD1306.CurrentY + i), (uint8_t) !color);
+				SSD1306_DrawPixel(SSD1306.CurrentX + j, (SSD1306.CurrentY + i), !color);
 			}
-			b++;
 		}
 	}
 

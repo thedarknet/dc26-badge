@@ -34,6 +34,7 @@ void UartClientCallbacks::afterConnect()
 		return;
 	}
 
+	vTaskDelay(1000 / portTICK_PERIOD_MS);
 	// get the characteristic for the CLIENT to RECEIVE (TX)
 	pRxChar = pRemoteService->getCharacteristic(uartCisoUUID);
 	if (pRxChar == nullptr) {

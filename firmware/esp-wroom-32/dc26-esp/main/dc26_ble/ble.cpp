@@ -286,7 +286,7 @@ void BluetoothTask::pairWithDevice(const darknet7::STMToESPRequest* m)
 	}
 	
 	flatbuffers::FlatBufferBuilder fbb;
-	auto con = darknet7::CreateBLEConnected(fbb, success, this->isActingClient);
+	auto con = darknet7::CreateBLEConnected(fbb, true, true);
 	flatbuffers::Offset<darknet7::ESPToSTM> of = darknet7::CreateESPToSTM(fbb, 0,
 	darknet7::ESPToSTMAny_BLEConnected, con.Union());
 	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);

@@ -62,7 +62,7 @@ static void gpio_task_example(void* arg) {
 			printf("GPIO[%d] intr, val: %d\n", io_num, level);
 			SSD1306_Fill(SSD1306_COLOR_BLACK);
 			SSD1306_GotoXY(0,16);
-			SSD1306_Puts("1233456778", &Font_7x10, SSD1306_COLOR_WHITE);
+			SSD1306_Puts("1233456778", &Font_11x18, SSD1306_COLOR_WHITE);
 			SSD1306_UpdateScreen();
 			//build test message
 			System::logSystemInfo();

@@ -51,10 +51,10 @@
  * @brief  Font structure used on my LCD libraries
  */
 typedef struct {
-	uint8_t FontWidth;    /*!< Font width in pixels */
-	uint8_t FontHeight;   /*!< Font height in pixels */
+	uint16_t FontWidth;    /*!< Font width in pixels */
+	uint16_t FontHeight;   /*!< Font height in pixels */
 	uint8_t CharBytes;    /*!< Count of bytes for one character */
-	const uint8_t *data; /*!< Pointer to data font data array */
+	const uint16_t *data; /*!< Pointer to data font data array */
 } FontDef_t;
 
 /** 
@@ -80,7 +80,7 @@ typedef struct {
  */
 extern FontDef_t Font_7x10;
 extern FontDef_t Font_5x7;
-
+extern FontDef_t Font_11x18;
 
 /**
  * @}

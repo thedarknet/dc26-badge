@@ -21,7 +21,7 @@ bool DisplayTask::init() {
 	ESP_LOGI(LOGTAG, "INIT");
 	if(SSD1306_Init(&I2cDisplay)>0) {
 		ESP_LOGI(LOGTAG,"display init successful");
-		SSD1306_Puts("BOOTING...", &Font_7x10, SSD1306_COLOR_WHITE);
+		SSD1306_Puts("BOOTING...", &Font_11x18, SSD1306_COLOR_WHITE);
 		SSD1306_UpdateScreen();
 	} else {
 		ESP_LOGI(LOGTAG,"display init UN-successful");
@@ -41,7 +41,7 @@ void DisplayTask::run(void *data) {
 	ESP_LOGI(LOGTAG, "Display Task started");
 	SSD1306_Fill(SSD1306_COLOR_BLACK);
 	SSD1306_GotoXY(0,16);
-	SSD1306_Puts("ESP 32 Started...", &Font_7x10, SSD1306_COLOR_WHITE);
+	SSD1306_Puts("ESP32 Ready", &Font_11x18, SSD1306_COLOR_WHITE);
 	SSD1306_UpdateScreen();
 	DisplayTask::DisplayMsg *m;
 	while (1) {
@@ -49,7 +49,7 @@ void DisplayTask::run(void *data) {
 			ESP_LOGI(LOGTAG, "got message from queue");
 			SSD1306_Fill(SSD1306_COLOR_BLACK);
 			SSD1306_GotoXY(m->x,m->y);
-			SSD1306_Puts(&m->Msg[0], &Font_7x10, SSD1306_COLOR_WHITE);
+			SSD1306_Puts(&m->Msg[0], &Font_11x18, SSD1306_COLOR_WHITE);
 			SSD1306_UpdateScreen();
 			uint32_t time = m->TimeInMSToDisplay;
 			delete m;

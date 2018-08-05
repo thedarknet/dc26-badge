@@ -195,6 +195,7 @@ void BluetoothTask::setDeviceName(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESetDeviceName* devName = m->Msg_as_BLESetDeviceName();
 	this->adv_name = devName->name()->str();
+	BLEDevice::setDeviceName(this->adv_name);
 	// TODO: Set badge name from flash
 	this->refreshAdvertisementData();
 	sendGenericResponse(true);

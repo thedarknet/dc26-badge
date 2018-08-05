@@ -413,6 +413,19 @@ uint16_t   BLEDevice::m_localMTU = 23;
 } // init
 
 
+void BLEDevice::setDeviceName(std::string deviceName)
+{
+	if(initialized)
+	{
+		esp_err_t errRc = ::esp_ble_gap_set_device_name(deviceName.c_str());
+		if (errRc != ESP_OK) {
+			ESP_LOGE(LOG_TAG, "esp_ble_gap_set_device_name: rc=%d %s", errRc, GeneralUtils::errorToString(errRc));
+			return;
+		};
+	}
+	vTaskDelay(200/portTICK_PERIOD_MS); // Delay for 200 msecs as a workaround to an apparent Arduino environment issue.
+}
+
 /**
  * @brief Set the transmission power.
  * The power level can be one of:
@@ -467,12 +480,12 @@ uint16_t   BLEDevice::m_localMTU = 23;
  * @param [in] address The address to add to the white list.
  */
 void BLEDevice::whiteListAdd(BLEAddress address) {
-	ESP_LOGD(LOG_TAG, ">> whiteListAdd: %s", address.toString().c_str());
+	ESP_LOGI(LOG_TAG, ">> whiteListAdd: %s", address.toString().c_str());
 	esp_err_t errRc = esp_ble_gap_update_whitelist(true, *address.getNative());  // True to add an entry.
 	if (errRc != ESP_OK) {
-		ESP_LOGE(LOG_TAG, "esp_ble_gap_update_whitelist: rc=%d %s", errRc, GeneralUtils::errorToString(errRc));
+		ESP_LOGI(LOG_TAG, "esp_ble_gap_update_whitelist: rc=%d %s", errRc, GeneralUtils::errorToString(errRc));
 	}
-	ESP_LOGD(LOG_TAG, "<< whiteListAdd");
+	ESP_LOGI(LOG_TAG, "<< whiteListAdd");
 } // whiteListAdd
 
 

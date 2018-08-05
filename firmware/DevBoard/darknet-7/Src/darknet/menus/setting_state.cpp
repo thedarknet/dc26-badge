@@ -10,6 +10,9 @@
 #include "../virtual_key_board.h"
 #include "../libstm32/display/display_device.h"
 #include "menu_state.h"
+#include "../darknet7.h"
+#include "../messaging/stm_to_esp_generated.h"
+#include "../messaging/esp_to_stm_generated.h"
 
 using cmdc0de::ErrorType;
 using cmdc0de::StateBase;
@@ -96,6 +99,11 @@ StateBase::ReturnStateContext SettingState::onRun() {
 			if (DarkNet7::get().getButtonInfo().wereAnyOfTheseButtonsReleased(DarkNet7::ButtonInfo::BUTTON_MID) && AgentName[0] != '\0' && AgentName[0] != ' ' && AgentName[0] != '_') {
 				AgentName[ContactStore::AGENT_NAME_LENGTH - 1] = '\0';
 				if (DarkNet7::get().getContacts().getSettings().setAgentname(&AgentName[0])) {
+					flatbuffers::FlatBufferBuilder fbb;
+					auto r = darknet7::CreateBLESetDeviceNameDirect(fbb,DarkNet7::get().getContacts().getSettings().getAgentName());
+					auto z = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::get().nextSeq(),darknet7::STMToESPAny_BLESetDeviceName,r.Union());
+					darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,z);
+					MCUToMCU::get().send(fbb);
 					nextState = DarkNet7::get().getDisplayMessageState(	DarkNet7::get().getDisplayMenuState(), (const char *)"Save Successful", 2000);
 				} else {
 					nextState = DarkNet7::get().getDisplayMessageState(	DarkNet7::get().getDisplayMenuState(), (const char *)"Save FAILED!",	4000);

@@ -23,7 +23,7 @@ public:
 	static const int NPCMSG_ITEM_SIZE = sizeof(NPCInteractionTask::NPCMsg*);
 	static const char *LOGTAG;
 public:
-	NPCInteractionTask(const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);
+	NPCInteractionTask(const std::string &tName, uint16_t stackSize=6144, uint8_t p=5);
 	bool init();
 	virtual void run(void *data);
 	virtual ~NPCInteractionTask();

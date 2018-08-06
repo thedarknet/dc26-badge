@@ -24,13 +24,13 @@ public:
 	}
 	virtual esp_err_t apStart() {
 		ESP_LOGI(logTag, "MyWiFiEventHandler(Class): apStart starting web server");
-		Port80WebServer.start(80,false);
+		//Port80WebServer.start(80,false);
 		APStarted = true;
 		return ESP_OK;
 	}
 	virtual esp_err_t apStop() {
 		ESP_LOGI(logTag, "MyWiFiEventHandler(Class): apStop stopping web server");
-		Port80WebServer.stop();
+		//Port80WebServer.stop();
 		APStarted = false;
 		return ESP_OK;
 	}
@@ -189,6 +189,7 @@ void CmdHandlerTask::run(void *data) {
 				const darknet7::SetupAP *sap = msg->Msg_as_SetupAP();
 				wifi_auth_mode_t auth_mode = convertAuthMode(sap->mode());
     			wifi.startAP(sap->ssid()->c_str(), sap->passwd()->c_str(), auth_mode);
+				Port80WebServer.start(80,false);
 				}
 				break;
 			case darknet7::STMToESPAny_StopAP: {
@@ -223,7 +224,7 @@ void CmdHandlerTask::run(void *data) {
 						darknet7::WiFiStatus status = darknet7::WiFiStatus_DOWN;
 						MyWiFiEventHandler *eh = (MyWiFiEventHandler*)wifi.getWifiEventHandler();
 						if(eh && eh->isAPStarted()) {
-							status = darknet7::WiFiStatus_AP_STA;
+							status = darknet7::WiFiStatus_AP;
 						}
 						auto s = darknet7::CreateCommunicationStatusResponseDirect(
 										 fbb, status, bttask.advertising_enabled, 

@@ -101,7 +101,7 @@ protected:
 		StateBase *nextState = this;
 			switch(InternalState) {
 			case NPC_LIST_REQUEST:
-				if(this->getTimesRunCalledSinceLastReset()>200) {
+				if(this->getTimesRunCalledSinceLastReset()>400) {
 					nextState = DarkNet7::get().getDisplayMessageState(DarkNet7::get().getDisplayMenuState(), DarkNet7::NO_DATA_FROM_ESP,2000);
 				}
 				break;

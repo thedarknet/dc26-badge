@@ -108,7 +108,6 @@ void MySecurity::onAuthenticationComplete(esp_ble_auth_cmpl_t auth_cmpl)
 		getMCUToMCU().send(fbb);
 	}
 
-	printf("Acting client: %d\n", pBTTask->isActingClient);
 	this->success = true;
 	vTaskDelay(3000 / portTICK_PERIOD_MS);
 }

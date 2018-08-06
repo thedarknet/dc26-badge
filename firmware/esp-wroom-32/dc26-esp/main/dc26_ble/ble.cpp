@@ -74,11 +74,6 @@ static void notifyCallback(BLERemoteCharacteristic* pBLERemoteCharacteristic,
 		memcpy(&mesgbuf[midx], &pData[1], length-1);
 		midx += (length-1);
 
-		printf("Client Received:"); // TODO: Remove this
-		for (int i = 0; i < midx; i++)
-			printf("%02X", mesgbuf[i]);
-		printf("\n");
-
 		// send MessageFromBob STM
 		auto sdata = fbb.CreateString(mesgbuf, midx);
 		auto sendData = darknet7::CreateBLEMessageFromDevice(fbb, sdata);
@@ -213,7 +208,6 @@ void BluetoothTask::scanForDevices(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLEScanForDevices* msg = m->Msg_as_BLEScanForDevices();
 	uint8_t filter = msg->filter();
-	printf("scanning!\n");
 
 	pScanCallbacks->setFilter(filter);
 	pScan->setActiveScan(true);
@@ -224,7 +218,6 @@ void BluetoothTask::scanForDevices(const darknet7::STMToESPRequest* m)
 	flatbuffers::FlatBufferBuilder fbb;
 	for (const auto &p : results)
 	{
-		printf("Device Found: %s - %s\n", p.first.c_str(), p.second.c_str());
 		auto addr = fbb.CreateString(p.first);
 		auto name = fbb.CreateString(p.second);
 		flatbuffers::Offset<darknet7::Badge> badge = darknet7::CreateBadge(fbb, name, addr);
@@ -297,21 +290,11 @@ void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 		memcpy(&temp[1], &buf[sent], size);
 		if (iUartClientCallbacks.isConnected)
 		{
-			printf("Sending:"); // TODO: Remove this
-			for (int i = 0; i < 23; i++)
-				printf("%02X", temp[i]);
-			printf("\n");
 			if (iUartClientCallbacks.setup)
-			{
 				iUartClientCallbacks.pTxChar->writeValue(temp, size + 1);
-			}
 		}
 		else if (iUartServerCallbacks.isConnected)
 		{
-			printf("Sending:"); // TODO: Remove this
-			for (int i = 0; i < 23; i++)
-				printf("%02X", temp[i]);
-			printf("\n");
 			pUartCisoCharacteristic->setValue(temp, size + 1);
 			pUartCisoCharacteristic->notify();
 		}

@@ -90,12 +90,6 @@ void UartCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 		// send MessageFromBob STM
 		mesgbuf2[midx2] = 0x0;
 
-		printf("Server Received:");
-		for (int i = 0; i < midx2; i++)
-			printf("%02X", mesgbuf2[i]); // TODO: print stuff
-		printf("\n");
-
-
 		auto sdata = fbb.CreateString(mesgbuf2, midx2);
 		auto sendData = darknet7::CreateBLEMessageFromDevice(fbb, sdata);
 		of = darknet7::CreateESPToSTM(fbb, 0,

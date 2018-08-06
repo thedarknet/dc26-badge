@@ -285,7 +285,9 @@ struct NPCInteractionResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Tab
     VT_NAME = 4,
     VT_DESCRIPTION = 6,
     VT_ACTIONS = 8,
-    VT_WASERROR = 10
+    VT_INFECTIONS = 10,
+    VT_RESPONSE = 12,
+    VT_WASERROR = 14
   };
   const flatbuffers::String *name() const {
     return GetPointer<const flatbuffers::String *>(VT_NAME);
@@ -295,6 +297,12 @@ struct NPCInteractionResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Tab
   }
   const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *actions() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_ACTIONS);
+  }
+  uint16_t infections() const {
+    return GetField<uint16_t>(VT_INFECTIONS, 0);
+  }
+  const flatbuffers::String *response() const {
+    return GetPointer<const flatbuffers::String *>(VT_RESPONSE);
   }
   int8_t wasError() const {
     return GetField<int8_t>(VT_WASERROR, 0);
@@ -308,6 +316,9 @@ struct NPCInteractionResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Tab
            VerifyOffset(verifier, VT_ACTIONS) &&
            verifier.Verify(actions()) &&
            verifier.VerifyVectorOfStrings(actions()) &&
+           VerifyField<uint16_t>(verifier, VT_INFECTIONS) &&
+           VerifyOffset(verifier, VT_RESPONSE) &&
+           verifier.Verify(response()) &&
            VerifyField<int8_t>(verifier, VT_WASERROR) &&
            verifier.EndTable();
   }
@@ -324,6 +335,12 @@ struct NPCInteractionResponseBuilder {
   }
   void add_actions(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> actions) {
     fbb_.AddOffset(NPCInteractionResponse::VT_ACTIONS, actions);
+  }
+  void add_infections(uint16_t infections) {
+    fbb_.AddElement<uint16_t>(NPCInteractionResponse::VT_INFECTIONS, infections, 0);
+  }
+  void add_response(flatbuffers::Offset<flatbuffers::String> response) {
+    fbb_.AddOffset(NPCInteractionResponse::VT_RESPONSE, response);
   }
   void add_wasError(int8_t wasError) {
     fbb_.AddElement<int8_t>(NPCInteractionResponse::VT_WASERROR, wasError, 0);
@@ -345,11 +362,15 @@ inline flatbuffers::Offset<NPCInteractionResponse> CreateNPCInteractionResponse(
     flatbuffers::Offset<flatbuffers::String> name = 0,
     flatbuffers::Offset<flatbuffers::String> description = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> actions = 0,
+    uint16_t infections = 0,
+    flatbuffers::Offset<flatbuffers::String> response = 0,
     int8_t wasError = 0) {
   NPCInteractionResponseBuilder builder_(_fbb);
+  builder_.add_response(response);
   builder_.add_actions(actions);
   builder_.add_description(description);
   builder_.add_name(name);
+  builder_.add_infections(infections);
   builder_.add_wasError(wasError);
   return builder_.Finish();
 }
@@ -359,12 +380,16 @@ inline flatbuffers::Offset<NPCInteractionResponse> CreateNPCInteractionResponseD
     const char *name = nullptr,
     const char *description = nullptr,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *actions = nullptr,
+    uint16_t infections = 0,
+    const char *response = nullptr,
     int8_t wasError = 0) {
   return darknet7::CreateNPCInteractionResponse(
       _fbb,
       name ? _fbb.CreateString(name) : 0,
       description ? _fbb.CreateString(description) : 0,
       actions ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*actions) : 0,
+      infections,
+      response ? _fbb.CreateString(response) : 0,
       wasError);
 }
 

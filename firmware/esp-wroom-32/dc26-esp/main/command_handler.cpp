@@ -261,9 +261,15 @@ void CmdHandlerTask::run(void *data) {
 							std::string((const char *)"DCDN-7-DC26"), ws->bssid()->data())) {
 						NPCInteractionTask::NPCMsg *nmsg = 0;
 						if(ws->type()==0) { //LIST
+							ESP_LOGI(LOGTAG, "NPC List Request");
 							nmsg = new NPCInteractionTask::NPCMsg(NPCInteractionTask::NPCMsg::HELO, msg->msgInstanceID());
 						} else { //action
-							nmsg = new NPCInteractionTask::NPCMsg(NPCInteractionTask::NPCMsg::INTERACT, msg->msgInstanceID(), ws->npcname()->c_str(), ws->action()->c_str());
+							ESP_LOGI(LOGTAG, "NPC Interaction request");
+							if(ws->action()!=0) {
+								nmsg = new NPCInteractionTask::NPCMsg(NPCInteractionTask::NPCMsg::INTERACT, msg->msgInstanceID(), ws->npcname()->c_str(), ws->action()->c_str());
+							} else {
+								nmsg = new NPCInteractionTask::NPCMsg(NPCInteractionTask::NPCMsg::INTERACT, msg->msgInstanceID(), ws->npcname()->c_str(), 0);
+							}
 						}
 						xQueueSend(NPCITask.getQueueHandle(), (void* )&nmsg,(TickType_t ) 100);
 					} else {

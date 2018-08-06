@@ -6,6 +6,7 @@
 #include "lib/Task.h"
 #include "freertos/queue.h"
 #include "mcu_to_mcu.h"
+#include <string.h>
 
 class NPCInteractionTask : public Task {
 public:
@@ -13,11 +14,22 @@ public:
 		enum REQUEST_TYPE { NONE, HELO, INTERACT };
 		REQUEST_TYPE RType;
 		uint32_t MsgID;
-		std::string NpcName;
-		std::string Action;
+		char NpcName[32];
+		char Action[32];
 		NPCMsg(const REQUEST_TYPE &r, uint32_t msgID) : RType(r), MsgID(msgID), NpcName(), Action() {}
 		NPCMsg(const REQUEST_TYPE &r, uint32_t msgID, const char *name, const char *action) 
-				  : RType(r), MsgID(msgID), NpcName(name), Action(action) {}
+				  : RType(r), MsgID(msgID), NpcName(), Action() {
+			if(name) {
+				strcpy(&NpcName[0],name);
+			} else {
+				memset(&NpcName[0],0,sizeof(NpcName));
+			}
+			if(action) {
+				strcpy(&Action[0],action);
+			} else {
+				memset(&Action[0],0,sizeof(Action));
+			}
+		}
 	};
 	static const int NPCMSG_QUEUE_SIZE = 10;
 	static const int NPCMSG_ITEM_SIZE = sizeof(NPCInteractionTask::NPCMsg*);

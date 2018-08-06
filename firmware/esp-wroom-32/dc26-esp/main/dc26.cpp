@@ -6,7 +6,6 @@
 #include "soc/uart_struct.h"
 #include "string.h"
 #include "lib/System.h"
-#include "lib/wifi/WiFi.h"
 #include "stm_to_esp_generated.h"
 #include "esp_to_stm_generated.h"
 #include "lib/FATFS_VFS.h"
@@ -14,6 +13,7 @@
 #include "command_handler.h"
 #include "display_handler.h"
 #include "lib/ssd1306.h"
+#include <nvs_flash.h>
 
 #include "dc26_ble/ble.h"
 

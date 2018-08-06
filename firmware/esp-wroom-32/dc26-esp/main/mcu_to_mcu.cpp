@@ -179,6 +179,7 @@ int32_t MCUToMCUTask::processMessage(const uint8_t *data, uint32_t size) {
 			case darknet7::STMToESPAny_CommunicationStatusRequest:
 			case darknet7::STMToESPAny_ESPRequest:
 			case darknet7::STMToESPAny_WiFiScan:
+			case darknet7::STMToESPAny_WiFiNPCInteract:
 				ESP_LOGI(LOGTAG, "sending to cmd handler");
 				xQueueSend(CmdHandler->getQueueHandle(), (void* )&m,(TickType_t ) 0);
 				ESP_LOGI(LOGTAG, "after send to cmd handler");

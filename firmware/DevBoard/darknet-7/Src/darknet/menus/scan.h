@@ -18,6 +18,15 @@ namespace darknet7 {
 	class ESPSystemInfo;
 }
 
+struct WiFiInfo {
+	uint8_t Bssid[6];
+	char Sid[33];
+	WiFiInfo() : Bssid(), Sid() {
+		memset(&Bssid[0],0,sizeof(Bssid));
+		memset(&Sid[0],0,sizeof(Sid));
+	}
+
+};
 
 class Scan: public Darknet7BaseState {
 public:
@@ -34,10 +43,11 @@ protected:
 private:
 	bool NPCOnly;
 	cmdc0de::GUIListData DisplayList;
-	cmdc0de::GUIListItemData Items[7];
-	char ListBuffer[7][48]; //height then width
+	cmdc0de::GUIListItemData Items[5];
+	char ListBuffer[5][48]; //height then width
 	uint32_t ESPRequestID;
 	INTERNAL_STATE InternalState;
+	WiFiInfo Wifis[5];
 };
 
 

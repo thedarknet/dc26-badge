@@ -10,10 +10,14 @@
 class NPCInteractionTask : public Task {
 public:
 	struct NPCMsg {
-		enum REQUEST_TYPE { NONE, HELO, GET_ACTION_LIST, INTERACT };
-		char PlayerToNPCAction[64];
+		enum REQUEST_TYPE { NONE, HELO, INTERACT };
 		REQUEST_TYPE RType;
-		NPCMsg(REQUEST_TYPE &r) : PlayerToNPCAction(), RType(r) {}
+		uint32_t MsgID;
+		std::string NpcName;
+		std::string Action;
+		NPCMsg(const REQUEST_TYPE &r, uint32_t msgID) : RType(r), MsgID(msgID), NpcName(), Action() {}
+		NPCMsg(const REQUEST_TYPE &r, uint32_t msgID, const char *name, const char *action) 
+				  : RType(r), MsgID(msgID), NpcName(name), Action(action) {}
 	};
 	static const int NPCMSG_QUEUE_SIZE = 10;
 	static const int NPCMSG_ITEM_SIZE = sizeof(NPCInteractionTask::NPCMsg*);

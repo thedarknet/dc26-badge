@@ -23,7 +23,7 @@ public:
 	virtual void onStop();
 protected:
 	QueueHandle_t InCommingQueueHandle = nullptr;
-	WIFI wifi;
+	WiFi wifi;
 private:
 };
 

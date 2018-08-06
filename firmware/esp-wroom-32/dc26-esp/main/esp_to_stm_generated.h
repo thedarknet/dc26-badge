@@ -10,6 +10,8 @@
 
 namespace darknet7 {
 
+struct NPCList;
+
 struct NPCInteractionResponse;
 
 struct GenericResponse;
@@ -80,11 +82,12 @@ enum ESPToSTMAny {
   ESPToSTMAny_BLEConnected = 9,
   ESPToSTMAny_BLEMessageFromDevice = 10,
   ESPToSTMAny_BLEPairingComplete = 11,
+  ESPToSTMAny_NPCList = 12,
   ESPToSTMAny_MIN = ESPToSTMAny_NONE,
-  ESPToSTMAny_MAX = ESPToSTMAny_BLEPairingComplete
+  ESPToSTMAny_MAX = ESPToSTMAny_NPCList
 };
 
-inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[12] {
+inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[13] {
   static const ESPToSTMAny values[] = {
     ESPToSTMAny_NONE,
     ESPToSTMAny_GenericResponse,
@@ -97,7 +100,8 @@ inline const ESPToSTMAny (&EnumValuesESPToSTMAny())[12] {
     ESPToSTMAny_BLESecurityConfirm,
     ESPToSTMAny_BLEConnected,
     ESPToSTMAny_BLEMessageFromDevice,
-    ESPToSTMAny_BLEPairingComplete
+    ESPToSTMAny_BLEPairingComplete,
+    ESPToSTMAny_NPCList
   };
   return values;
 }
@@ -116,6 +120,7 @@ inline const char * const *EnumNamesESPToSTMAny() {
     "BLEConnected",
     "BLEMessageFromDevice",
     "BLEPairingComplete",
+    "NPCList",
     nullptr
   };
   return names;
@@ -174,6 +179,10 @@ template<> struct ESPToSTMAnyTraits<BLEPairingComplete> {
   static const ESPToSTMAny enum_value = ESPToSTMAny_BLEPairingComplete;
 };
 
+template<> struct ESPToSTMAnyTraits<NPCList> {
+  static const ESPToSTMAny enum_value = ESPToSTMAny_NPCList;
+};
+
 bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, ESPToSTMAny type);
 bool VerifyESPToSTMAnyVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types);
 
@@ -209,24 +218,97 @@ inline const char *EnumNameWiFiStatus(WiFiStatus e) {
   return EnumNamesWiFiStatus()[index];
 }
 
+struct NPCList FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_NAMES = 4,
+    VT_WASERROR = 6
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *names() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_NAMES);
+  }
+  int8_t wasError() const {
+    return GetField<int8_t>(VT_WASERROR, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_NAMES) &&
+           verifier.Verify(names()) &&
+           verifier.VerifyVectorOfStrings(names()) &&
+           VerifyField<int8_t>(verifier, VT_WASERROR) &&
+           verifier.EndTable();
+  }
+};
+
+struct NPCListBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_names(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> names) {
+    fbb_.AddOffset(NPCList::VT_NAMES, names);
+  }
+  void add_wasError(int8_t wasError) {
+    fbb_.AddElement<int8_t>(NPCList::VT_WASERROR, wasError, 0);
+  }
+  explicit NPCListBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  NPCListBuilder &operator=(const NPCListBuilder &);
+  flatbuffers::Offset<NPCList> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<NPCList>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<NPCList> CreateNPCList(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> names = 0,
+    int8_t wasError = 0) {
+  NPCListBuilder builder_(_fbb);
+  builder_.add_names(names);
+  builder_.add_wasError(wasError);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<NPCList> CreateNPCListDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *names = nullptr,
+    int8_t wasError = 0) {
+  return darknet7::CreateNPCList(
+      _fbb,
+      names ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*names) : 0,
+      wasError);
+}
+
 struct NPCInteractionResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_MESSAGE = 4,
-    VT_ACTIONS = 6
+    VT_NAME = 4,
+    VT_DESCRIPTION = 6,
+    VT_ACTIONS = 8,
+    VT_WASERROR = 10
   };
-  const flatbuffers::String *message() const {
-    return GetPointer<const flatbuffers::String *>(VT_MESSAGE);
+  const flatbuffers::String *name() const {
+    return GetPointer<const flatbuffers::String *>(VT_NAME);
+  }
+  const flatbuffers::String *description() const {
+    return GetPointer<const flatbuffers::String *>(VT_DESCRIPTION);
   }
   const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *actions() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_ACTIONS);
   }
+  int8_t wasError() const {
+    return GetField<int8_t>(VT_WASERROR, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_MESSAGE) &&
-           verifier.Verify(message()) &&
+           VerifyOffset(verifier, VT_NAME) &&
+           verifier.Verify(name()) &&
+           VerifyOffset(verifier, VT_DESCRIPTION) &&
+           verifier.Verify(description()) &&
            VerifyOffset(verifier, VT_ACTIONS) &&
            verifier.Verify(actions()) &&
            verifier.VerifyVectorOfStrings(actions()) &&
+           VerifyField<int8_t>(verifier, VT_WASERROR) &&
            verifier.EndTable();
   }
 };
@@ -234,11 +316,17 @@ struct NPCInteractionResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Tab
 struct NPCInteractionResponseBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_message(flatbuffers::Offset<flatbuffers::String> message) {
-    fbb_.AddOffset(NPCInteractionResponse::VT_MESSAGE, message);
+  void add_name(flatbuffers::Offset<flatbuffers::String> name) {
+    fbb_.AddOffset(NPCInteractionResponse::VT_NAME, name);
+  }
+  void add_description(flatbuffers::Offset<flatbuffers::String> description) {
+    fbb_.AddOffset(NPCInteractionResponse::VT_DESCRIPTION, description);
   }
   void add_actions(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> actions) {
     fbb_.AddOffset(NPCInteractionResponse::VT_ACTIONS, actions);
+  }
+  void add_wasError(int8_t wasError) {
+    fbb_.AddElement<int8_t>(NPCInteractionResponse::VT_WASERROR, wasError, 0);
   }
   explicit NPCInteractionResponseBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -254,22 +342,30 @@ struct NPCInteractionResponseBuilder {
 
 inline flatbuffers::Offset<NPCInteractionResponse> CreateNPCInteractionResponse(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::String> message = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> actions = 0) {
+    flatbuffers::Offset<flatbuffers::String> name = 0,
+    flatbuffers::Offset<flatbuffers::String> description = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> actions = 0,
+    int8_t wasError = 0) {
   NPCInteractionResponseBuilder builder_(_fbb);
   builder_.add_actions(actions);
-  builder_.add_message(message);
+  builder_.add_description(description);
+  builder_.add_name(name);
+  builder_.add_wasError(wasError);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<NPCInteractionResponse> CreateNPCInteractionResponseDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const char *message = nullptr,
-    const std::vector<flatbuffers::Offset<flatbuffers::String>> *actions = nullptr) {
+    const char *name = nullptr,
+    const char *description = nullptr,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *actions = nullptr,
+    int8_t wasError = 0) {
   return darknet7::CreateNPCInteractionResponse(
       _fbb,
-      message ? _fbb.CreateString(message) : 0,
-      actions ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*actions) : 0);
+      name ? _fbb.CreateString(name) : 0,
+      description ? _fbb.CreateString(description) : 0,
+      actions ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*actions) : 0,
+      wasError);
 }
 
 struct GenericResponse FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -335,9 +431,13 @@ inline flatbuffers::Offset<GenericResponse> CreateGenericResponseDirect(
 
 struct WiFiScanResult FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
-    VT_SSID = 4,
-    VT_AUTHMODE = 6
+    VT_BSSID = 4,
+    VT_SSID = 6,
+    VT_AUTHMODE = 8
   };
+  const flatbuffers::Vector<uint8_t> *bssid() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_BSSID);
+  }
   const flatbuffers::String *ssid() const {
     return GetPointer<const flatbuffers::String *>(VT_SSID);
   }
@@ -346,6 +446,8 @@ struct WiFiScanResult FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_BSSID) &&
+           verifier.Verify(bssid()) &&
            VerifyOffset(verifier, VT_SSID) &&
            verifier.Verify(ssid()) &&
            VerifyField<int8_t>(verifier, VT_AUTHMODE) &&
@@ -356,6 +458,9 @@ struct WiFiScanResult FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
 struct WiFiScanResultBuilder {
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_bssid(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> bssid) {
+    fbb_.AddOffset(WiFiScanResult::VT_BSSID, bssid);
+  }
   void add_ssid(flatbuffers::Offset<flatbuffers::String> ssid) {
     fbb_.AddOffset(WiFiScanResult::VT_SSID, ssid);
   }
@@ -376,20 +481,24 @@ struct WiFiScanResultBuilder {
 
 inline flatbuffers::Offset<WiFiScanResult> CreateWiFiScanResult(
     flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> bssid = 0,
     flatbuffers::Offset<flatbuffers::String> ssid = 0,
     WifiMode authMode = WifiMode_UNKNOWN) {
   WiFiScanResultBuilder builder_(_fbb);
   builder_.add_ssid(ssid);
+  builder_.add_bssid(bssid);
   builder_.add_authMode(authMode);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<WiFiScanResult> CreateWiFiScanResultDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<uint8_t> *bssid = nullptr,
     const char *ssid = nullptr,
     WifiMode authMode = WifiMode_UNKNOWN) {
   return darknet7::CreateWiFiScanResult(
       _fbb,
+      bssid ? _fbb.CreateVector<uint8_t>(*bssid) : 0,
       ssid ? _fbb.CreateString(ssid) : 0,
       authMode);
 }
@@ -1004,6 +1113,9 @@ struct ESPToSTM FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const BLEPairingComplete *Msg_as_BLEPairingComplete() const {
     return Msg_type() == ESPToSTMAny_BLEPairingComplete ? static_cast<const BLEPairingComplete *>(Msg()) : nullptr;
   }
+  const NPCList *Msg_as_NPCList() const {
+    return Msg_type() == ESPToSTMAny_NPCList ? static_cast<const NPCList *>(Msg()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint32_t>(verifier, VT_MSGINSTANCEID) &&
@@ -1056,6 +1168,10 @@ template<> inline const BLEMessageFromDevice *ESPToSTM::Msg_as<BLEMessageFromDev
 
 template<> inline const BLEPairingComplete *ESPToSTM::Msg_as<BLEPairingComplete>() const {
   return Msg_as_BLEPairingComplete();
+}
+
+template<> inline const NPCList *ESPToSTM::Msg_as<NPCList>() const {
+  return Msg_as_NPCList();
 }
 
 struct ESPToSTMBuilder {
@@ -1141,6 +1257,10 @@ inline bool VerifyESPToSTMAny(flatbuffers::Verifier &verifier, const void *obj, 
     }
     case ESPToSTMAny_BLEPairingComplete: {
       auto ptr = reinterpret_cast<const BLEPairingComplete *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case ESPToSTMAny_NPCList: {
+      auto ptr = reinterpret_cast<const NPCList *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return false;

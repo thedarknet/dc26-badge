@@ -32,13 +32,9 @@ void NPCInteractionTask::run(void *data) {
 			bool connected = true; //check if connected
 			if(connected) {
 				if(m->RType==NPCMsg::HELO) {
+					ESP_LOGI(LOGTAG,"got HELO");
 					//http post 192.168.4.1/helo
 					//wait for list of NPCs
-					//If list > 1 send back NPCs list
-					//else http post 192.168.4.1/npc/<npc>
-					//get list of 
-				} else if (m->RType==NPCMsg::GET_ACTION_LIST) {
-
 				} else if (m->RType==NPCMsg::INTERACT) {
 	
 				}

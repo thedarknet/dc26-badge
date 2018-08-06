@@ -3,6 +3,7 @@
 #include "esp_to_stm_generated.h"
 #include "lib/System.h"
 #include "lib/net/HttpServer.h"
+#include <esp_wifi.h>
 #include "mcu_to_mcu.h"
 #include "dc26.h"
 #include "dc26_ble/ble.h"
@@ -18,7 +19,7 @@ public:
 public:
 	virtual esp_err_t staGotIp(system_event_sta_got_ip_t event_sta_got_ip) {
 		ESP_LOGD(logTag, "MyWiFiEventHandler(Class): staGotIp");
-		IP2STR(&event_sta_got_ip.ip_info.ip);
+		//IP2STR(&event_sta_got_ip.ip_info.ip);
 		return ESP_OK;
 	}
 	virtual esp_err_t apStart() {
@@ -69,14 +70,21 @@ public:
 		wifi_ap_record_t *recs = new wifi_ap_record_t[numAPs];
 		std::vector<flatbuffers::Offset<darknet7::WiFiScanResult>> APs;
 		flatbuffers::FlatBufferBuilder fbb;
+		int numberToReturn = 0;
 		if(ESP_OK==esp_wifi_scan_get_ap_records(&numAPs,recs)) {
 			for(auto i=0;i<numAPs;++i) {
-				if(i<5) {
+				if(numberToReturn<5) {
 					ESP_LOGI(logTag, "ssid: %s \t auth: %d", (const char *)recs[i].ssid,recs[i].authmode);
-					flatbuffers::Offset<darknet7::WiFiScanResult> sro = 
-						  	darknet7::CreateWiFiScanResultDirect(fbb,(const char *)recs[i].ssid,
+					if(strstr("dark",(const char *)recs[i].ssid)) {
+						std::vector<uint8_t> bssid;
+						for(int kk=0;kk<6;kk++) bssid.push_back(recs[i].bssid[kk]);
+						flatbuffers::Offset<darknet7::WiFiScanResult> sro = 
+						  	darknet7::CreateWiFiScanResultDirect(fbb,
+									&bssid, (const char *)recs[i].ssid,
 									convertToWiFiAuthMode(recs[i].authmode));
-					APs.push_back(sro);
+						APs.push_back(sro);
+						++numberToReturn;
+					}
 				}
 			}
 			auto ssro = darknet7::CreateWiFiScanResultsDirect(fbb,&APs);
@@ -140,7 +148,8 @@ bool CmdHandlerTask::init() {
 	}
 	WiFiEventHandler *handler = new MyWiFiEventHandler();
 	wifi.setWifiEventHandler(handler);
-	return wifi.init();
+	//return wifi.init();
+	return true;
 }
 
 CmdHandlerTask::~CmdHandlerTask() {
@@ -177,20 +186,9 @@ void CmdHandlerTask::run(void *data) {
 			ESP_LOGI(LOGTAG, "message type is: %d", msg->Msg_type());
 			switch (msg->Msg_type()) {
 			case darknet7::STMToESPAny_SetupAP: {
-				wifi_config_t wifi_config;
-				bool isHidden = false;
-				uint8_t max_con = 4;
-				uint16_t beacon_interval = 1000;
 				const darknet7::SetupAP *sap = msg->Msg_as_SetupAP();
 				wifi_auth_mode_t auth_mode = convertAuthMode(sap->mode());
-				wifi.initWiFiConfig(wifi_config, sap->ssid()->c_str(), 
-									 sap->passwd()->c_str(), 
-									 auth_mode, isHidden, max_con, beacon_interval);
-				tcpip_adapter_ip_info_t ipInfo;
-				wifi.initAdapterIp(ipInfo);
-				dhcps_lease_t l;
-				wifi.initDHCPSLeaseInfo(l);
-				wifi.wifi_start_access_point(wifi_config,ipInfo,l);
+    			wifi.startAP(sap->ssid()->c_str(), sap->passwd()->c_str(), auth_mode);
 				}
 				break;
 			case darknet7::STMToESPAny_StopAP: {
@@ -257,7 +255,26 @@ void CmdHandlerTask::run(void *data) {
 					ESP_LOGI(LOGTAG, "processing wifi npc interaction");
 					//MyWiFiEventHandler *eh = (MyWiFiEventHandler*)wifi.getWifiEventHandler();
 					const darknet7::WiFiNPCInteract * ws = msg->Msg_as_WiFiNPCInteract();
-					//wifi.connect(ws->bssid()->data());
+					wifi.stopWiFi();
+					if(ESP_OK==wifi.connectAP(std::string(ws->ssid()->c_str()), 
+							std::string((const char *)"DCDN-7-DC26"), ws->bssid()->data())) {
+						NPCInteractionTask::NPCMsg *nmsg = 0;
+						if(ws->type()==0) { //LIST
+							nmsg = new NPCInteractionTask::NPCMsg(NPCInteractionTask::NPCMsg::HELO, msg->msgInstanceID());
+						} else { //action
+							nmsg = new NPCInteractionTask::NPCMsg(NPCInteractionTask::NPCMsg::INTERACT, msg->msgInstanceID(), ws->npcname()->c_str(), ws->action()->c_str());
+						}
+						xQueueSend(NPCITask.getQueueHandle(), (void* )&nmsg,(TickType_t ) 100);
+					} else {
+						//let stm know we failed
+						flatbuffers::FlatBufferBuilder fbb;
+						auto s = darknet7::CreateNPCListDirect(fbb,nullptr,(int8_t)1);
+						flatbuffers::Offset<darknet7::ESPToSTM> of =
+								darknet7::CreateESPToSTM(fbb, msg->msgInstanceID(),
+										darknet7::ESPToSTMAny_NPCList, s.Union());
+						darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
+						getMCUToMCU().send(fbb);
+					}
 				}
 				break;
 			default:

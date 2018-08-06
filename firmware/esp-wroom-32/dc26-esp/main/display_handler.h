@@ -28,7 +28,6 @@ public:
 	virtual ~DisplayTask();
 protected:
 	QueueHandle_t InCommingQueueHandle = nullptr;
-	WIFI wifi;
 private:
 };
 

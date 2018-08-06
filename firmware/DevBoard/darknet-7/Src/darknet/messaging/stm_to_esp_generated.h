@@ -250,19 +250,37 @@ inline const char *EnumNameESPRequestType(ESPRequestType e) {
 struct WiFiNPCInteract FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_BSSID = 4,
-    VT_ACTION = 6
+    VT_SSID = 6,
+    VT_TYPE = 8,
+    VT_NPCNAME = 10,
+    VT_ACTION = 12
   };
   const flatbuffers::Vector<uint8_t> *bssid() const {
     return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_BSSID);
   }
-  int8_t action() const {
-    return GetField<int8_t>(VT_ACTION, 0);
+  const flatbuffers::String *ssid() const {
+    return GetPointer<const flatbuffers::String *>(VT_SSID);
+  }
+  int8_t type() const {
+    return GetField<int8_t>(VT_TYPE, 0);
+  }
+  const flatbuffers::String *npcname() const {
+    return GetPointer<const flatbuffers::String *>(VT_NPCNAME);
+  }
+  const flatbuffers::String *action() const {
+    return GetPointer<const flatbuffers::String *>(VT_ACTION);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_BSSID) &&
            verifier.Verify(bssid()) &&
-           VerifyField<int8_t>(verifier, VT_ACTION) &&
+           VerifyOffset(verifier, VT_SSID) &&
+           verifier.Verify(ssid()) &&
+           VerifyField<int8_t>(verifier, VT_TYPE) &&
+           VerifyOffset(verifier, VT_NPCNAME) &&
+           verifier.Verify(npcname()) &&
+           VerifyOffset(verifier, VT_ACTION) &&
+           verifier.Verify(action()) &&
            verifier.EndTable();
   }
 };
@@ -273,8 +291,17 @@ struct WiFiNPCInteractBuilder {
   void add_bssid(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> bssid) {
     fbb_.AddOffset(WiFiNPCInteract::VT_BSSID, bssid);
   }
-  void add_action(int8_t action) {
-    fbb_.AddElement<int8_t>(WiFiNPCInteract::VT_ACTION, action, 0);
+  void add_ssid(flatbuffers::Offset<flatbuffers::String> ssid) {
+    fbb_.AddOffset(WiFiNPCInteract::VT_SSID, ssid);
+  }
+  void add_type(int8_t type) {
+    fbb_.AddElement<int8_t>(WiFiNPCInteract::VT_TYPE, type, 0);
+  }
+  void add_npcname(flatbuffers::Offset<flatbuffers::String> npcname) {
+    fbb_.AddOffset(WiFiNPCInteract::VT_NPCNAME, npcname);
+  }
+  void add_action(flatbuffers::Offset<flatbuffers::String> action) {
+    fbb_.AddOffset(WiFiNPCInteract::VT_ACTION, action);
   }
   explicit WiFiNPCInteractBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -291,21 +318,33 @@ struct WiFiNPCInteractBuilder {
 inline flatbuffers::Offset<WiFiNPCInteract> CreateWiFiNPCInteract(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::Vector<uint8_t>> bssid = 0,
-    int8_t action = 0) {
+    flatbuffers::Offset<flatbuffers::String> ssid = 0,
+    int8_t type = 0,
+    flatbuffers::Offset<flatbuffers::String> npcname = 0,
+    flatbuffers::Offset<flatbuffers::String> action = 0) {
   WiFiNPCInteractBuilder builder_(_fbb);
-  builder_.add_bssid(bssid);
   builder_.add_action(action);
+  builder_.add_npcname(npcname);
+  builder_.add_ssid(ssid);
+  builder_.add_bssid(bssid);
+  builder_.add_type(type);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<WiFiNPCInteract> CreateWiFiNPCInteractDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<uint8_t> *bssid = nullptr,
-    int8_t action = 0) {
+    const char *ssid = nullptr,
+    int8_t type = 0,
+    const char *npcname = nullptr,
+    const char *action = nullptr) {
   return darknet7::CreateWiFiNPCInteract(
       _fbb,
       bssid ? _fbb.CreateVector<uint8_t>(*bssid) : 0,
-      action);
+      ssid ? _fbb.CreateString(ssid) : 0,
+      type,
+      npcname ? _fbb.CreateString(npcname) : 0,
+      action ? _fbb.CreateString(action) : 0);
 }
 
 struct WiFiScan FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {

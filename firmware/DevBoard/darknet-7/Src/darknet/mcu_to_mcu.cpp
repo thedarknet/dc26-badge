@@ -195,6 +195,16 @@ void MCUToMCU::process() {
 			this->getBus().emitSignal(this,mevt);
 			}
 			break;
+		case darknet7::ESPToSTMAny_NPCList: {
+			MSGEvent<darknet7::NPCList> mevt(msg->Msg_as_NPCList(),msg->msgInstanceID());
+			this->getBus().emitSignal(this,mevt);
+			}
+			break;
+		case darknet7::ESPToSTMAny_NPCInteractionResponse: {
+			MSGEvent<darknet7::NPCInteractionResponse> mevt(msg->Msg_as_NPCInteractionResponse(),msg->msgInstanceID());
+			this->getBus().emitSignal(this,mevt);
+			}
+			break;
 		case darknet7::ESPToSTMAny_BadgesInArea: {
 			MSGEvent<darknet7::BadgesInArea> mevt(msg->Msg_as_BadgesInArea(), msg->msgInstanceID());
 			this->getBus().emitSignal(this, mevt);

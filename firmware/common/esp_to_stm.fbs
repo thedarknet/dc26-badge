@@ -4,11 +4,20 @@ namespace darknet7;
 
 enum RESPONSE_SUCCESS : byte { False = 0, True = 1 }
 
-union ESPToSTMAny { GenericResponse, ESPSystemInfo, BLEInfectionData, CommunicationStatusResponse, WiFiScanResults, NPCInteractionResponse, BadgesInArea, BLESecurityConfirm, BLEConnected, BLEMessageFromDevice, BLEPairingComplete}
+union ESPToSTMAny { GenericResponse, ESPSystemInfo, BLEInfectionData, CommunicationStatusResponse, WiFiScanResults, NPCInteractionResponse, BadgesInArea, BLESecurityConfirm, BLEConnected, BLEMessageFromDevice, BLEPairingComplete, NPCList}
+
+table NPCList {
+	names:[string];
+	wasError:byte;
+}
 
 table NPCInteractionResponse {
-	message:string;
+	name:string;
+	description:string;
 	actions:[string];
+	infections:uint16;
+	response:string;
+	wasError:byte;
 }
 
 table GenericResponse {
@@ -17,6 +26,7 @@ table GenericResponse {
 }
 
 table WiFiScanResult {
+	bssid:[ubyte];
 	ssid:string;
 	authMode:WifiMode;
 }

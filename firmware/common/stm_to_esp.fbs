@@ -28,7 +28,10 @@ union STMToESPAny
 
 table WiFiNPCInteract {
 	bssid:[ubyte]; //bssid ap to interact with
-	action:byte; //option choosen
+	ssid:string;
+	type:byte;  // 0 = LIST 1 = INTERACT
+	npcname:string; //npc name
+	action:string; //IF LIST unused, if INTERACT its action(verb) choosen 
 }
 
 table WiFiScan {

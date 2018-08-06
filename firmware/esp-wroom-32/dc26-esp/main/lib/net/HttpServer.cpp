@@ -71,7 +71,7 @@ private:
 	 * @param [in] request The HTTP request to process.
 	 */
 	void processRequest(HttpRequest &request) {
-		ESP_LOGD("HttpServerTask", ">> processRequest: Method: %s, Path: %s",
+		ESP_LOGI("HttpServerTask", ">> processRequest: Method: %s, Path: %s",
 			request.getMethod().c_str(), request.getPath().c_str());
 
 		// Loop over all the path handlers we have looking for the first one that matches.  Note that none of them
@@ -132,7 +132,7 @@ private:
 		m_pHttpServer = (HttpServer*)data;             // The passed in data is an instance of an HttpServer.
 		m_pHttpServer->m_socket.setSSL(m_pHttpServer->m_useSSL);
 		m_pHttpServer->m_socket.listen(m_pHttpServer->m_portNumber, false /* is datagram */, true /* Allow address reuse */);
-		ESP_LOGD("HttpServerTask", "Listening on port %d", m_pHttpServer->getPort());
+		ESP_LOGI("HttpServerTask", "Listening on port %d", m_pHttpServer->getPort());
 		Socket clientSocket;
 		while(1) {   // Loop forever.
 
@@ -148,7 +148,7 @@ private:
 				return;
 			}
 
-			ESP_LOGD("HttpServerTask", "HttpServer that was listening on port %d has received a new client connection; sockFd=%d", m_pHttpServer->getPort(), clientSocket.getFD());
+			ESP_LOGI("HttpServerTask", "HttpServer that was listening on port %d has received a new client connection; sockFd=%d", m_pHttpServer->getPort(), clientSocket.getFD());
 
 			HttpRequest request(clientSocket);   // Build the HTTP Request from the socket.
 			if (request.isWebsocket()) {        // If this is a WebSocket
@@ -389,7 +389,7 @@ void HttpServer::setRootPath(std::string path) {
 void HttpServer::start(uint16_t portNumber, bool useSSL) {
 	// Design:
 	// The start of the HTTP server should be as fast as possible.
-	ESP_LOGD(LOG_TAG, ">> start: port: %d, useSSL: %d", portNumber, useSSL);
+	ESP_LOGI(LOG_TAG, ">> start: port: %d, useSSL: %d", portNumber, useSSL);
 
 	// Take the semaphore that says that we are now running.  If we are already running, then end here as
 	// there is nothing further to do.
@@ -403,7 +403,7 @@ void HttpServer::start(uint16_t portNumber, bool useSSL) {
 
 	HttpServerTask* pHttpServerTask = new HttpServerTask("HttpServerTask");
 	pHttpServerTask->start(this);
-	ESP_LOGD(LOG_TAG, "<< start");
+	ESP_LOGI(LOG_TAG, "<< start");
 } // start
 
 
@@ -414,10 +414,10 @@ void HttpServer::stop() {
 	// Shutdown the HTTP Server.  The high level is that we will stop the server socket
 	// that is listening for incoming connections.  That will then shutdown all the other
 	// activities.
-	ESP_LOGD(LOG_TAG, ">> stop");
+	ESP_LOGI(LOG_TAG, ">> stop");
 	m_socket.close();                      // Close the socket that is being used to watch for incoming requests.
 	m_semaphoreServerStarted.wait("stop"); // Wait for the server to stop.
-	ESP_LOGD(LOG_TAG, "<< stop");
+	ESP_LOGI(LOG_TAG, "<< stop");
 } // stop
 
 

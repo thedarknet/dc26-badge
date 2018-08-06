@@ -23,7 +23,7 @@ class MCUToMCUTask : public Task {
 public:
 	static const int ENVELOP_HEADER = 4;
 	static const int ENVELOP_HEADER_SIZE_MASK = 0x7FF;
-	static const int MAX_MESSAGE_SIZE = 252;
+	static const int MAX_MESSAGE_SIZE = 300;
 	static const int TOTAL_MESSAGE_SIZE = MAX_MESSAGE_SIZE+ENVELOP_HEADER;
 public:
 	class Message {

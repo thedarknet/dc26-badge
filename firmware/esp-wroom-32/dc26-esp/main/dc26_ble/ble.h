@@ -39,7 +39,7 @@ public:
 	bool isActingServer = false;
 
 	// STM to ESP Queue
-	static const int STM_MSG_QUEUE_SIZE = 5;
+	static const int STM_MSG_QUEUE_SIZE = 3;
 	static const int STM_MSG_ITEM_SIZE = sizeof(MCUToMCUTask::Message *);
 	StaticQueue_t STMQueue;
 	QueueHandle_t STMQueueHandle = nullptr;

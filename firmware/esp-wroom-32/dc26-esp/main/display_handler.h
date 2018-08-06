@@ -20,7 +20,7 @@ public:
 	static const int DISPLAY_MSG_ITEM_SIZE = sizeof(DisplayTask::DisplayMsg*);
 	static const char *LOGTAG;
 public:
-	DisplayTask(const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);
+	DisplayTask(const std::string &tName, uint16_t stackSize=4000, uint8_t p=5);
 	bool init();
 	QueueHandle_t getQueueHandle() {return InCommingQueueHandle;}
 public:

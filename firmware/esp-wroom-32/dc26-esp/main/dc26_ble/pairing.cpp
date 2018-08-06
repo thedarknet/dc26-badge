@@ -73,7 +73,7 @@ void UartCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 	{
 		// clear mesgbuf2 and start from beginning
 		midx2 = 0;
-		memset(mesgbuf2, 0, 200);
+		memset(mesgbuf2, 0, 90);
 		memcpy(&mesgbuf2[midx2], &pData[1], length-1);
 		midx2 += (length-1);
 	}

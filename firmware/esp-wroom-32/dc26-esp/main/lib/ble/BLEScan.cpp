@@ -119,7 +119,10 @@ void BLEScan::handleGAPEvent(
 						m_pAdvertisedDeviceCallbacks->onResult(advertisedDevice);
 					}
 
-					if (!found) {   // If we have previously seen this device, don't record it again.
+					if (!found && advertisedDevice.haveAppearance() && 
+						(advertisedDevice.getAppearance() == 0x26DC)) {
+						// If we have previously seen this device, don't record it again.
+						// FIXME: don't do this for now, too much wasted memory
 						m_scanResults.m_vectorAdvertisedDevices.push_back(advertisedDevice);
 					}
 

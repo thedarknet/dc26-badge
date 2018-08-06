@@ -98,7 +98,7 @@ void MyScanCallbacks::onResult(BLEAdvertisedDevice advertisedDevice)
 			{
 				std::string name = advertisedDevice.getName();
 				std::string address = advertisedDevice.getAddress().toString();
-				this->results[name] = address;
+				this->results[address] = name;
 			}
 		}
 	}

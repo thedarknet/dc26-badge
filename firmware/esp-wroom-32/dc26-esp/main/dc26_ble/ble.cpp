@@ -395,7 +395,7 @@ void BluetoothTask::run(void * data)
 		}
 		else
 		{
-			if (loopsSinceScan >= 30)
+			if (loopsSinceScan >= 180)
 			{
 				// this is so we periodically attempt to get infected
 				// scan without filtering anything

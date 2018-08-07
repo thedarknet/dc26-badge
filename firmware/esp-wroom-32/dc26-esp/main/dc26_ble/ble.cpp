@@ -154,7 +154,7 @@ void BluetoothTask::setDeviceName(const darknet7::STMToESPRequest* m)
 	if (this->nvs_file_opened)
 	{
 		nvs_set_str(nvs_fp, "devname", this->adv_name.c_str());
-		nvs_commit();
+		nvs_commit(nvs_fp);
 	}
 	// TODO: Set badge name from flash
 	this->refreshAdvertisementData();

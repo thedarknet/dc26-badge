@@ -49,25 +49,25 @@ void ContactStore::SettingsInfo::receiveSignal(MCUToMCU*, const MSGEvent<darknet
 	uint16_t exposures = mevt->InnerMsg->exposures();
 	uint16_t infections = 0x0;
 	uint32_t unlucky = rand() % 100;
-	infections |= (unlucky < 12)                  ? (exposures & 0x2) : 0;
-	infections |= (unlucky >= 5 && unlucky < 95)  ? (exposures & 0x4) : 0;
+	//infections |= (unlucky < 12)                  ? (exposures & 0x2) : 0;
+	infections |= (unlucky < 5)  ? (exposures & 0x4) : 0;
 	infections |= (unlucky < 50)                  ? (exposures & 0x8) : 0;
-	infections |= (unlucky > 11 && unlucky < 25)  ? (exposures & 0x10) : 0;
-	infections |= (unlucky > 24 && unlucky < 75)  ? (exposures & 0x20) : 0;
-	infections |= (unlucky > 25 && unlucky < 45)  ? (exposures & 0x40) : 0;
-	infections |= (unlucky > 50)                  ? (exposures & 0x80) : 0;
-	infections |= (unlucky > 45 && unlucky < 75)  ? (exposures & 0x100) : 0;
+	//infections |= (unlucky > 11 && unlucky < 25)  ? (exposures & 0x10) : 0;
+	//infections |= (unlucky > 24 && unlucky < 75)  ? (exposures & 0x20) : 0;
+	//infections |= (unlucky > 25 && unlucky < 45)  ? (exposures & 0x40) : 0;
+	//infections |= (unlucky > 50)                  ? (exposures & 0x80) : 0;
+	//infections |= (unlucky > 45 && unlucky < 75)  ? (exposures & 0x100) : 0;
 
 	this->setHealth(infections);
 
 	//Uncomment this to infect other people
-	//infections = DarkNet7::get().getContacts().getSettings().getHealth();
-	//infections &= 0x0; // TODO: Mask off everything except measels and...?
-	//flatbuffers::FlatBufferBuilder fbb;
-	//auto r = darknet7::CreateBLESetInfectionData(fbb, infections);
-	//auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESetInfectionData, r.Union());
-	//darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
-	//MCUToMCU::get().send(fbb);
+	infections = DarkNet7::get().getContacts().getSettings().getHealth();
+	infections &= 0x4; // Only expose others to measels
+	flatbuffers::FlatBufferBuilder fbb;
+	auto r = darknet7::CreateBLESetInfectionData(fbb, infections);
+	auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESetInfectionData, r.Union());
+	darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+	MCUToMCU::get().send(fbb);
 
 	return;
 }

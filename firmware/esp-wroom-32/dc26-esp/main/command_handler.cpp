@@ -75,7 +75,9 @@ public:
 			for(auto i=0;i<numAPs;++i) {
 				if(numberToReturn<5) {
 					ESP_LOGI(logTag, "ssid: %s \t auth: %d", (const char *)recs[i].ssid,recs[i].authmode);
-					if(strstr("dark",(const char *)recs[i].ssid)) {
+					ESP_LOGI(logTag, "%x%x%x",recs[i].bssid[0],recs[i].bssid[1],recs[i].bssid[2]);
+					if(strstr("dark",(const char *)recs[i].ssid) && recs[i].bssid[0]==0xdc 
+										 && recs[i].bssid[1]==0xd0) {
 						std::vector<uint8_t> bssid;
 						for(int kk=0;kk<6;kk++) bssid.push_back(recs[i].bssid[kk]);
 						flatbuffers::Offset<darknet7::WiFiScanResult> sro = 

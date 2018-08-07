@@ -203,7 +203,7 @@ StateBase::ReturnStateContext PairingState::onRun() {
 	{
 		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
 		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Connecting", cmdc0de::RGBColor::BLUE);
-		if (this->timesRunCalledSinceReset > 500)
+		if (this->timesRunCalledSinceReset > 2000)
 			this->InternalState = PAIRING_FAILED;
 	}
 	else if (InternalState == CONNECTING)
@@ -238,6 +238,8 @@ StateBase::ReturnStateContext PairingState::onRun() {
 	{
 		DarkNet7::get().getDisplay().fillScreen(cmdc0de::RGBColor::BLACK);
 		DarkNet7::get().getDisplay().drawString(5,10,(const char *)"Confirming", cmdc0de::RGBColor::BLUE);
+		if (this->timesRunCalledSinceReset > 1500)
+			this->InternalState = PAIRING_FAILED;
 	}
 	else if (InternalState == ALICE_SEND_ONE)
 	{

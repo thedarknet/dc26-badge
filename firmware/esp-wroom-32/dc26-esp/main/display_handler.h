@@ -14,8 +14,7 @@ public:
 		char Msg[64];
 		uint8_t x, y;
 		uint32_t TimeInMSToDisplay;
-		bool clearScreen;
-		DisplayMsg() : Msg(), x(0), y(8), TimeInMSToDisplay(2000), clearScreen(true) {}
+		DisplayMsg() : Msg(), x(0), y(16), TimeInMSToDisplay(2000) {}
 	};
 	static const int DISPLAY_QUEUE_SIZE = 10;
 	static const int DISPLAY_MSG_ITEM_SIZE = sizeof(DisplayTask::DisplayMsg*);

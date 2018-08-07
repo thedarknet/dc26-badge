@@ -49,14 +49,8 @@ void ContactStore::SettingsInfo::receiveSignal(MCUToMCU*, const MSGEvent<darknet
 	uint16_t exposures = mevt->InnerMsg->exposures();
 	uint16_t infections = 0x0;
 	uint32_t unlucky = rand() % 100;
-	//infections |= (unlucky < 12)                  ? (exposures & 0x2) : 0;
-	infections |= (unlucky < 50)  ? (exposures & 0x0004) : 0;
+	infections |= (unlucky < 5)  ? (exposures & 0x0004) : 0;
 	infections |= (unlucky < 50)  ? (exposures & 0x0020) : 0;
-	//infections |= (unlucky > 11 && unlucky < 25)  ? (exposures & 0x10) : 0;
-	//infections |= (unlucky > 24 && unlucky < 75)  ? (exposures & 0x20) : 0;
-	//infections |= (unlucky > 25 && unlucky s< 45)  ? (exposures & 0x40) : 0;
-	//infections |= (unlucky > 50)                  ? (exposures & 0x80) : 0;
-	//infections |= (unlucky > 45 && unlucky < 75)  ? (exposures & 0x100) : 0;
 
 	this->setHealth(infections);
 

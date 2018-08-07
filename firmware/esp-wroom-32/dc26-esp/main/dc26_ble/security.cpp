@@ -36,9 +36,7 @@ bool MySecurity::onConfirmPIN(uint32_t pass_key)
 	this->success = false;
 	DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
 	memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
-	dmsg->y = 40;
-	dmsg->clearScreen = false;
-	sprintf(dmsg->Msg, "PIN: %u", pass_key);
+	sprintf(dmsg->Msg, "%u", pass_key);
 	ESP_LOGI(SECTAG, "onConfirmPin: %s", dmsg->Msg);
 	xQueueSendFromISR(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
 
@@ -57,8 +55,8 @@ bool MySecurity::onConfirmPIN(uint32_t pass_key)
 	getMCUToMCU().send(fbb);
 
 	this->confirmed = false;
-	// Wait for the confirmation to come through for about 15 seconds
-	while ((this->confirmed == false) && (waited < 15))
+	// Wait for the confirmation to come through for about 30 seconds
+	while ((this->confirmed == false) && (waited < 30))
 	{
 		ESP_LOGI(SECTAG, "waiting: %d\n", this->confirmed);
 		vTaskDelay(1000 / portTICK_PERIOD_MS);

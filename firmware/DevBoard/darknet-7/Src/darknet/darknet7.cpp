@@ -189,7 +189,6 @@ DarkNet7::~DarkNet7() {
 }
 
 ErrorType DarkNet7::onInit() {
-	MCUToMCU::get().init(&huart1);
 
 	ErrorType et;
 
@@ -298,17 +297,35 @@ ErrorType DarkNet7::onInit() {
 #endif
 
 	//darknet7_led_init();
+	 MCUToMCU::get().init(&huart1);
 	return et;
 }
 
-static const char *RFAILED = "Receive Failed";
-static const char *TFAILED = "Transmit Failed";
-//static const uint16_t ESP_ADDRESS = 1;
+static uint16_t hackMsg = 0;
+static uint32_t hackTime = 0;
 
 ErrorType DarkNet7::onRun() {
 	MyButtons.processButtons();
 
 	//emit new messages
+	if(hackMsg<2) {
+		bool b = false;
+		if(hackMsg==0) {
+			b = true;
+			++hackMsg;
+			hackTime = HAL_GetTick();
+		} else if ((HAL_GetTick()-hackTime)>2000) {
+			++hackMsg;
+			b = true;
+		}
+		if(b) {
+			flatbuffers::FlatBufferBuilder fbb;
+			auto r = darknet7::CreateESPRequest(fbb,darknet7::ESPRequestType::ESPRequestType_SYSTEM_INFO);
+			auto e = darknet7::CreateSTMToESPRequest(fbb,DarkNet7::get().nextSeq(),darknet7::STMToESPAny_ESPRequest, r.Union());
+			darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
+			MCUToMCU::get().send(fbb);
+		}
+	}
 	MCUToMCU::get().process();
 
 	cmdc0de::StateBase::ReturnStateContext rsc = getCurrentState()->run();

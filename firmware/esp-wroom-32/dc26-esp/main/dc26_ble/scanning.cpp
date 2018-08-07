@@ -46,17 +46,8 @@ void MyScanCallbacks::setFilter(uint8_t val)
 	this->filter = val;
 }
 
-static int i = 0;
-static char scanMsg[] = "............";
 void MyScanCallbacks::onResult(BLEAdvertisedDevice advertisedDevice)
 {
-	DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
-	memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
-	dmsg->y = 40;
-	dmsg->clearScreen = false;
-	memcpy(dmsg->Msg, scanMsg, i);
-	xQueueSendFromISR(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
-	i %= sizeof(scanMsg);
 	// filter out DC26 devices only
 	if (advertisedDevice.haveAppearance() &&
 		advertisedDevice.getAppearance() == 0x26DC)
@@ -106,11 +97,6 @@ void MyScanCallbacks::onResult(BLEAdvertisedDevice advertisedDevice)
 			}
 			else
 			{
-				DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
-				memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
-				sprintf(dmsg->Msg, "Scanning");
-				xQueueSendFromISR(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
-
 				std::string name = advertisedDevice.getName();
 				std::string address = advertisedDevice.getAddress().toString();
 				this->results[address] = name;

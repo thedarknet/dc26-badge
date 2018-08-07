@@ -233,11 +233,6 @@ void BluetoothTask::scanForDevices(const darknet7::STMToESPRequest* m)
 	darknet7::FinishSizePrefixedESPToSTMBuffer(fbb, of);
 	getMCUToMCU().send(fbb);
 	
-	DisplayTask::DisplayMsg* dmsg2 = new DisplayTask::DisplayMsg();
-	memset(dmsg2->Msg, '0', sizeof(dmsg2->Msg));
-	sprintf(dmsg2->Msg, "Complete");
-	xQueueSend(getDisplayTask().getQueueHandle(), &dmsg2, (TickType_t) 0);
-	
 	return;
 }
 
@@ -248,10 +243,10 @@ void BluetoothTask::pairWithDevice(const darknet7::STMToESPRequest* m)
 	BLEAddress remoteAddr = BLEAddress(addr);
 	this->isActingClient = true;
 
-	DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
-	memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
-	sprintf(dmsg->Msg, "Connecting");
-	xQueueSend(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
+	//DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
+	//memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
+	//sprintf(dmsg->Msg, "Connecting");
+	//xQueueSend(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
 
 	pMySecurity->success = false;
 	pClient->connect(remoteAddr);
@@ -275,10 +270,10 @@ void BluetoothTask::pairWithDevice(const darknet7::STMToESPRequest* m)
 	
 	if (success)
 	{	
-		DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
-		memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
-		sprintf(dmsg->Msg, "Connected");
-		xQueueSend(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
+		//DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
+		//memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
+		//sprintf(dmsg->Msg, "Connected");
+		//xQueueSend(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
 	}
 
 }
@@ -288,10 +283,10 @@ void BluetoothTask::sendPINConfirmation(const darknet7::STMToESPRequest* m)
 	const darknet7::BLESendPINConfirmation* msg = m->Msg_as_BLESendPINConfirmation();
 	pMySecurity->confirmed = msg->confirm();
 	ESP_LOGI(LOGTAG, "Confirmed Pin");
-	DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
-	memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
-	sprintf(dmsg->Msg, "Confirmed");
-	xQueueSend(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
+	//DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
+	//memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
+	//sprintf(dmsg->Msg, "Confirmed");
+	//xQueueSend(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
 }
 
 void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
@@ -305,10 +300,10 @@ void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 	uint8_t temp[23];
 
 
-	DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
-	memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
-	sprintf(dmsg->Msg, "Transmit");
-	xQueueSend(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
+	//DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
+	//memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
+	//sprintf(dmsg->Msg, "Transmit");
+	//xQueueSend(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
 	while (len > 0)
 	{
 		size = (len > 22) ? 22 : len;
@@ -330,12 +325,12 @@ void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 		sent += size;
 		len -= size;
 	}
-	DisplayTask::DisplayMsg* dmsg2 = new DisplayTask::DisplayMsg();
-	memset(dmsg2->Msg, '0', sizeof(dmsg2->Msg));
-	dmsg->y = 40;
-	dmsg->clearScreen = false;
-	sprintf(dmsg2->Msg, "Complete");
-	xQueueSend(getDisplayTask().getQueueHandle(), &dmsg2, (TickType_t) 0);
+	//DisplayTask::DisplayMsg* dmsg2 = new DisplayTask::DisplayMsg();
+	//memset(dmsg2->Msg, '0', sizeof(dmsg2->Msg));
+	//dmsg->y = 40;
+	//dmsg->clearScreen = false;
+	//sprintf(dmsg2->Msg, "Complete");
+	//xQueueSend(getDisplayTask().getQueueHandle(), &dmsg2, (TickType_t) 0);
 }
 
 void BluetoothTask::sendDNPairComplete(const darknet7::STMToESPRequest* m)

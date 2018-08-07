@@ -164,6 +164,9 @@ void BluetoothTask::getInfectionData()
 	uint16_t infections = (man_buf[3] << 8) | (man_buf[4]);
 	uint16_t exposures = pScanCallbacks->getExposures();
 	uint16_t cures = pScanCallbacks->getCures();
+
+	printf("exposures: %04x\n", exposures);
+
 	flatbuffers::FlatBufferBuilder fbb;
 	flatbuffers::Offset<darknet7::ESPToSTM> of;
 	auto infect = darknet7::CreateBLEInfectionData(fbb, infections, exposures, cures);
@@ -184,6 +187,7 @@ void BluetoothTask::setInfectionData(const darknet7::STMToESPRequest* m)
 {
 	const darknet7::BLESetInfectionData* msg = m->Msg_as_BLESetInfectionData();
 	uint16_t idata = msg->vectors();
+	printf("infections: %04x\n", idata);
 	this->man_buf[3] = (char)((idata >> 8) & 0xFF);
 	this->man_buf[4] = (char)(idata & 0xFF);
 	this->refreshAdvertisementData();
@@ -434,7 +438,7 @@ void BluetoothTask::run(void * data)
 		}
 		else
 		{
-			if (loopsSinceScan >= 180)
+			if (loopsSinceScan >= 30)
 			{
 				// this is so we periodically attempt to get infected
 				// scan without filtering anything

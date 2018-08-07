@@ -33,7 +33,7 @@ void SerialCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 			len = 12; // Screens not that big
 
 		DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
-		memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
+		memset(dmsg->Msg, 0, sizeof(dmsg->Msg));
 		memcpy(dmsg->Msg, msgOrig, len);
 		xQueueSendFromISR(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
 	}
@@ -43,10 +43,11 @@ void init_ble_serial(BLEService* pService)
 {
 
 	pCisoChar = pService->createCharacteristic(serialCisoUUID, serialCisoCharProps);
+	sCiso2902.setNotifications(true);
 	pCisoChar->addDescriptor(&sCiso2902);
-	pCisoChar->setCallbacks(&SerialCosiCallbacks);
 
 	pCosiChar = pService->createCharacteristic(serialCosiUUID, serialCosiCharProps);
+	pCosiChar->setCallbacks(&SerialCosiCallbacks);
 	pCosiChar->addDescriptor(&sCosi2902);
 
 }

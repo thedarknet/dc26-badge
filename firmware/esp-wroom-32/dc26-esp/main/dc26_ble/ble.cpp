@@ -396,7 +396,7 @@ void BluetoothTask::run(void * data)
 		}
 		else
 		{
-			if (loopsSinceScan >= 30)
+			if (loopsSinceScan >= 180)
 			{
 				// this is so we periodically attempt to get infected
 				// scan without filtering anything
@@ -434,6 +434,8 @@ bool BluetoothTask::init()
 		{
 			ESP_LOGI("BT Init", "Found Device name %s\n", devName);
 			BLEDevice::init(devName);
+			std::string devNameString(devName);
+			adv_name = devNameString;
 		}
 		else
 		{
@@ -480,6 +482,8 @@ bool BluetoothTask::init()
 	iUartServerCallbacks.isConnected = false;
 	iUartServerCallbacks.pBTTask = this;
 	pServer->setCallbacks(&iUartServerCallbacks);
+	
+	init_ble_serial(pService);
 	pService->start();
 
 	// Setup advertising object
@@ -501,7 +505,6 @@ bool BluetoothTask::init()
 	pScanCallbacks = new MyScanCallbacks();
 	pScan->setAdvertisedDeviceCallbacks(pScanCallbacks);
 
-	init_ble_serial(pService);
 
 	return true;
 }

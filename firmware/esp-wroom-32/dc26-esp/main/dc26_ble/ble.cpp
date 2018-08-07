@@ -3,6 +3,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include <map>
+#include <nvs_flash.h>
 
 // include main dc26 ESP device code for flatbuffers
 #include "../mcu_to_mcu.h"
@@ -150,6 +151,8 @@ void BluetoothTask::setDeviceName(const darknet7::STMToESPRequest* m)
 	const darknet7::BLESetDeviceName* devName = m->Msg_as_BLESetDeviceName();
 	this->adv_name = devName->name()->str();
 	BLEDevice::setDeviceName(this->adv_name);
+	if (this->nvs_file_opened)
+		nvs_set_str(nvs_fp, "devname", this->adv_name.c_str());
 	// TODO: Set badge name from flash
 	this->refreshAdvertisementData();
 }
@@ -416,7 +419,29 @@ bool BluetoothTask::init()
 	STMQueueHandle = xQueueCreateStatic(STM_MSG_QUEUE_SIZE, STM_MSG_ITEM_SIZE,
 										fromSTMBuffer, &STMQueue);
 	// TODO: Get badge name from flash
-	BLEDevice::init("DNDevice");
+	esp_err_t err = nvs_open(BT_CFILE_PATH, NVS_READWRITE, &nvs_fp);
+	char devName[15] = "\0";
+	size_t nameSize = 15;
+	if (err == ESP_OK)
+	{
+		this->nvs_file_opened = true;
+		err = nvs_get_str(nvs_fp, "devname", devName, &nameSize);
+		if (err == ESP_OK)
+		{
+			ESP_LOGI("BT Init", "Found Device name %s\n", devName);
+			BLEDevice::init(devName);
+		}
+		else
+		{
+			ESP_LOGI("BT Init", "Device name not found.  Default to DNDevice\n");
+			BLEDevice::init("DNDevice");
+		}
+	}
+	else
+	{
+		ESP_LOGI("BT Init", "Failed the open the fail.  Default to DNDevice\n");
+		BLEDevice::init("DNDevice");
+	}
 	BLEDevice::setMTU(43);
 
 	BLEDevice::setEncryptionLevel(ESP_BLE_SEC_ENCRYPT);

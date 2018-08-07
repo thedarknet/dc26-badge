@@ -11,6 +11,9 @@
 #include "pairing.h"
 #include "scanning.h"
 #include "security.h"
+#include <nvs_flash.h>
+	
+static const char* BT_CFILE_PATH = "bt_name.conf";
 
 class BluetoothTask : public Task {
 public:
@@ -29,6 +32,10 @@ public:
 	BLECharacteristic *pUartCisoCharacteristic;
 	BLECharacteristic *pUartCosiCharacteristic;
 	BLEAdvertisementData adv_data;
+
+	// nvs handle
+	nvs_handle nvs_fp;
+	bool nvs_file_opened = false;
 
 	// Advertisement data
 	bool advertising_enabled = false;

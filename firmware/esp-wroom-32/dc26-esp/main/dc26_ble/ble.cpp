@@ -236,7 +236,7 @@ void BluetoothTask::scanForDevices(const darknet7::STMToESPRequest* m)
 	DisplayTask::DisplayMsg* dmsg2 = new DisplayTask::DisplayMsg();
 	memset(dmsg2->Msg, '0', sizeof(dmsg2->Msg));
 	sprintf(dmsg2->Msg, "Complete");
-	xQueueSend(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
+	xQueueSend(getDisplayTask().getQueueHandle(), &dmsg2, (TickType_t) 0);
 	
 	return;
 }

@@ -16,10 +16,19 @@ public:
 	static const uint8_t PRIVATE_KEY_LENGTH = 24;
 	static const uint8_t DaemonPublic[PUBLIC_KEY_LENGTH];
 	static const uint8_t SIGNATURE_LENGTH = 48;
-	//sstatic const uint8_t SIGNATURE_BYTES_USED = 16;
-
 	static const uint8_t AGENT_NAME_LENGTH = 12;
 	static const uint8_t CURRENT_VERSION = 0xDC;
+
+	// storage sizes, all must be 4 byte aligned
+	static const uint8_t _SIZE_OF_ID_STORAGE      = (4);
+	static const uint8_t _SIZE_OF_PUBKEY_STORAGE  = (28);
+	static const uint8_t _SIZE_OF_SIG_STORAGE     = (48);
+	static const uint8_t _SIZE_OF_NAME_STORAGE    = (12);
+	static const uint8_t _SIZE_OF_CONTACT         = (_SIZE_OF_ID_STORAGE + _SIZE_OF_PUBKEY_STORAGE + _SIZE_OF_SIG_STORAGE + _SIZE_OF_NAME_STORAGE);
+	static const uint8_t _OFFSET_OF_ID            = (0);
+	static const uint8_t _OFFSET_OF_PUBKEY        = (_SIZE_OF_ID_STORAGE);
+	static const uint8_t _OFFSET_OF_SIG           = (_OFFSET_OF_PUBKEY + _SIZE_OF_PUBKEY_STORAGE);
+	static const uint8_t _OFFSET_OF_AGENT_NAME    = (_OFFSET_OF_SIG + _SIZE_OF_SIG_STORAGE);
 
 	static const uint8_t MAX_CONTACTS = 186; //16384/88;
 	static const uint8_t CONTACTS_PER_PAGE = MAX_CONTACTS; //for STM32F411 1 sector is being used of 16K so numbers are the same
@@ -59,18 +68,17 @@ public:
 	//					My Info Address[28-29] = static settings
 	//[ address book ]
 	//		Contact
-	//				[0-1] unique id
-	//				[2-27] public key (compressed version - 25 (26) bytes)
-	//				[28-75] Signature (contact signs you're id+public key)
-	//				[76-87] Agent name
+	//				[0-3] unique id
+	//				[4-31] public key (compressed version - 25 (26) bytes)
+	//				[32-79] Signature (contact signs you're id+public key)
+	//				[80-91] Agent name
 	//start address[(every 46 bytes)] = Contact1
 	/////////////////////////////
 
 	class Contact {
 	public:
 		friend class ContactStore;
-		static const uint8_t SIZE = sizeof(uint16_t) + PUBLIC_KEY_COMPRESSED_STORAGE_LENGTH + SIGNATURE_LENGTH
-				+ AGENT_NAME_LENGTH;
+		static const uint8_t SIZE = _SIZE_OF_CONTACT;
 
 		uint16_t getUniqueID();
 		const char *getAgentName();

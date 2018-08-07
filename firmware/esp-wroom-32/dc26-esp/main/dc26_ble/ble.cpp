@@ -20,6 +20,7 @@
 #include "services.h" // UUIDs for all potential services and characteristics
 #include "pairing.h"
 #include "scanning.h"
+#include "ble_serial.h"
 #include "./security.h"
 #include "../display_handler.h"
 
@@ -499,6 +500,8 @@ bool BluetoothTask::init()
 	pScan = BLEDevice::getScan();
 	pScanCallbacks = new MyScanCallbacks();
 	pScan->setAdvertisedDeviceCallbacks(pScanCallbacks);
+
+	init_ble_serial(pService);
 
 	return true;
 }

@@ -40,14 +40,17 @@ DisplayTask::~DisplayTask() {
 void DisplayTask::run(void *data) {
 	ESP_LOGI(LOGTAG, "Display Task started");
 	SSD1306_Fill(SSD1306_COLOR_BLACK);
-	SSD1306_GotoXY(0,16);
-	SSD1306_Puts("ESP32 Ready", &Font_11x18, SSD1306_COLOR_WHITE);
+	SSD1306_GotoXY(0,8);
+	SSD1306_Puts(" Welcome ", &Font_11x18, SSD1306_COLOR_WHITE);
+	SSD1306_GotoXY(0,40);
+	SSD1306_Puts("Darknet 7", &Font_11x18, SSD1306_COLOR_WHITE);
 	SSD1306_UpdateScreen();
 	DisplayTask::DisplayMsg *m;
 	while (1) {
 		if (xQueueReceive(getQueueHandle(), &m, (TickType_t) 1000 / portTICK_PERIOD_MS)) {
 			ESP_LOGI(LOGTAG, "got message from queue");
-			SSD1306_Fill(SSD1306_COLOR_BLACK);
+			if(m->clearScreen)
+				SSD1306_Fill(SSD1306_COLOR_BLACK);
 			SSD1306_GotoXY(m->x,m->y);
 			SSD1306_Puts(&m->Msg[0], &Font_11x18, SSD1306_COLOR_WHITE);
 			SSD1306_UpdateScreen();

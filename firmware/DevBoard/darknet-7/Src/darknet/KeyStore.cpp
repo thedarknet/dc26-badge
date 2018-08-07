@@ -61,8 +61,10 @@ void ContactStore::SettingsInfo::receiveSignal(MCUToMCU*, const MSGEvent<darknet
 	this->setHealth(infections);
 
 	//Uncomment this to infect other people
+	//infections = DarkNet7::get().getContacts().getSettings().getHealth();
+	//infections &= 0x0; // TODO: Mask off everything except measels and...?
 	//flatbuffers::FlatBufferBuilder fbb;
-	//auto r = darknet7::CreateBLESetInfectionData(fbb, DarkNet7::get().getContacts().getSettings().getHealth());
+	//auto r = darknet7::CreateBLESetInfectionData(fbb, infections);
 	//auto e = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESetInfectionData, r.Union());
 	//darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb,e);
 	//MCUToMCU::get().send(fbb);

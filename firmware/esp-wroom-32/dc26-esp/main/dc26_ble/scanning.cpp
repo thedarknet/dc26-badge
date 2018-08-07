@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <string.h>
+#include "../dc26.h"
 #include "ble.h"
 #include "scanning.h"
 #include <map>
 #include "../common_generated.h"
 #include "../lib/ble/BLEDevice.h"
-
+#include "../display_handler.h"
 
 void MyScanCallbacks::reset(void)
 {
@@ -45,8 +46,17 @@ void MyScanCallbacks::setFilter(uint8_t val)
 	this->filter = val;
 }
 
+static int i = 0;
+static char scanMsg[] = "............";
 void MyScanCallbacks::onResult(BLEAdvertisedDevice advertisedDevice)
 {
+	DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
+	memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
+	dmsg->y = 40;
+	dmsg->clearScreen = false;
+	memcpy(dmsg->Msg, scanMsg, i);
+	xQueueSendFromISR(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
+	i %= sizeof(scanMsg);
 	// filter out DC26 devices only
 	if (advertisedDevice.haveAppearance() &&
 		advertisedDevice.getAppearance() == 0x26DC)
@@ -86,8 +96,8 @@ void MyScanCallbacks::onResult(BLEAdvertisedDevice advertisedDevice)
 				this->RSSIs.erase(smallest);
 				std::string name = advertisedDevice.getName();
 				std::string address = advertisedDevice.getAddress().toString();
-				this->results[name] = address;
-				this->RSSIs[name] = rssi;
+				this->results[address] = name;
+				this->RSSIs[address] = rssi;
 				// Find the new smallest entry
 				int small_rssi = 0x7FFFFFFF;
 				for (const auto &p : this->RSSIs)
@@ -96,6 +106,11 @@ void MyScanCallbacks::onResult(BLEAdvertisedDevice advertisedDevice)
 			}
 			else
 			{
+				DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
+				memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
+				sprintf(dmsg->Msg, "Scanning");
+				xQueueSendFromISR(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
+
 				std::string name = advertisedDevice.getName();
 				std::string address = advertisedDevice.getAddress().toString();
 				this->results[address] = name;

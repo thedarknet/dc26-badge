@@ -36,20 +36,17 @@ bool MySecurity::onConfirmPIN(uint32_t pass_key)
 	this->success = false;
 	DisplayTask::DisplayMsg* dmsg = new DisplayTask::DisplayMsg();
 	memset(dmsg->Msg, '0', sizeof(dmsg->Msg));
-
-	sprintf(dmsg->Msg, "%u", pass_key);
+	dmsg->y = 40;
+	dmsg->clearScreen = false;
+	sprintf(dmsg->Msg, "PIN: %u", pass_key);
 	ESP_LOGI(SECTAG, "onConfirmPin: %s", dmsg->Msg);
 	xQueueSendFromISR(getDisplayTask().getQueueHandle(), &dmsg, (TickType_t) 0);
 
 	// Client side doesn't like being interrupted like this, just have server confirm
 	if (pBTTask->isActingClient)
-	{
 		return true;
-	}
 	else
-	{
 		pBTTask->pScan->stop(); // potential race conditiong O_O
-	}
 
 	// Send to STM, get back confirmation
 	flatbuffers::FlatBufferBuilder fbb;

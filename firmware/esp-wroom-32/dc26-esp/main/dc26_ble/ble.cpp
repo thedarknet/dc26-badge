@@ -287,19 +287,30 @@ void BluetoothTask::sendDataToDevice(const darknet7::STMToESPRequest* m)
 		memcpy(&temp[1], &buf[sent], size);
 		if (iUartClientCallbacks.isConnected)
 		{
-			//printf("sending dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
 			if (iUartClientCallbacks.setup)
 				iUartClientCallbacks.pTxChar->writeValue(temp, size + 1);
 		}
 		else if (iUartServerCallbacks.isConnected)
 		{
-			//printf("sending dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
 			pUartCisoCharacteristic->setValue(temp, size + 1);
 			pUartCisoCharacteristic->notify();
 		}
 		sent += size;
 		len -= size;
 	}
+}
+
+void BluetoothTask::sendDisplayMessage(const darknet7::STMToESPRequest* m)
+{
+	const darknet7::BLESendDisplayMessage* msg = m->Msg_as_BLESendDisplayMessage();
+	std::string buffer = msg->data()->str();
+	int len = buffer.length();
+	const char* buf = buffer.c_str();
+	if (len > 12)
+		len = 12;
+
+	if (iUartClientCallbacks.displayChar != nullptr)
+		iUartClientCallbacks.displayChar->writeValue(buf, len);
 }
 
 void BluetoothTask::sendDNPairComplete(const darknet7::STMToESPRequest* m)
@@ -358,6 +369,9 @@ void BluetoothTask::commandHandler(MCUToMCUTask::Message* msg)
 			break;
 		case darknet7::STMToESPAny_BLESendDataToDevice:
 			this->sendDataToDevice(m);
+			break;
+		case darknet7::STMToESPAny_BLESendDisplayMessage:
+			this->sendDisplayMessage(m);
 			break;
 		case darknet7::STMToESPAny_BLESendDNPairComplete:
 			this->sendDNPairComplete(m);

@@ -38,6 +38,7 @@ public:
 	BLERemoteService *pRemoteService;
 	BLERemoteCharacteristic *pTxChar;
 	BLERemoteCharacteristic *pRxChar;
+	BLERemoteCharacteristic *displayChar;
 	bool isConnected = false;
 	bool setup = false;
 public:

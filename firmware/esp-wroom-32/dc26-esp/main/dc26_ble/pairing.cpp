@@ -22,6 +22,7 @@ void UartClientCallbacks::onConnect(BLEClient* client)
 	ESP_LOGI(PAIR_CLIENT_TAG, "connected to server");
 	isConnected = true;
 	pClient = client;
+	displayChar = nullptr;
 }
 
 void UartClientCallbacks::afterConnect()
@@ -48,6 +49,10 @@ void UartClientCallbacks::afterConnect()
 		ESP_LOGE(PAIR_CLIENT_TAG, "second char finding error");
 		return;
 	}
+
+	displayChar = pRemoteService->getCharacteristic(serialCosiUUID);
+	if (displayChar == nullptr)
+		ESP_LOGE(PAIR_CLIENT_TAG, "Display client characteristic doesn't exit");
 	
 	ESP_LOGI(PAIR_CLIENT_TAG, "Setup Complete");
 	this->setup = true;
@@ -59,6 +64,7 @@ void UartClientCallbacks::onDisconnect(BLEClient* client)
 	ESP_LOGI(PAIR_CLIENT_TAG, "disconnected");
 	pBTTask->isActingClient = false;
 	isConnected = false;
+	displayChar = nullptr;
 }
 
 int aliceMessage = 1;

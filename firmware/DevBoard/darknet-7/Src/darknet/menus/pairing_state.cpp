@@ -410,6 +410,13 @@ StateBase::ReturnStateContext PairingState::onRun() {
 	}
 	else if (InternalState == PAIRING_COMPLETE)
 	{
+		auto sdata = fbb.CreateString(DarkNet7::get().getContacts().getSettings().getAgentName());
+		DarkNet7::get().getDisplay().drawString(5,60,(const char *)"Booping", cmdc0de::RGBColor::WHITE);
+		auto q = darknet7::CreateBLESendDisplayMessage(fbb, sdata);
+		auto t = darknet7::CreateSTMToESPRequest(fbb, 0, darknet7::STMToESPAny_BLESendDisplayMessage, q.Union());
+		darknet7::FinishSizePrefixedSTMToESPRequestBuffer(fbb, t);
+		MCUToMCU::get().send(fbb);
+
 		auto r = darknet7::CreateBLEDisconnect(fbb);
 		this->ESPRequestID = DarkNet7::get().nextSeq();
 		auto e = darknet7::CreateSTMToESPRequest(fbb, ESPRequestID, darknet7::STMToESPAny_BLEDisconnect, r.Union());

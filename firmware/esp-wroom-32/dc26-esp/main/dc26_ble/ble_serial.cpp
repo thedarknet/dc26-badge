@@ -2,6 +2,8 @@
 #include <string.h>
 #include "ble.h"
 #include "ble_serial.h"
+#include "services.h"
+
 #include "../dc26.h"
 #include "../display_handler.h"
 #include "../lib/ble/BLEDevice.h"
@@ -12,15 +14,6 @@ BLE2902 sCosi2902;
 BLE2902 sCiso2902;
 BLECharacteristic* pCosiChar;
 BLECharacteristic* pCisoChar;
-
-#define SERIAL_CISO_UUID   "646e0012-0001-0002-0003-000000000001"
-#define SERIAL_COSI_UUID   "646e0012-0001-0002-0003-000000000002"
-static BLEUUID serialCisoUUID(SERIAL_CISO_UUID);
-static BLEUUID serialCosiUUID(SERIAL_COSI_UUID);
-#define serialCisoCharProps (BLECharacteristic::PROPERTY_READ | \
-                           BLECharacteristic::PROPERTY_NOTIFY)
-#define serialCosiCharProps (BLECharacteristic::PROPERTY_WRITE)
-
 
 void SerialCosiCharCallbacks::onWrite(BLECharacteristic *pCharacteristic)
 {

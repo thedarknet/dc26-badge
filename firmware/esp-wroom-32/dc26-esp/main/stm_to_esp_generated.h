@@ -40,6 +40,8 @@ struct BLESendPINConfirmation;
 
 struct BLESendDataToDevice;
 
+struct BLESendDisplayMessage;
+
 struct BLESendDNPairComplete;
 
 struct BLEDisconnect;
@@ -66,15 +68,16 @@ enum STMToESPAny {
   STMToESPAny_BLEPairWithDevice = 14,
   STMToESPAny_BLESendPINConfirmation = 15,
   STMToESPAny_BLESendDataToDevice = 16,
-  STMToESPAny_BLESendDNPairComplete = 17,
-  STMToESPAny_BLEDisconnect = 18,
-  STMToESPAny_WiFiScan = 19,
-  STMToESPAny_WiFiNPCInteract = 20,
+  STMToESPAny_BLESendDisplayMessage = 17,
+  STMToESPAny_BLESendDNPairComplete = 18,
+  STMToESPAny_BLEDisconnect = 19,
+  STMToESPAny_WiFiScan = 20,
+  STMToESPAny_WiFiNPCInteract = 21,
   STMToESPAny_MIN = STMToESPAny_NONE,
   STMToESPAny_MAX = STMToESPAny_WiFiNPCInteract
 };
 
-inline const STMToESPAny (&EnumValuesSTMToESPAny())[21] {
+inline const STMToESPAny (&EnumValuesSTMToESPAny())[22] {
   static const STMToESPAny values[] = {
     STMToESPAny_NONE,
     STMToESPAny_SetupAP,
@@ -93,6 +96,7 @@ inline const STMToESPAny (&EnumValuesSTMToESPAny())[21] {
     STMToESPAny_BLEPairWithDevice,
     STMToESPAny_BLESendPINConfirmation,
     STMToESPAny_BLESendDataToDevice,
+    STMToESPAny_BLESendDisplayMessage,
     STMToESPAny_BLESendDNPairComplete,
     STMToESPAny_BLEDisconnect,
     STMToESPAny_WiFiScan,
@@ -120,6 +124,7 @@ inline const char * const *EnumNamesSTMToESPAny() {
     "BLEPairWithDevice",
     "BLESendPINConfirmation",
     "BLESendDataToDevice",
+    "BLESendDisplayMessage",
     "BLESendDNPairComplete",
     "BLEDisconnect",
     "WiFiScan",
@@ -200,6 +205,10 @@ template<> struct STMToESPAnyTraits<BLESendPINConfirmation> {
 
 template<> struct STMToESPAnyTraits<BLESendDataToDevice> {
   static const STMToESPAny enum_value = STMToESPAny_BLESendDataToDevice;
+};
+
+template<> struct STMToESPAnyTraits<BLESendDisplayMessage> {
+  static const STMToESPAny enum_value = STMToESPAny_BLESendDisplayMessage;
 };
 
 template<> struct STMToESPAnyTraits<BLESendDNPairComplete> {
@@ -932,6 +941,55 @@ inline flatbuffers::Offset<BLESendDataToDevice> CreateBLESendDataToDeviceDirect(
       data ? _fbb.CreateString(data) : 0);
 }
 
+struct BLESendDisplayMessage FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  enum {
+    VT_DATA = 4
+  };
+  const flatbuffers::String *data() const {
+    return GetPointer<const flatbuffers::String *>(VT_DATA);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_DATA) &&
+           verifier.Verify(data()) &&
+           verifier.EndTable();
+  }
+};
+
+struct BLESendDisplayMessageBuilder {
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_data(flatbuffers::Offset<flatbuffers::String> data) {
+    fbb_.AddOffset(BLESendDisplayMessage::VT_DATA, data);
+  }
+  explicit BLESendDisplayMessageBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  BLESendDisplayMessageBuilder &operator=(const BLESendDisplayMessageBuilder &);
+  flatbuffers::Offset<BLESendDisplayMessage> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<BLESendDisplayMessage>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<BLESendDisplayMessage> CreateBLESendDisplayMessage(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> data = 0) {
+  BLESendDisplayMessageBuilder builder_(_fbb);
+  builder_.add_data(data);
+  return builder_.Finish();
+}
+
+inline flatbuffers::Offset<BLESendDisplayMessage> CreateBLESendDisplayMessageDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *data = nullptr) {
+  return darknet7::CreateBLESendDisplayMessage(
+      _fbb,
+      data ? _fbb.CreateString(data) : 0);
+}
+
 struct BLESendDNPairComplete FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1092,6 +1150,9 @@ struct STMToESPRequest FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const BLESendDataToDevice *Msg_as_BLESendDataToDevice() const {
     return Msg_type() == STMToESPAny_BLESendDataToDevice ? static_cast<const BLESendDataToDevice *>(Msg()) : nullptr;
   }
+  const BLESendDisplayMessage *Msg_as_BLESendDisplayMessage() const {
+    return Msg_type() == STMToESPAny_BLESendDisplayMessage ? static_cast<const BLESendDisplayMessage *>(Msg()) : nullptr;
+  }
   const BLESendDNPairComplete *Msg_as_BLESendDNPairComplete() const {
     return Msg_type() == STMToESPAny_BLESendDNPairComplete ? static_cast<const BLESendDNPairComplete *>(Msg()) : nullptr;
   }
@@ -1176,6 +1237,10 @@ template<> inline const BLESendPINConfirmation *STMToESPRequest::Msg_as<BLESendP
 
 template<> inline const BLESendDataToDevice *STMToESPRequest::Msg_as<BLESendDataToDevice>() const {
   return Msg_as_BLESendDataToDevice();
+}
+
+template<> inline const BLESendDisplayMessage *STMToESPRequest::Msg_as<BLESendDisplayMessage>() const {
+  return Msg_as_BLESendDisplayMessage();
 }
 
 template<> inline const BLESendDNPairComplete *STMToESPRequest::Msg_as<BLESendDNPairComplete>() const {
@@ -1297,6 +1362,10 @@ inline bool VerifySTMToESPAny(flatbuffers::Verifier &verifier, const void *obj, 
     }
     case STMToESPAny_BLESendDataToDevice: {
       auto ptr = reinterpret_cast<const BLESendDataToDevice *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case STMToESPAny_BLESendDisplayMessage: {
+      auto ptr = reinterpret_cast<const BLESendDisplayMessage *>(obj);
       return verifier.VerifyTable(ptr);
     }
     case STMToESPAny_BLESendDNPairComplete: {

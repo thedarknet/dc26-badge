@@ -184,18 +184,19 @@ int32_t MCUToMCUTask::processMessage(const uint8_t *data, uint32_t size) {
 				xQueueSend(CmdHandler->getQueueHandle(), (void* )&m,(TickType_t ) 0);
 				ESP_LOGI(LOGTAG, "after send to cmd handler");
 				break;
-	     	case darknet7::STMToESPAny_BLEAdvertise:
-        	case darknet7::STMToESPAny_BLESetDeviceName:
-        	case darknet7::STMToESPAny_BLEGetInfectionData:
-        	case darknet7::STMToESPAny_BLESetExposureData:
-        	case darknet7::STMToESPAny_BLESetInfectionData:
-        	case darknet7::STMToESPAny_BLESetCureData:
-        	case darknet7::STMToESPAny_BLEScanForDevices:
-        	case darknet7::STMToESPAny_BLEPairWithDevice:
-        	case darknet7::STMToESPAny_BLESendPINConfirmation:
-        	case darknet7::STMToESPAny_BLESendDataToDevice:
+			case darknet7::STMToESPAny_BLEAdvertise:
+		case darknet7::STMToESPAny_BLESetDeviceName:
+			case darknet7::STMToESPAny_BLEGetInfectionData:
+			case darknet7::STMToESPAny_BLESetExposureData:
+			case darknet7::STMToESPAny_BLESetInfectionData:
+			case darknet7::STMToESPAny_BLESetCureData:
+			case darknet7::STMToESPAny_BLEScanForDevices:
+			case darknet7::STMToESPAny_BLEPairWithDevice:
+			case darknet7::STMToESPAny_BLESendPINConfirmation:
+			case darknet7::STMToESPAny_BLESendDataToDevice:
+			case darknet7::STMToESPAny_BLESendDisplayMessage:
 			case darknet7::STMToESPAny_BLESendDNPairComplete:
-	        	case darknet7::STMToESPAny_BLEDisconnect:
+			case darknet7::STMToESPAny_BLEDisconnect:
 				ESP_LOGI(LOGTAG, "sending to bluetooth task");
 				xQueueSend(getBLETask().getQueueHandle(), (void*)&m, (TickType_t) 0);
 				ESP_LOGI(LOGTAG, "after send to bluetooth task");

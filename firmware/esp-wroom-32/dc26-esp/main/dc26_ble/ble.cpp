@@ -20,6 +20,7 @@
 #include "services.h" // UUIDs for all potential services and characteristics
 #include "pairing.h"
 #include "scanning.h"
+#include "ble_serial.h"
 #include "./security.h"
 #include "../display_handler.h"
 
@@ -433,6 +434,8 @@ bool BluetoothTask::init()
 		{
 			ESP_LOGI("BT Init", "Found Device name %s\n", devName);
 			BLEDevice::init(devName);
+			std::string devNameString(devName);
+			adv_name = devNameString;
 		}
 		else
 		{
@@ -479,6 +482,8 @@ bool BluetoothTask::init()
 	iUartServerCallbacks.isConnected = false;
 	iUartServerCallbacks.pBTTask = this;
 	pServer->setCallbacks(&iUartServerCallbacks);
+	
+	init_ble_serial(pService);
 	pService->start();
 
 	// Setup advertising object
@@ -499,6 +504,7 @@ bool BluetoothTask::init()
 	pScan = BLEDevice::getScan();
 	pScanCallbacks = new MyScanCallbacks();
 	pScan->setAdvertisedDeviceCallbacks(pScanCallbacks);
+
 
 	return true;
 }

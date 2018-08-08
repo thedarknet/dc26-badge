@@ -305,11 +305,11 @@ uint16_t ContactStore::Contact::getUniqueID() {
 }
 
 const char *ContactStore::Contact::getAgentName() {
-	return ((char*) (StartAddress + sizeof(uint16_t) + PUBLIC_KEY_COMPRESSED_STORAGE_LENGTH + SIGNATURE_LENGTH));
+	return ((char*) (StartAddress + _OFFSET_OF_AGENT_NAME));
 }
 
 uint8_t *ContactStore::Contact::getCompressedPublicKey() {
-	return ((uint8_t*) (StartAddress + sizeof(uint16_t)));
+	return ((uint8_t*) (StartAddress + _OFFSET_OF_PUBKEY));
 }
 
 void ContactStore::Contact::getUnCompressedPublicKey(uint8_t key[PUBLIC_KEY_LENGTH]) {
@@ -317,7 +317,7 @@ void ContactStore::Contact::getUnCompressedPublicKey(uint8_t key[PUBLIC_KEY_LENG
 }
 
 uint8_t *ContactStore::Contact::getPairingSignature() {
-	return ((uint8_t*) (StartAddress + sizeof(uint16_t) + PUBLIC_KEY_COMPRESSED_STORAGE_LENGTH));
+	return ((uint8_t*) (StartAddress + _OFFSET_OF_SIG));
 }
 
 void ContactStore::Contact::setUniqueID(uint16_t id) {
@@ -328,14 +328,14 @@ void ContactStore::Contact::setUniqueID(uint16_t id) {
 void ContactStore::Contact::setAgentname(const char name[AGENT_NAME_LENGTH]) {
 	//int len = strlen(name);
 	FLASH_LOCKER f;
-	uint32_t s = StartAddress + sizeof(uint16_t) + PUBLIC_KEY_COMPRESSED_STORAGE_LENGTH + SIGNATURE_LENGTH;
+	uint32_t s = StartAddress + _OFFSET_OF_AGENT_NAME;
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s, (*((uint32_t *) &name[0])));
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 4, (*((uint32_t *) &name[4])));
 	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s + 8, (*((uint32_t *) &name[8])));
 }
 
 void ContactStore::Contact::setCompressedPublicKey(const uint8_t key1[PUBLIC_KEY_COMPRESSED_LENGTH]) {
-	uint32_t s = StartAddress + sizeof(uint16_t);
+	uint32_t s = StartAddress + _OFFSET_OF_PUBKEY;
 	uint8_t key[PUBLIC_KEY_COMPRESSED_STORAGE_LENGTH];
 	memset(&key[0], 0, sizeof(key)); //set array to 0
 	memcpy(&key[0], &key1[0], PUBLIC_KEY_COMPRESSED_LENGTH); //copy over just the 25 bytes of the compressed public key
@@ -351,7 +351,7 @@ void ContactStore::Contact::setCompressedPublicKey(const uint8_t key1[PUBLIC_KEY
 }
 
 void ContactStore::Contact::setPairingSignature(const uint8_t sig[SIGNATURE_LENGTH]) {
-	uint32_t s = StartAddress + sizeof(uint16_t) + PUBLIC_KEY_COMPRESSED_STORAGE_LENGTH;
+	uint32_t s = StartAddress + _OFFSET_OF_SIG;
 	FLASH_LOCKER f;
 	//for(uint32_t i=0;i<sizeof(sig);i+=4) {
 	//	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, s+i, (*((uint32_t *) &sig[i])));

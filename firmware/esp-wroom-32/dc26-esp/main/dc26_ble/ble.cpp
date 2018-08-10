@@ -25,6 +25,7 @@
 #include "../display_handler.h"
 
 const char *BluetoothTask::LOGTAG = "BluetoothTask";
+static const char* BT_CFILE_PATH = "bt_name.conf";
 
 // We need a global reference so that we can access the callback message queue
 // from a static function

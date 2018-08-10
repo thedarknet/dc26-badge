@@ -12,6 +12,7 @@ flashfatfs: $(SDKCONFIG_MAKEFILE) mkfatfs
 	@echo "$(ESPTOOLPY_WRITE_FLASH)"
 	$(MKFATFS_COMPONENT_PATH)/../mkfatfs/src/$(MKFATFS_BIN) -c $(FATFS_IMAGE_COMPONENT_PATH)/image -s $(CONFIG_FATFS_SIZE) $(BUILD_DIR_BASE)/fatfs_image.img
 	@echo $(ESPTOOLPY_WRITE_FLASH) $(CONFIG_FATFS_BASE_ADDR) $(BUILD_DIR_BASE)/fatfs_image.img
+	$(ESPTOOLPY_WRITE_FLASH) $(CONFIG_FATFS_BASE_ADDR) $(BUILD_DIR_BASE)/fatfs_image.img
 
 makefatfs: $(SDKCONFIG_MAKEFILE) mkfatfs
 	@echo "Making fatfs image ..."

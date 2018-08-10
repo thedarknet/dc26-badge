@@ -52,7 +52,7 @@ HttpServer::~HttpServer() {
  */
 class HttpServerTask: public Task {
 public:
-	HttpServerTask(std::string name): Task(name, 16*1024) {
+	HttpServerTask(std::string name): Task(name, 13*1024) {
 		m_pHttpServer = nullptr;
 	};
 
@@ -136,7 +136,7 @@ private:
 		Socket clientSocket;
 		while(1) {   // Loop forever.
 
-			ESP_LOGD("HttpServerTask", "Waiting for new peer client");
+			ESP_LOGI("HttpServerTask", "Waiting for new peer client");
 
 			try {
 				clientSocket = m_pHttpServer->m_socket.accept();   // Block waiting for a new external client connection.

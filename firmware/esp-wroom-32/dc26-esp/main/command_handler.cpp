@@ -8,6 +8,7 @@
 #include "dc26.h"
 #include "dc26_ble/ble.h"
 #include "npc_interact.h"
+#include "display_handler.h"
 
 static NPCInteractionTask NPCITask("NPCInteractTask");
 static HttpServer Port80WebServer;
@@ -24,12 +25,14 @@ public:
 	}
 	virtual esp_err_t apStart() {
 		ESP_LOGI(logTag, "MyWiFiEventHandler(Class): apStart starting web server");
+		getDisplayTask().showMessage("starting AP!", 0, 16, 2000);
 		//Port80WebServer.start(80,false);
 		APStarted = true;
 		return ESP_OK;
 	}
 	virtual esp_err_t apStop() {
 		ESP_LOGI(logTag, "MyWiFiEventHandler(Class): apStop stopping web server");
+		getDisplayTask().showMessage("stopping AP!", 0, 16, 2000);
 		//Port80WebServer.stop();
 		APStarted = false;
 		return ESP_OK;
@@ -39,11 +42,13 @@ public:
 		return ESP_OK;
 	}
 	virtual esp_err_t staConnected(system_event_sta_connected_t info) {
+		getDisplayTask().showMessage("Connected!", 0, 16, 2000);
 		std::string s((const char *)&info.ssid[0],info.ssid_len);
 		ESP_LOGI(logTag,"Connected to: %s on channel %d",s.c_str(), (int)info.channel);
 		return ESP_OK;
 	}
 	virtual esp_err_t staDisconnected(system_event_sta_disconnected_t info) {
+		getDisplayTask().showMessage("Disconnected!", 0, 16, 2000);
 		return ESP_OK;
 	}
 	darknet7::WifiMode convertToWiFiAuthMode(uint16_t authMode) {
@@ -240,6 +245,7 @@ void CmdHandlerTask::run(void *data) {
 					break;
 			case darknet7::STMToESPAny_WiFiScan: {
 					ESP_LOGI(LOGTAG, "processing wifi scan");
+					getDisplayTask().showMessage("Scanning!", 0, 16, 2000);
 					MyWiFiEventHandler *eh = (MyWiFiEventHandler*)wifi.getWifiEventHandler();
 					const darknet7::WiFiScan * ws = msg->Msg_as_WiFiScan();
 					if(eh) {

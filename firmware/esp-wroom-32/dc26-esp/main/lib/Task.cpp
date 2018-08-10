@@ -55,9 +55,9 @@ void Task::delay(int ms) {
  */
 void Task::runTask(void* pTaskInstance) {
 	Task* pTask = (Task*)pTaskInstance;
-	ESP_LOGD(tag, ">> runTask: taskName=%s", pTask->m_taskName.c_str());
+	ESP_LOGI(tag, ">> runTask: taskName=%s", pTask->m_taskName.c_str());
 	pTask->run(pTask->m_taskData);
-	ESP_LOGD(tag, "<< runTask: taskName=%s", pTask->m_taskName.c_str());
+	ESP_LOGI(tag, "<< runTask: taskName=%s", pTask->m_taskName.c_str());
 	pTask->stop();
 } // runTask
 
@@ -71,6 +71,7 @@ void Task::start(void* taskData) {
 	if (m_handle != nullptr) {
 		ESP_LOGW(tag, "Task::start - There might be a task already running!");
 	}
+	ESP_LOGI(tag, ">> runstart: taskName=%s", m_taskName.c_str());
 	m_taskData = taskData;
 	::xTaskCreatePinnedToCore(&runTask, m_taskName.c_str(), m_stackSize, this, m_priority, &m_handle, m_coreId);
 	onStart();

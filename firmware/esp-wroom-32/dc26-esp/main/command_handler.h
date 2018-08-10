@@ -14,7 +14,7 @@ public:
 	static const int STM_TO_ESP_MSG_ITEM_SIZE = sizeof(MCUToMCUTask::Message*);
 	static const char *LOGTAG;
 public:
-	CmdHandlerTask(const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);
+	CmdHandlerTask(const std::string &tName, uint16_t stackSize=4196, uint8_t p=5);
 	bool init();
 	QueueHandle_t getQueueHandle() {return InCommingQueueHandle;}
 public:

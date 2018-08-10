@@ -52,11 +52,11 @@ public:
 		friend class MCUToMCUTask;
 	};
 public:
-	static const int ESP_TO_STM_MSG_QUEUE_SIZE = 5;
+	static const int ESP_TO_STM_MSG_QUEUE_SIZE = 4;
 	static const int ESP_TO_STM_MSG_ITEM_SIZE = sizeof(Message *);
 	static const char *LOGTAG;
 public:
-	MCUToMCUTask(CmdHandlerTask *pch, const std::string &tName, uint16_t stackSize=10000, uint8_t p=5);
+	MCUToMCUTask(CmdHandlerTask *pch, const std::string &tName, uint16_t stackSize=6000, uint8_t p=5);
 	bool init(gpio_num_t tx, gpio_num_t rx, uint16_t rxBufSize);
 	int32_t processMessage(const uint8_t *data, uint32_t size);
 	//uint16_t getBufferSize() {return BufSize;}

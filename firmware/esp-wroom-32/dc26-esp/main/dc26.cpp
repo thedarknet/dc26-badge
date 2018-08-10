@@ -60,13 +60,11 @@ static void gpio_task_example(void* arg) {
 		if(xQueueReceive(gpio_evt_queue, &io_num, portMAX_DELAY)) {
 			uint32_t level = (uint32_t) gpio_get_level((gpio_num_t)io_num);
 			printf("GPIO[%d] intr, val: %d\n", io_num, level);
-			SSD1306_Fill(SSD1306_COLOR_BLACK);
-			SSD1306_GotoXY(0,16);
-			SSD1306_Puts("1233456778", &Font_11x18, SSD1306_COLOR_WHITE);
-			SSD1306_UpdateScreen();
 			//build test message
 			System::logSystemInfo();
-
+			char buf[32] = {'\0'};
+			sprintf(&buf[0],"Free Mem: %u", System::getFreeHeapSize());
+			getDisplayTask().showMessage(&buf[0],0,16,4000);
 		}
 		vTaskDelay(1000 / portTICK_RATE_MS);
 	}
@@ -89,7 +87,7 @@ void initButton() {
 	gpio_config(&io_conf);
 	gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
 	//start gpio task
-	xTaskCreate(gpio_task_example, "gpio_task_example", 6048, NULL, 10, NULL);
+	xTaskCreate(gpio_task_example, "gpio_task_example", 2048, NULL, 10, NULL);
 	gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
 	//hook isr handler for specific gpio pin
 	gpio_isr_handler_add(GPIO_NUM_0, gpio_isr_handler, (void*) GPIO_INPUT_IO_0);

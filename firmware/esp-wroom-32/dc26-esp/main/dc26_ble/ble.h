@@ -13,7 +13,6 @@
 #include "security.h"
 #include <nvs_flash.h>
 	
-static const char* BT_CFILE_PATH = "bt_name.conf";
 
 class BluetoothTask : public Task {
 public:

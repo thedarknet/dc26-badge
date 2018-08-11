@@ -63,7 +63,7 @@ static void gpio_task_example(void* arg) {
 			//build test message
 			System::logSystemInfo();
 			char buf[32] = {'\0'};
-			sprintf(&buf[0],"Free Mem: %u", System::getFreeHeapSize());
+			sprintf(&buf[0],"FMem: %u", System::getFreeHeapSize());
 			getDisplayTask().showMessage(&buf[0],0,16,4000);
 		}
 		vTaskDelay(1000 / portTICK_RATE_MS);
